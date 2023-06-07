@@ -1,0 +1,38 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+	<div class="row">
+		<div class="col-12">
+			<div class="span6">
+				<div class="hero-unit">
+					<h2>Por favor actualice sus datos antes de continuar</h2>
+				</div>
+			</div>
+		</div>
+		<div class="col-12">
+			{{=form}}
+		</div>
+	</div>
+</div>
+
+{{block page_js}}
+<script>
+	window.page = "update_data";
+	$('#update_data').click(function() {
+        console.log("?")
+		if($('#working').prop('checked')) {
+			let validation = $('#work_address').val() == "" 
+                            && $('#company_name').val() == "" 
+                            && $('#work_phone').val() == ""
+            if(validation) {
+				alert("{{=T('Please fill working information fields')}}");
+				return false;	
+			}
+		}
+
+		if($('#home_address').val() == "") {
+			alert("{{=T('Please fill home address field')}}");
+			return false;	
+		}
+	});
+</script>
+{{end page_js}}

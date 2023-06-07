@@ -1,0 +1,42 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h3>Asignacion de Horario</h3>
+        </div>
+        {{if create_button:}}
+            <div class="col-12 mt-3 well">
+                <div class="table-responsive">
+                    <table>
+                        <tr><td>{{=create_button}}</td></tr>
+                        <tr><td>{{=tutor_search_form}}</td></tr>
+                        <tr><td>{{=tutor_information_table}}</td></tr>
+                        <tr><td>{{=assignation_schedule_table}}</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-12 mt-3 well">
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <td>{{=create_day_schedule_button}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{=list_schedules}}</td>
+                        </tr>
+                        <tr>
+                            <td>{{=day_schedule_table}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-12 mt-3 well">
+                <div class="table-responsive">
+                    {{=enable_assignation_form}}
+                </div>
+            </div>
+        {{else: }}
+            <h1>No hay información</h1>
+        {{pass}}
+    </div>
+</div>

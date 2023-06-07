@@ -1,0 +1,229 @@
+{{extend 'dashboard.html'}}
+<div class="row-fluid">
+  <div class="well span12" style="overflow: auto">
+    <a onclick="window.history.back()" class="btn btn-primary"
+      ><i class="icon-arrow-left"></i> Back</a
+    >
+    <a
+      class="btn btn-success pull-right"
+      onclick="tableToExcel('report-filter','');"
+    >
+      <i class="icon-download icon-white"></i>
+      {{=T('Excel (XLS)')}}
+    </a>
+    {{if not status_instance:}}
+    <h1>{{=T('All')}}</h1>
+    {{else:}}
+    <h1>
+      <i class="{{=status_instance.icon or icon-star}}"></i>
+      {{=T(status_instance.name)}}
+    </h1>
+    {{pass}}
+    <a class="show_class" style="cursor: pointer" onclick="visible_detail();">
+      {{=T('View Detail')}}
+    </a>
+    <a
+      class="hide_class"
+      style="cursor: pointer; display: none"
+      onclick="hide_detail();"
+    >
+      {{=T('Hide Detail')}}
+    </a>
+    <table id="report-filter" class="table table-bordered">
+      <thead>
+        <tr>
+          <th>{{=T('No')}}</th>
+          <th>{{=T('Project')}}</th>
+          <th>{{=T('Created')}}</th>
+          <th>{{=T('School id')}}</th>
+          <th class="hide_class" style="display: none">{{=T('Email')}}</th>
+          <th>{{=T('User')}}</th>
+          <th>{{=T('Restriction')}}</th>
+          <th>{{=T('Score')}}</th>
+          <th>{{=T('Status')}}</th>
+          <th>{{=T('Report Summary')}}</th>
+          <th class="hide_class" style="display: none">{{=T('Started')}}</th>
+          <th class="hide_class" style="display: none">{{=T('Ends')}}</th>
+          <th>
+            <div class="right pull-right">
+              {{=T('DTT Approval')}}:
+              <a
+                class="btn btn-success"
+                href="{{=URL('admin','dtt_general_approval', vars=dict(approve = True, status = status, period = period))}}"
+              >
+                <span class="icon-check"></span>
+              </a>
+              <a
+                class="btn btn-danger"
+                href="{{=URL('admin','dtt_general_approval', vars=dict(approve = False, status = status, period = period))}}"
+              >
+                <span class="icon-remove"></span>
+              </a>
+              <a
+                class="btn btn-primary"
+                href="{{=URL('admin','dtt_general_approval', vars=dict(status = status, period = period))}}"
+              >
+                <span class="icon-time"></span>
+              </a>
+            </div>
+          </th>
+          <th>{{=T('Report')}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{count = 0}} 
+        {{for report in reports:}} 
+        {{hours_left = report.assignation.hours}} 
+        {{hours_left = hours_left - (report.hours or 0)}} 
+        {{hours = report.hours}} 
+        {{show = False}} {{entries = count_log_entries(report)}} 
+        {{metrics = count_metrics_report(report)}}
+        <!-- {{anomalies = \ c
+          ount_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']}} -->
+        {{anomalies = \
+          count_anomalies(report)[0]['COUNT(log_entry.id)']}}
+        {{if report.assignation.project.area_level.name==\ 
+          'DTT Tutor Académico':}}
+          {{if metrics != 0 or entries != 0 or anomalies != 0:}} 
+            {{show = True}}
+            {{pass}} 
+          {{else:}} 
+            {{if hours != 0 and hours != None:}} 
+            {{show = True}}
+          {{pass}} 
+        {{pass}} 
+        {{if show:}} 
+          {{count += 1}}
+        <tr>
+          <td>{{=count}}</td>
+          <td>{{=report.assignation.project.name}}</td>
+          <td>{{=report.created}}</td>
+          <td>{{=report.assignation.assigned_user.username}}</td>
+          <td class="hide_class" style="display: none">
+            {{=report.assignation.assigned_user.email}}
+          </td>
+          <td>
+            {{=report.assignation.assigned_user.first_name}}
+            {{=report.assignation.assigned_user.last_name}}
+          </td>
+          <td>{{=report.report_restriction.name}}</td>
+          <td>{{=report.score or 0}}</td>
+          <td>{{=T(report.status.name)}}</td>
+          <td>
+            <b>{{=T('Activity logs')}}:</b>
+            {{=entries}}
+            <br />
+            <b>{{=T('Metric logs')}}:</b>
+            {{=metrics}}
+            <br />
+            <b>{{=T('Hours')}}:</b>
+            {{=hours or 0}}
+            <br />
+            <b>{{=T('Pending Hours')}}:</b>
+            {{=hours_left}}
+            <br />
+            <b>{{=T('Anomalies')}}:</b>
+            {{=anomalies}}
+          </td>
+          <td class="hide_class" style="display: none">
+            {{=report.assignation.period.yearp}} -
+            {{=T(report.assignation.period.period.name)}}
+          </td>
+          <td class="hide_class" style="display: none">
+            {{=calculate_ending_date(report)}}
+          </td>
+          <td>
+            {{if report.dtt_approval is None:}} {{=report.never_delivered}}
+            <span class="label"> {{=T('DTT Approval Pending')}} </span>
+            {{elif report.dtt_approval is True:}} {{=report.never_delivered}}
+            <span class="label label-success"> {{=T('DTT Approved')}} </span>
+            {{else:}} {{=report.never_delivered}}
+            <span class="label label-warning"> {{=T('DTT faling')}} </span>
+            {{pass}}
+            <p>
+              {{if report.score is None:}}
+              <span class="label"> {{=T('Teacher Approval Pending')}} </span>
+              {{elif report.score >= report.min_score:}}
+              <span class="label label-success">
+                {{=T('Teacher Approved')}}
+              </span>
+              {{elif report.score < report.min_score:}}
+              <span class="label label-warning">
+                {{=T('Teacher Failed')}}
+              </span>
+              {{pass}}
+            </p>
+            <div class="pull-right right">
+              <a
+                class="btn btn-success"
+                href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=True))}}"
+              >
+                <span class="icon-check"></span>
+              </a>
+              <a
+                class="btn btn-danger"
+                href="{{=URL('admin','dtt_approval', vars=dict(report=report.id, approve=False))}}"
+              >
+                <span class="icon-remove"></span>
+              </a>
+              <a
+                class="btn btn-primary"
+                href="{{=URL('admin','dtt_approval', vars=dict(report=report.id))}}"
+              >
+                <span class="icon-time"></span>
+              </a>
+            </div>
+          </td>
+          <td>
+            <a
+              class="btn"
+              href="{{=URL('admin','report/view', vars=dict(report=report.id))}}"
+            >
+              <span class="icon-eye-open"></span>
+              {{=T('Report detail')}}
+            </a>
+          </td>
+        </tr>
+        {{pass}} {{pass}}
+        <tr>
+          <td class="hide_class" style="display: none" colspan="12"></td>
+          <td class="show_class" colspan="8"></td>
+          <td>
+            <div class="pull-right right">
+              <b>{{=T('DTT Approval')}}:</b>
+              <a
+                class="btn btn-success"
+                href="{{=URL('admin','dtt_general_approval', vars=dict(approve = True, status = status, period = period))}}"
+              >
+                <span class="icon-check"></span>
+              </a>
+              <a
+                class="btn btn-danger"
+                href="{{=URL('admin','dtt_general_approval', vars=dict(approve = False, status = status, period = period))}}"
+              >
+                <span class="icon-remove"></span>
+              </a>
+              <a
+                class="btn btn-primary"
+                href="{{=URL('admin','dtt_general_approval', vars=dict(status = status, period = period))}}"
+              >
+                <span class="icon-time"></span>
+              </a>
+            </div>
+          </td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script type="text/javascript">
+  function visible_detail() {
+    $(".hide_class").css("display", "table-cell");
+    $(".show_class").css("display", "none");
+  }
+  function hide_detail() {
+    $(".show_class").css("display", "table-cell");
+    $(".hide_class").css("display", "none");
+  }
+</script>

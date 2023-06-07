@@ -1,0 +1,27 @@
+{{extend 'dashboard.html'}}
+<h1>{{=T('Items management')}}</h1>
+<div class="row-fluid">
+  <div class="well span12">
+    <a onclick="window.history.back()" class="btn btn-primary">
+      <i class="icon-arrow-left"></i>
+      {{=T('Back')}}
+    </a>
+    <table class="table table-striped table-bordered">
+      {{for restriction in restrictions:}}
+      <tr>
+        <td>{{=T(restriction.name)}}</td>
+        <td>
+          <a
+            class="btn btn-success"
+            href="{{=URL('admin', 'delivered_download_button/dl', \
+                vars=dict(restriction=restriction.id, period=period))}}"
+          >
+            <i class="icon-download"></i>
+            {{=T('Download')}}
+          </a>
+        </td>
+      </tr>
+      {{pass}}
+    </table>
+  </div>
+</div>

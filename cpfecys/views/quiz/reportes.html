@@ -1,0 +1,92 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+	<div class="col-12 text-center">
+		<h2>Reportes de evaluaciones</h2>
+	</div>
+	{{if permiso:}}
+        {{import datetime}}
+        <div class="col-12 text-center">
+            <h5>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</h5>
+        </div>
+        {{=back_button}}
+        <div class="col-12 mt-2">
+            <h4>Reportes disponibles</h4>
+        </div>
+        <div class="col-12">
+            <div class="well table-responsive" id="div_seleccionar_tipo_pregunta">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><center>Actividad</center></th>
+                            <th><center>Quiz</center></th>
+                            <th><center>Fecha de programación</center></th>
+                            <th><center>Duración</center></th>
+                            <th><center>Estado</center></th>
+                            <th><center>Privacidad</center></th>
+                            <th><center>Reporte</center></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for programacion in programaciones:}}
+                            <tr>
+                                <td><center>{{=programacion.course_activity.name}}</center></td>
+                                <td><center>{{=programacion.tb_metadata_quiz.nombre}}</center></td>
+                                <td><center>{{=programacion.tb_quiz_actividad.fecha}} {{=programacion.tb_quiz_actividad.inicio}}<center></td>
+                                <td><center>{{=programacion.tb_quiz_actividad.duracion}} Minutos</center></td>
+                                {{init = datetime.datetime.combine(programacion.tb_quiz_actividad.fecha, programacion.tb_quiz_actividad.inicio)}}
+                                {{fin = init + datetime.timedelta(minutes = programacion.tb_quiz_actividad.duracion)}}
+                                {{if init > datetime.datetime.now():}}
+                                    <td><center>Pendiente</center></td>
+                                {{elif init <= datetime.datetime.now() and fin >= datetime.datetime.now():}}
+                                    <td><center>Activo</center></td>
+                                {{else:}}
+                                    <td><center>Realizado</center></td>
+                                {{pass}}
+                    
+                                {{if programacion.tb_quiz_actividad.private == 1:}}
+                                    <td><center>Privado</center></td>
+                                {{else:}}
+                                    <td><center>Público</center></td>
+                                {{pass}}
+
+                                {{if fin < datetime.datetime.now():}}
+                                    <td>
+                                        <center>
+                                            <button name="btReporte" id={{=programacion.tb_quiz_actividad.id_actividad}} type="button" class="btn btn-info btReporte">Ir a reporte</button>
+                                        </center>
+                                    </td>
+                                {{else:}}
+                                    <td>
+                                        <center>
+                                            <button name="btReporte" type="button" class="btn btn-info" disabled>Ir a reporte</button>
+                                        </center>
+                                    </td>
+                                {{pass}}
+                                <td hidden id=""></td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	{{else:}}
+        <div class="col-12">
+            <h2>ACCESO DENEGADO</h2>
+        </div>
+        <div class="col-12">
+            <p>Usted no tiene permisos para ingresar a este recurso, este intento de acceso quedo registrado y sera reportado.</p>
+        </div>
+	{{pass}}
+</div>
+
+<script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(".btReporte").click(function(){
+			var IdActividad = $(this).attr("id");
+			window.location.href = `https://${location.hostname}/quiz/reporte/${IdActividad}?period={{=periodo.id}}&project={{=course}}`;
+		});
+	});
+</script>
+

@@ -1,0 +1,80 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    {{=back_button}}<br/><br/>
+    {{if permiso:}}
+        <div class="col-12">
+            <h2>Evaluación: "{{=metadata.tb_metadata_quiz.nombre}}"</h2>
+        </div>
+        <div class="col-12 mt-3">
+            <h4>Información general de la evaluación</h4>
+        </div>
+        <div class="col-12">
+            <div class="well" id="div_metainfo_quiz">
+                <p><strong>Creador:&nbsp;</strong>{{=f'{metadata.auth_user.first_name} {metadata.auth_user.last_name}'}}</p> 
+                <p><strong>Curso:&nbsp;</strong>{{=metadata.project.name}}</p>
+                <p><strong>Fecha de creación:&nbsp;</strong>{{=metadata.tb_metadata_quiz.fecha_creacion}}</p>
+            </div>
+        </div>
+        <div class="col-12">
+            {{if not vacio:}}
+                {{import json}}
+                {{quiz_json = json.loads(quiz)}}
+                <h4>Detalle de la evalucación</h4>
+                <div class="well" id="div_metainfo_quiz">
+                    <ol class="list-group">
+                        {{for pregunta in quiz_json["PREGUNTAS"]:}}
+                            <li class="list-group-item">
+                                <h4>{{=pregunta["value"]}}</h4>
+                                {{if pregunta["tipo"] == "multiple":}}
+                                    <p><strong>Tipo:</strong> Pregunta de opción múltiple</p>
+                                    <p><strong>Respuestas:</strong></p>
+                                    <ol class="list-group list-group-horizontal">
+                                        {{for respuesta in pregunta["respuesta"]:}}
+                                            <li class="list-group-item">
+                                                {{=respuesta["value"]}}
+                                                {{if respuesta["correcta"]:}}
+                                                    <span class="fa fa-check" style="color: green;"></span>
+                                                {{else:}}
+                                                    <span class="fa fa-times" style="color: red;"></span>
+                                                {{pass}}
+                                            </li>
+                                        {{pass}}
+                                    </ol>
+                                {{elif pregunta["tipo"] == "veracidad":}}
+                                    <p><strong>Tipo: </strong>Pregunta de falso / verdadero</p>
+                                    <p><strong>Respuesta correcta: </strong>
+                                        {{
+                                            if not pregunta["respuesta"]:
+                                                ="Falso"
+                                            else:
+                                                ="Verdadero"
+                                            pass
+                                        }}
+                                    </p>
+                                {{else:}}
+                                    <p><strong>Tipo: </strong>Respuesta corta</p>
+                                    <p><strong>Respuesta correcta: </strong> {{=pregunta["respuesta"]}}</p>
+                                {{pass}}
+                            </li>
+                        {{pass}}
+                    </ol>
+                </div>
+            {{else:}}
+                <div class="well"  id="div_metainfo_quiz">
+                    <h4>Información</h4>
+                    <div class="mt-4">
+                        <p>Ha ocurrido un error al recuperar la evaluación. El detalle de la evaluacion ha sido eliminado o se ha movido de ubicacion.</p>
+                    </div>
+                </div>
+            {{pass}}
+        </div>
+    {{else:}}
+        <div class="col-12 text-center">
+            <h4>ACCESO DENEGADO</h4>
+        </div>
+        <div class="col-12">
+            <p>Usted no tiene permisos para ingresar a este recurso, este intento de acceso quedo registrado y sera reportado.</p>
+        </div>
+    {{pass}}
+</div>

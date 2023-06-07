@@ -1,0 +1,173 @@
+{{extend 'dashboard.html'}}
+<script type="text/javascript" src="{{=URL('static','intro_js/intro.js')}}"></script>
+
+<div class="mt-4">
+    {{if permiso:}}
+        <div class="row-fluid">
+            <center>
+                <h2>Evaluación: {{=metadata.tb_metadata_quiz.nombre}}
+                    {{if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):}}
+                        <a onclick="javascript:introJs().setOptions({'skipLabel': 'Quitar', 'nextLabel': 'Siguiente', 'prevLabel': 'Anterior', 'doneLabel': 'Salir'}).start();" href='javascript:void(0);' class="btn btn-primary" >
+                            <span class="fa fa-question-circle"></span>
+                        </a>
+                    {{pass}}
+                    <br>
+                </h2>
+            </center>
+        </div>
+        {{=back_button}}
+        <div class="well mt-2" id="div_metainfo_quiz">
+            <a style="cursor:pointer;">
+                <center><h4>Informacion general de la evaluación</h4></center>
+            </a>
+            <hr>
+            <p><strong>Creador:</strong>{{=metadata.auth_user.first_name}} {{=metadata.auth_user.last_name}}</p> 
+            <p><strong>Curso: </strong>{{=metadata.project.name}}</p>
+            <p><strong>Fecha de creación: </strong>{{=metadata.tb_metadata_quiz.fecha_creacion}}</p>
+            <p><strong>Estudiante: </strong>{{=f"{usuario.first_name} {usuario.last_name} - {usuario.username}"}}</p>
+        </div>
+        {{if not vacio:}}
+            <br>
+            {{import json}}
+            {{quiz_json = json.loads(quiz)}}
+            <div class="well" id="div_metainfo_quiz">
+                <a style="cursor:pointer;">
+                    <center><h4>Detalle de la evaluación</h4></center>
+                </a>
+                <hr>
+                <ol>
+                    {{for pregunta in quiz_json["PREGUNTAS"]:}}
+                        <li class="list-group-item">
+                            <h4>{{=pregunta["value"]}}</h4>
+                            {{if pregunta["tipo"] == "multiple":}}
+                                <p><strong>Tipo:</strong> Pregunta de opción múltiple</p>
+                                <p><strong>Respuestas:</strong></p>
+                                <ol class="list-group list-group-horizontal">
+                                    {{for respuesta in pregunta["respuesta"]:}}
+                                        <li class="list-group-item">
+                                            {{=respuesta["value"]}}
+                                            {{if respuesta["correcta"]:}}
+                                                <span class="fa fa-check" style="color: green;"></span>
+                                            {{else:}}
+                                                <span class="fa fa-times" style="color: red;"></span>
+                                            {{pass}}
+                                        </li>
+                                    {{pass}}
+                                </ol>
+                            {{elif pregunta["tipo"] == "veracidad":}}
+                                <p><strong>Tipo: </strong>Pregunta de falso / verdadero</p>
+                                <p><strong>Respuesta correcta: </strong>{{=pregunta["respuesta"]}}</p>
+                            {{else:}}
+                                <p><strong>Tipo: </strong>Respuesta corta</p>
+                                <p><strong>Respuesta correcta: </strong> {{=pregunta["respuesta"]}}</p>
+                            {{pass}}
+                            <p><strong>Respuesta seleccionada:</strong> 
+                                {{salida = ''}}
+                                {{for respuesta_correcta in respuestas:}}
+                                    {{if respuesta_correcta.id_pregunta == int(pregunta['id']) and respuesta_correcta.es_correcta == 1:}}    
+                                        {{salida += f"{respuesta_correcta.respuesta}, "}}
+                                    {{pass}}
+                                {{pass}}
+                                {{=salida[0:len(salida) - 2]}}
+                            </p>
+                        </li>
+                    {{pass}}
+                </ol>
+            </div>
+        {{else:}}
+            <div class="navbar" data-step=1 data-intro="Div detalle del quiz">
+                <div class="navbar-inner">
+                    <a style="cursor:pointer;"><center><h4>Informacion</h4></center></a>
+                </div>
+            </div>
+            <div class="well" id="div_metainfo_quiz">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                        <td style="width:10%;"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td colspan="2" style="text-align:center;">
+                            <img src="{{=URL('static','images')}}/info.png" width="50%">
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td colspan="7"></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td colspan="6">
+                            <label>Ha ocurrido un error al recuperar la evaluacion. El detalle de la evaluacion ha sido eliminado o se ha movido de ubicacion.</label>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        {{pass}}
+    {{else:}}
+        <div class="navbar" data-step=1 data-intro="Div detalle del quiz">
+            <div class="navbar-inner">
+                <a style="cursor:pointer;"><center><h4>ACCESO DENEGADO</h4></center></a>
+            </div>
+        </div>
+        <div class="well" id="div_metainfo_quiz">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="2" style="text-align:center;">
+                        <img src="{{=URL('static','images')}}/ACCESODENEGADO.png" width="100%">
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">
+                        <label>Usted no tiene permisos para ingresar a este recurso, este intento de acceso quedo registrado y sera reportado.</label>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    {{pass}}
+</div>

@@ -1,0 +1,54 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <a href="{{=URL('asign_students')}}" class="btn btn-primary" ><i class="icon-arrow-left"></i> {{=T('Back to Assignation')}}</a>
+    <h2>Carga Masiva - Asignación de Estudiantes</h2>
+    {{if success:}}
+        <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                        <span class="icon-remove"></span> {{=T('User upload errors')}}
+                        <span class="pull-right">{{=T('Total Errors: ') + len(errors)}}</span>
+                    </a>
+                </div>
+                <div id="collapseOne" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        <ul>
+                            {{for error in errors:}}
+                                <li class="error">
+                                    <pre>
+                                        {{for row in error:}}{{=row}}  --  {{pass}}
+                                    </pre>
+                                </li>
+                            {{pass}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                        <span class="icon-warning-sign"></span> {{=T('User upload warnings')}}
+                        <span class="pull-right">{{=T('Total Warnings: ') + len(warnings)}}</span>
+                    </a>
+                </div>
+                <div id="collapseTwo" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        <ul>
+                            {{for warning in warnings:}}
+                                <li class="error">
+                                    <pre>
+                                        {{for row in warning:}}{{=row}}  --  {{pass}}
+                                    </pre>
+                                </li>
+                            {{pass}}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{else:}}
+        {{=form}}
+    {{pass}}
+</div>

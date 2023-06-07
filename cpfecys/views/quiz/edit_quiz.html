@@ -1,0 +1,252 @@
+{{extend 'dashboard.html'}}
+<script type="text/javascript" src="{{=URL('static','js/quiz-js/editQuiz.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
+<script type="text/javascript">
+    var idp = 1;
+    var idr = 1;
+	
+    var respuesta;
+    var preguntas = [];
+    var preguntasObj = new Array();
+
+    function GetID()  { idp += 1; }
+    function GetIDR()  { idr += 1; }
+
+    $(document).ready(function(){
+        var preguntasObjAux = JSON.parse('{{=XML(quiz)}}');
+        var aux = 1;
+        $.each(preguntasObjAux.PREGUNTAS, function(index, value){
+            valAux = value;
+            if(valAux["id"] === undefined) {
+                valAux.id = aux;
+                aux ++;
+            }
+            preguntasObj.push(valAux);
+        });
+        idp = preguntasObj.length + 1;
+		
+		for (let iterator = 1; iterator < idp; iterator++) {
+            GuardarPregunta(`Guardar_Pregunta${iterator}`)
+        }
+    });
+</script>
+
+<div class="mt-4">
+	<div class="col-12">
+		<div class="row-fluid">
+			<div class="row">
+				<div class="col-12">
+					{{=back_button}}
+				</div>
+				{{if permiso:}}
+					<div class="well col-12 mt-3">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-header">
+									<h5 class="card-title">Nombre de la prueba</h5>
+								</div>
+								<div class="card-body">
+									<textarea id="txtTitulo" class="estilotextarea2 form-control" cols="1" rows="1">{{=metadata.tb_metadata_quiz.nombre}}</textarea>
+								</div>
+							</div>
+						</div>
+						<div class="col-12 mt-3">
+							<div class="row">
+								<div class="col-12">
+									<div class="card">
+										<div class="card-header">
+											<h5 class="card-title">Preguntas de la prueba</h5>
+										</div>
+										<div class="card-body">
+											<form>
+												<input type="hidden" name="id" id="id" value='{{=metadata.tb_metadata_quiz.id}}'>
+												<input type="hidden" id="id_quiz" name="id_quiz" value='{{=metadata.tb_metadata_quiz.id_quiz}}'>
+												{{import json}}
+												{{quiz_json = json.loads(quiz)}}
+												<ol id="contenedorDePreguntas">
+													{{aux = 0}}
+													{{for pregunta in quiz_json["PREGUNTAS"]:}}
+														{{
+															if "id" not in pregunta:
+																aux += 1
+															else:
+																aux = pregunta["id"]
+															pass
+														}}
+														{{if pregunta['tipo'] == 'multiple':}}
+															<li id="Pregunta_{{=aux}}" name="tipo1" class="list-group-item">
+																<div class="navbar" data-intro="Pregunta de opcion multiple">
+																	<div class="navbar-inner">
+																		<form id="Formulario_P{{=aux}}" class="form-dtt-quiz pt-3 pb-3">
+																			<div class="form-group">
+																				<h5>Pregunta:</h5>
+																			</div>
+																			<div class="form-group">
+																				<textarea id="Campo_Pregunta{{=aux}}" class="estilotextarea2 form-control" cols="1" rows="1">{{=pregunta["value"]}}</textarea>
+																			</div>
+																			<div class="form-group">
+																				<button id="Guardar_Pregunta{{=aux}}" type="button" class="btn btn-primary" onclick="GuardarPregunta(this.id)">
+																					<i class="fa fa-floppy-o"></i>
+																					Guardar
+																				</button>
+																				<button id='Editar_Pregunta{{=aux}}' type="button" class="btn btn-warning" onclick="HabilitarPregunta(this.id)" attr-id='{{=aux}}'>
+																					<i class="fa fa-pencil"></i>
+																					Editar
+																				</button>
+																				<button id='Eliminar_Pregunta{{=aux}}' type="button" class="btn btn-danger" onclick="EliminarPregunta(this.id)">
+																					<i class="fa fa-trash"></i>
+																					Borrar
+																				</button>
+																			</div>
+																		</form>
+																	</div>
+																	<div class="well" id="div_respuestas">
+																		<fieldset name="multiple">
+																			<a style="cursor: pointer;">Respuestas:</a>
+																			<ol id='Respuestas_P{{=aux}}' type="A" name="multiple">
+																				{{i = 1}}
+																				{{for respuesta in pregunta["respuesta"]:}}
+																					<li id="Respuesta_{{=i}}">
+																						<input type="text" value='{{=respuesta["value"]}}'>
+																						{{
+																							checked = ""
+																							if respuesta["correcta"]:
+																								checked = "checked"
+																							pass
+																						}}
+																						<input type="checkbox" {{=checked}}> Correcta
+																						<button id="Eliminar_Respuesta{{=i}}" type="button" class="btn btn-danger" onclick="EliminarRespuesta(this.id)">X</button>
+																					</li>
+																					{{i += 1}}
+																				{{pass}}
+																			</ol>
+																		</fieldset>
+																		<script>
+																			if({{=i}} > idr) { idr = {{=i}}; }
+																		</script>
+																		<button id='btAddRespuesta{{=aux}}' type="button" class="btn btn-primary" onclick="AgregarRespuesta(this.id)">+ Agregar una nueva respuesta</button>
+																	</div>
+																</div>
+															</li>
+														{{elif pregunta['tipo'] == 'veracidad':}}
+															<li id="Pregunta_{{=aux}}" name="tipo3" class="list-group-item">
+																<div class="navbar" data-intro="Pregunta falso o verdadero">
+																	<div class="navbar-inner">
+																		<form id="Formulario_P{{=aux}}" class="form-dtt-quiz pt-3 pb-3">
+																			<div class="form-group">
+																				<h5>Pregunta:</h5>
+																			</div>
+																			<div class="form-group">
+																				<textarea id="Campo_Pregunta{{=aux}}" class="estilotextarea2 form-control" cols="1" rows="1">{{=pregunta["value"]}}</textarea>
+																			</div>
+																			<div class="form-group">
+																				<button id="Guardar_Pregunta{{=aux}}" type="button" class="btn btn-primary" onclick="GuardarPregunta(this.id)">
+																					<i class="fa fa-floppy-o"></i>
+																					Guardar
+																				</button>
+																				<button id='Editar_Pregunta{{=aux}}' type="button" class="btn btn-warning" onclick="HabilitarPregunta(this.id)" attr-id='{{=aux}}'>
+																					<i class="fa fa-pencil"></i>
+																					Editar
+																				</button>
+																				<button id='Eliminar_Pregunta{{=aux}}' type="button" class="btn btn-danger" onclick="EliminarPregunta(this.id)">
+																					<i class="fa fa-trash"></i>
+																					Borrar
+																				</button>
+																			</div>
+																		</form>
+																	</div>
+																	<div class="well" id="div_respuestas">
+																		<fieldset id="Respuestas_P{{=aux}}" name="veracidad">
+																			<a style="cursor: pointer;">Seleccione la respuesta:</a>
+																			<br><br>
+																			{{
+																				resp_verdadero = ''
+																				resp_falso = ''
+																				if pregunta["respuesta"]:
+																					resp_verdadero = "checked"
+																				else:
+																					resp_falso = "checked"
+																				pass
+																			}}
+																			<label>
+																				<input type="radio" name='Opcion{{=aux}}' value="verdadero" {{=resp_verdadero}}>
+																				Verdadero
+																			</label>
+																			&nbsp;
+																			<label>
+																				<input type="radio" name='Opcion{{=aux}}' value="falso" {{=resp_falso}}>
+																				Falso
+																			</label>
+																		</fieldset>
+																	</div>
+																</div>
+															</li>
+														{{else:}}
+															<li id="Pregunta_{{=aux}}" name="tipo2" class="list-group-item">
+																<div class="navbar" data-intro="Pregunta de respuesta corta">
+																	<div class="navbar-inner">
+																		<form id="Formulario_P{{=aux}}" class="form-dtt-quiz pt-3 pb-3">
+																			<div class="form-group">
+																				<h5>Pregunta:</h5>
+																			</div>
+																			<div class="form-group">
+																				<textarea id="Campo_Pregunta{{=aux}}" class="estilotextarea2 form-control" cols="1" rows="1">{{=pregunta["value"]}}</textarea>
+																			</div>
+																			<div class="form-group">
+																				<button id="Guardar_Pregunta{{=aux}}" type="button" class="btn btn-primary" onclick="GuardarPregunta(this.id)">
+																					<i class="fa fa-floppy-o"></i>
+																					Guardar
+																				</button>
+																				<button id='Editar_Pregunta{{=aux}}' type="button" class="btn btn-warning" onclick="HabilitarPregunta(this.id)" attr-id='{{=aux}}'>
+																					<i class="fa fa-pencil"></i>
+																					Editar
+																				</button>
+																				<button id='Eliminar_Pregunta{{=aux}}' type="button" class="btn btn-danger" onclick="EliminarPregunta(this.id)">
+																					<i class="fa fa-trash"></i>
+																					Borrar
+																				</button>
+																			</div>
+																		</form>
+																	</div>
+																	<div class="well" id="div_respuestas">
+																		<fieldset id="Respuestas_P{{=aux}}" name="directa">
+																			<a style="cursor: pointer;">Ingrese la respuesta correcta:</a><br><br>
+																			<input type="text" value="{{=pregunta['respuesta']}}">
+																		</fieldset>
+																	</div>
+																</div>
+															</li>
+														{{pass}}
+													{{pass}}
+													<script>
+														idp = {{=aux}} + 1
+													</script>
+												</ol>
+											</form>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row mt-3">
+								<div class="col-12">
+									<h5 class="card-title">Agregar pregunta al cuestionario</h5>
+								</div>
+								<div class="col-12" id="div_seleccionar_tipo_pregunta">
+									<button id="btAddTipo1" type="button" class="btn btn-success">+ Opcion Multiple</button>
+									<button id="btAddTipo2" type="button" class="btn btn-info">+ Falso/Verdadero</button>
+									<button id="btAddTipo3" type="button" class="btn btn-warning">+ Respuesta Corta</button>
+								</div>
+							</div>
+							<br>
+							<button id="btnContinuar" class="btn btn-large btn-primary" type="button">Guardar</button>
+						</div>
+					</div>
+				{{pass}}
+				<input type="hidden" id="userid" name="{{=auth.user.id}}">
+				<input type="hidden" id="project_id" name="{{=project}}">
+				<input type="hidden" id="period_id" name="{{=idperiodoc}}">
+				<input type="hidden" id="id_project" name="{{=idproject}}">
+			</div>
+		</div>
+	</div>
+</div>

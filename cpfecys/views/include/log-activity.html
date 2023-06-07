@@ -1,0 +1,68 @@
+<!-- START->log-activity -->
+<div id="{{=inc_vars['id']}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="aria-{{=inc_vars['id']}}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{=inc_vars['url']}}" method="POST">
+                <div class="modal-header">
+                    <span class="row-fluid">
+                        <span class="row">
+                            <span class="col-12">
+                                <h3 id="aria-{{=inc_vars['id']}}">Registrar actividad</h3>
+                            </span>
+                            <span class="col-12">
+                                <div class="input-prepend">
+                                    <span class="add-on">{{=T('Log Date')}}: </span>
+                                    <input class="form-control" value="{{=inc_vars['date']}}" id="log-date-{{=inc_vars['id']}}" name="log-date" type="date">
+                                </div>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" style="display:none;" id="log-error-{{=inc_vars['id']}}">
+                        <strong>{{=T('Alert')}}!</strong> {{=T('All fields are mandatory, please check and try again.')}}
+                    </div>
+                    <div class="input-prepend">
+                        <span class="add-on">{{=T('Type')}}</span>
+                        <select id="log-type-{{=inc_vars['id']}}" name="log-type" class="form-control">
+                            {{for log_type in inc_vars['log_types']:}}
+                                <!--#****************************************************************************-->
+                                <!--#****************************PHASE 2 DTT*************************************-->
+                                {{if report.assignation.project.area_level.name != 'DTT Tutor Académico':}}
+                                    <option value = "{{=log_type.id}}"
+                                        {{if log_type.id == inc_vars['log_type']:}} selected {{pass}}
+                                        >{{=T(log_type.name)}}</option>
+                                {{else:}}
+                                    {{if T(log_type.name) == 'Anomalia':}}
+                                        <option value = "{{=log_type.id}}"
+                                            {{if log_type.id == inc_vars['log_type']:}} selected {{pass}}
+                                            >{{=T(log_type.name)}}</option>
+                                    {{pass}}
+                                {{pass}}
+                                <!--#****************************************************************************-->
+                                <!--#****************************PHASE 2 DTT*************************************-->
+                            {{pass}}
+                        </select>
+                    </div>
+                    <textarea id="log-content-{{=inc_vars['id']}}" name="log-content" class="text mt-2">{{=inc_vars['content']}}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+                    <input type="submit"
+                        onclick="if (
+                            $('#log-type-{{=inc_vars['id']}}').val()
+                            && $('#log-content-{{=inc_vars['id']}}').val()
+                            && $('#log-date-{{=inc_vars['id']}}').val()) {
+                                return true;
+                            } else {
+                                $('#log-error-{{=inc_vars['id']}}').show();
+                                return false;
+                            }"
+                        class="btn btn-primary"
+                        value="{{=T('Save Changes')}}"></input>
+                </div>
+            </form>
+         </div> 
+     </div>
+</div>
+<!-- END->log-activity -->

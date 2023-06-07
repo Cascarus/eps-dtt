@@ -1,0 +1,260 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class="text-center">
+        <h1>Recepción de papelería para prácticas finales</h1>
+    </div>
+    {{if action['type'] == 'list':}}
+        <div class="text-center">
+            <h4>Información del estudiante</h4>
+        </div>
+        <div class="mt-4">
+            <div class="col-12">
+                <div class="row-fluid">
+                    <div class="col-12">
+                        <div class="card">
+                            <h5 class="card-header">Datos del estudiante</h5>
+                            <div class="card-body">
+                                <div class="ml-3">
+                                    <ul>
+                                        <li><span class="font-weight-bold">Estudiante</span>: {{=auth.user.username}}</li>
+                                        <li><span class="font-weight-bold">Nombres</span>: {{=auth.user.first_name}}</li>
+                                        <li><span class="font-weight-bold">Apellidos</span>: {{=auth.user.last_name}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <h3>Historial de asignaciones</h3>
+                        <div class="accordion mt-2" id="accordionEstudentDeliverables">
+                            {{for assignation in assignations:}}
+                                <div class="card">
+                                    <div class="card-header" id="heading-i{{=assignation['user_project']}}">
+                                        <h2 class="mb-0">
+                                            <button class="btn btn-link collapsed w-100" type="button" data-toggle="collapse" data-target="#i{{=assignation['user_project']}}" aria-expanded="true" aria-controls="#i{{=assignation['user_project']}}">
+                                                <div class="row">
+                                                    <div class="col-12 col-md-6">
+                                                        <div>
+                                                            <strong>Nombre del proyecto:</strong>
+                                                            {{=assignation['project_name']}}
+                                                        </div>
+                                                        <div>
+                                                            <strong>Área:</strong>
+                                                            {{=assignation['area']}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-12 col-md-6 text-right">
+                                                        <div>
+                                                            <strong>Inicio:</strong>
+                                                            {{=assignation['practice_year']}} - {{=T(assignation['practice_period'])}}
+                                                        </div>
+                                                        <div>
+                                                            <strong>Duración:</strong>
+                                                            {{=assignation['periods']}} Semestres
+                                                        </div>
+                                                        <div>
+                                                            <strong>Estado:</strong>
+                                                            {{if assignation['assignation_status'] is not None:}}
+                                                                <span class="badge badge-secondary">
+                                                                    {{=T(str(assignation['name_status']))}}
+                                                                </span>
+                                                            {{else:}}
+                                                                <span class="badge badge-success">{{=T('Active')}}</span>
+                                                            {{pass}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </h2>
+                                    </div>
+                                    <div id="i{{=assignation['user_project']}}" class="collapse" aria-labelledby="heading-i{{=assignation['user_project']}}" data-parent="#accordionEstudentDeliverables">
+                                        <div class="card-body">
+                                            {{documents_period = control_documents_period(assignation['user_project'])}}
+                                            {{for document_p in documents_period:}}
+                                                {{doc_types = doc_type_document_delivered(document_p['id'], assignation['user_project'])}}
+                                                {{for doc_type in doc_types:}}
+                                                    <div class="row-fluid">
+                                                        <div class="well span12">
+                                                            <h3>Entregables ({{='Práctica Inicia' if doc_type['doc_type'] == 'Practice Start' else 'Práctica Finaliza'}})</h3>
+                                                            <h5>{{=T(document_p['control_period'])}} - {{=document_p['control_year']}}</h5>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-striped table-bordered">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th style="width:200px;">Nombre</th>
+                                                                            <th style="width:310px;">Descripción</th>
+                                                                            <th style="width:250px;">Fecha de entrega</th>
+                                                                            <th style="width:115px;">Estado</th>
+                                                                            <th style="width:180px;">Última modificación</th>
+                                                                            <th style="width:135px;">Comentario</th>
+                                                                            <th style="width:165px;">Acciones</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                    {{documents = documents_delivered(document_p['id'], assignation['user_project'], doc_type['doc_type'])}}
+                                                                    {{for document in documents:}}
+                                                                        <tr>
+                                                                            <td>{{=document['deliverable']}}</td>
+                                                                            <td>{{=document['description']}}</td>
+                                                                            <td>{{=document['date_start'].strftime('%A, %d %b %Y, %H:%M:%S')}} al<br />{{=document['date_finish'].strftime('%A, %d %b %Y, %H:%M:%S')}}</td>
+                                                                            <td>
+                                                                                {{if not is_in_range_date(document['date_start'], document['date_finish'], document['status']):}}
+                                                                                    <span class="badge badge-danger">Entregable Fallido</span>
+                                                                                {{else:}}
+                                                                                    {{if document['status'] == 'Pending':}}
+                                                                                        <span class="badge badge-secondary">Pendiente</span>
+                                                                                    {{elif document['status'] == 'Delivered':}}
+                                                                                        <span class="badge badge-success">Entregado</span>
+                                                                                    {{elif document['status'] == 'Rejected':}}
+                                                                                        <span class="badge badge-danger">Rechazado</span>
+                                                                                    {{elif document['status'] == 'Revised':}}
+                                                                                        <span class="badge badge-warning">Revisado</span>
+                                                                                    {{elif document['status'] == 'Signed':}}
+                                                                                        <span class="badge badge-info">Firmado</span>
+                                                                                    {{pass}}
+                                                                                {{pass}}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{if document['uploaded_at'] is not None:}}
+                                                                                    {{=document['uploaded_at'].strftime('%A, %d %b %Y, %H:%M:%S')}}
+                                                                                {{pass}}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{if document['comment'] is not None:}}
+                                                                                    {{=document['comment']}}
+                                                                                {{pass}}
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="btn-group">
+                                                                                    {{if document['is_enabled'] == 'F' or not is_in_range_date(document['date_start'], document['date_finish'], document['status']):}}
+                                                                                        <span class="badge badge-danger">No hay acciones disponibles</span>
+                                                                                    {{elif is_in_range_date(document['date_start'], document['date_finish']):}}
+                                                                                        {{if document['status'] != 'Pending' and document['file_uploaded'] is not None:}}
+                                                                                            {{if document['signed_file'] is not None and document['status'] == 'Signed':}}
+                                                                                                <a href="{{=URL('student', 'download_deliverable', args=[document['signed_file']])}}">
+                                                                                                <button class="btn btn-primary btn-sm">
+                                                                                                    <span class="fa fa-search"></span>
+                                                                                                    &nbsp;Ver
+                                                                                                </button></a>
+                                                                                            {{else:}}
+                                                                                                <a href="{{=URL('student', 'download_deliverable', args=[document['file_uploaded']])}}">
+                                                                                                <button class="btn btn-primary btn-sm">
+                                                                                                    <span class="fa fa-search"></span>
+                                                                                                    &nbsp;Ver
+                                                                                                </button></a>
+                                                                                            {{pass}}
+                                                                                            <a href="{{=URL('student', 'stationery', args=['item','edit'], vars={'deliverable': document['doc_delivered']})}}">
+                                                                                            <button class="btn btn-success btn-sm">
+                                                                                                <span class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"></span>
+                                                                                                &nbsp;Editar
+                                                                                            </button></a>
+                                                                                        {{else:}}
+                                                                                            <a href="{{=URL('student', 'stationery', args=['item','create'], vars={'deliverable': document['doc_delivered']})}}">
+                                                                                            <button class="btn btn-primary btn-sm">
+                                                                                                <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+                                                                                                &nbsp;Añadir Item
+                                                                                            </button></a>
+                                                                                        {{pass}}
+                                                                                    {{elif document['status'] != 'Pending' and (document['file_uploaded'] is not None or document['signed_file'] is not None):}}
+                                                                                        {{if document['signed_file'] is not None and document['status'] == 'Signed':}}
+                                                                                            <a href="{{=URL('student', 'download_deliverable', args=[document['signed_file']])}}">
+                                                                                                <button class="btn btn-primary btn-sm">
+                                                                                                    <span class="fa fa-search"></span>
+                                                                                                    &nbsp;Ver
+                                                                                                </button></a>
+                                                                                        {{else:}}
+                                                                                            <a href="{{=URL('student', 'download_deliverable', args=[document['file_uploaded']])}}">
+                                                                                                <button class="btn btn-primary btn-sm">
+                                                                                                    <span class="fa fa-search"></span>
+                                                                                                    &nbsp;Ver
+                                                                                                </button></a>
+                                                                                        {{pass}}
+                                                                                    {{pass}}
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    {{pass}}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{pass}}
+                                            {{pass}}
+                                        </div>
+                                    </div>
+                                </div>
+                            {{pass}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{elif action['type'] == 'create' or action['type'] == 'edit' :}}
+        <div class="text-center">
+            {{if action['type'] == 'create':}}
+                <h4>Crear entregable</h4>
+            {{else:}}
+                <h4>Editar entregable</h4>
+            {{pass}}
+        </div>
+        <div class="mt-4">
+            <div class="col-12">
+                <div class="row-fluid">
+                    <div class="col-12">
+                        <div class="card">
+                            <h5 class="card-header">Datos del entregable</h5>
+                            <div class="card-body">
+                                <div class="ml-3">
+                                    <ul>
+                                        <li><span class="font-weight-bold">Nombre</span>: {{=action['item']['deliverable']}}</li>
+                                        <li><span class="font-weight-bold">Descripción</span>: {{=action['item']['description']}}</li>
+                                        <li><span class="font-weight-bold">Extensión del archivo</span>: {{=action['item']['extension']}}</li>
+                                        <li><span class="font-weight-bold">Tamaño máximo</span>: {{=action['item']['max_size']}} MB</li>
+                                    </ul>
+                                    <a href="{{=URL('student', 'stationery')}}">
+                                        <button class="btn btn-primary">
+                                            <span class="fa fa-arrow-circle-left"></span>
+                                            &nbsp;Regresar
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-4">
+                        <div class="row">
+                            <div class="col-2"></div>
+                            <div class="col-8 well">
+                                {{=form}}
+                                <br />
+                                {{if 'message' in action:}}
+                                    <div class="alert alert-danger alert-dismissible" role="alert">
+                                        <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                {{pass}}
+                            </div>
+                            <div class="col-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{pass}}
+</div>
+
+<style>
+    .btn-group, .btn-group-vertical {
+        display: inline-block;
+    }
+    .table td, .table th{
+        vertical-align: middle;
+    }
+    .badge-warning{
+        color: #fff;
+    }
+</style>

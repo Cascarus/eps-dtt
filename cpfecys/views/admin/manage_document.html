@@ -1,0 +1,657 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+  <h1>Entregables</h1>
+</div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{=URL('admin', 'manage_document')}}">Entregables</a>
+    </li>
+    {{if action['type'] == 'new':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{=URL('admin', 'manage_document', args=['new'])}}">Nuevo</a>
+    </li>
+    {{elif action['type'] == 'show':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_document', args=['show', action['item'][0]['id']])}}"
+        >Ver</a
+      >
+    </li>
+    {{elif action['type'] == 'delete':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_document', args=['delete', action['item'][0]['id']])}}"
+        >Eliminar</a
+      >
+    </li>
+    {{elif action['type'] == 'edit':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_document', args=['edit', action['item']['id']])}}"
+        >Editar</a
+      >
+    </li>
+    {{pass}}
+  </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+  <div class="col-md-4">
+    <a href="{{=URL('admin', 'manage_document',args=['new'])}}">
+      <button class="btn btn-primary">
+        <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+        &nbsp;Añadir Registro
+      </button>
+    </a>
+  </div>
+</div>
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th style="width: 80px">Id</th>
+            <th style="width: 150px">Nombre</th>
+            <th style="width: 125px">Descripción</th>
+            <th style="width: 125px">Tipo de Archivo</th>
+            <th style="width: 115px">Tipo Entregable</th>
+            <th style="width: 125px">Tamaño Máximo(MB)</th>
+            <th style="width: 100px">Fecha inicio</th>
+            <th style="width: 125px">Fecha finalización</th>
+            <th style="width: 100px">¿Requiere Firma?</th>
+            <th style="width: 80px">¿Está Activo?</th>
+            <th style="width: 375px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ for document in action['list']: }}
+          <tr>
+            <td>{{=document['id']}}</td>
+            <td
+              style="
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 1px;
+              "
+              title="{{=document['name']}}"
+            >
+              {{=document['name']}}
+            </td>
+            <td
+              style="
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 1px;
+              "
+              title="{{=document['description']}}"
+            >
+              {{=document['description']}}
+            </td>
+            <td
+              style="
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 1px;
+              "
+            >
+              {{=document['type']}}
+            </td>
+            <td>
+              {{='Práctica inicia' if document['doc_type']=='Practice Start'
+              else 'Práctica finaliza'}}
+            </td>
+            <td>{{=document['max_size']}}</td>
+            <td>{{=document['date_start']}}</td>
+            <td>{{=document['date_finish']}}</td>
+            <td>{{='Si' if document['signature_required']=='T' else 'No'}}</td>
+            <td>{{='Si' if document['is_active']=='T' else 'No'}}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  href="{{=URL('admin', 'manage_document',args=['show', document['id']])}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'manage_document',args=['edit', document['id']])}}"
+                >
+                  <button class="btn btn-success btn-sm">
+                    <span
+                      class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"
+                    ></span>
+                    &nbsp;Editar
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'manage_document',args=['delete', document['id']])}}"
+                >
+                  <button class="btn btn-danger btn-sm">
+                    <span
+                      class="icon trash icon-trash glyphicon glyphicon-trash"
+                    ></span>
+                    &nbsp;Eliminar
+                  </button></a
+                >
+                <button
+                  class="btn btn-primary dropdown-toggle btn-sm"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Acciones
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'document_restrictions',vars={'document' : document['id']})}}"
+                    role="button"
+                  >
+                    Áreas de Restricción
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'signature_assignment',vars={'document' : document['id'], 'reference' : 'doc'})}}"
+                    role="button"
+                  >
+                    Asignación de Firmas
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{else:}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-6 well">
+        {{if action['type'] == 'new':}}
+        <form
+          action="{{=URL('admin', 'manage_document', args=['new'])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="inputName"
+                value="{{if 'item' in action:}}{{=action['item']['inputName']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDescription" class="col-sm-3 col-form-label"
+              >Descripción</label
+            >
+            <div class="col-sm-9">
+              <textarea
+                class="form-control"
+                id="inputDescription"
+                name="inputDescription"
+                rows="5"
+              >
+{{if 'item' in action:}}{{=action['item']['inputDescription']}}{{pass}}</textarea
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputTypeFile" class="col-sm-3 col-form-label"
+              >Tipo de Archivo</label
+            >
+            <div class="col-sm-9">{{=action['select']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDocumentType" class="col-sm-3 col-form-label"
+              >Tipo Entregable</label
+            >
+            <div class="col-sm-9">{{=action['selectDoc']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSize" class="col-sm-3 col-form-label"
+              >Tamaño Máximo (MB)</label
+            >
+            <div class="col-sm-9">{{=action['selectSize']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputStart" class="col-sm-3 col-form-label"
+              >Fecha inicio</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control datetime"
+                id="inputStart"
+                name="inputStart"
+                value="{{if 'item' in action:}}{{=action['item']['inputStart']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputFinish" class="col-sm-3 col-form-label"
+              >Fecha Finalización</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="datetime form-control"
+                id="inputFinish"
+                name="inputFinish"
+                value="{{if 'item' in action:}}{{=action['item']['inputFinish']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >¿Requiere Firma?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">{{=action['checkSignature']}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputActivate" class="col-sm-3 col-form-label"
+              >¿Está Activo?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">{{=action['checkActivate']}}</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{elif action['type'] == 'show':}}
+        <div class="form-group row">
+          <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['name']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputDescription" class="col-sm-3 col-form-label"
+            >Descripción</label
+          >
+          <div class="col-sm-9">
+            <textarea readonly class="form-control-plaintext" rows="5">
+{{=action['item'][0]['description']}}</textarea
+            >
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputTypeFile" class="col-sm-3 col-form-label"
+            >Tipo de archivo</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['type']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputDocumentType" class="col-sm-3 col-form-label"
+            >Tipo entregable</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{='Práctica inicia' if action['item'][0]['doc_type']=='Practice Start' else 'Práctica finaliza'}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSize" class="col-sm-3 col-form-label"
+            >Tamaño máximo (MB)</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['max_size']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputStart" class="col-sm-3 col-form-label"
+            >Fecha inicio</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['date_start']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputFinish" class="col-sm-3 col-form-label"
+            >Fecha Finalización</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['date_finish']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSignature" class="col-sm-3 col-form-label"
+            >¿Requiere Firma?</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{= 'Si' if action['item'][0]['signature_required']=='T' else 'No'}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputActivate" class="col-sm-3 col-form-label"
+            >¿Está Activo?</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{= 'Si' if action['item'][0]['is_active']=='T' else 'No'}}"
+            />
+          </div>
+        </div>
+        <a href="{{=URL('admin', 'manage_document')}}">
+          <button class="btn btn-primary">
+            <span class="fa fa-arrow-circle-left"></span>
+            &nbsp;Regresar
+          </button>
+        </a>
+        {{elif action['type'] == 'delete':}}
+        <form
+          action="{{=URL('admin', 'manage_document', args=['delete', action['item'][0]['id']])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['name']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDescription" class="col-sm-3 col-form-label"
+              >Descripción</label
+            >
+            <div class="col-sm-9">
+              <textarea readonly class="form-control-plaintext" rows="5">
+{{=action['item'][0]['description']}}</textarea
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputTypeFile" class="col-sm-3 col-form-label"
+              >Tipo de archivo</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['type']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDocumentType" class="col-sm-3 col-form-label"
+              >Tipo entregable</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{='Práctica inicia' if action['item'][0]['doc_type']=='Practice Start' else 'Práctica finaliza'}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSize" class="col-sm-3 col-form-label"
+              >Tamaño máximo (MB)</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['max_size']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputStart" class="col-sm-3 col-form-label"
+              >Fecha inicio</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['date_start']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputFinish" class="col-sm-3 col-form-label"
+              >Fecha Finalización</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['date_finish']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >¿Requiere Firma?</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{= 'Si' if action['item'][0]['signature_required']=='T' else 'No'}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputActivate" class="col-sm-3 col-form-label"
+              >¿Está Activo?</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{= 'Si' if action['item'][0]['is_active']=='T' else 'No'}}"
+              />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+        {{elif action['type'] == 'edit':}}
+        <form
+          action="{{=URL('admin', 'manage_document', args=['edit', action['item']['id']])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="inputName"
+                value="{{=action['item']['inputName']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDescription" class="col-sm-3 col-form-label"
+              >Descripción</label
+            >
+            <div class="col-sm-9">
+              <textarea
+                class="form-control"
+                id="inputDescription"
+                name="inputDescription"
+                rows="5"
+              >
+{{=action['item']['inputDescription']}}</textarea
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputTypeFile" class="col-sm-3 col-form-label"
+              >Tipo de archivo</label
+            >
+            <div class="col-sm-9">{{=action['select']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDocumentType" class="col-sm-3 col-form-label"
+              >Tipo entregable</label
+            >
+            <div class="col-sm-9">{{=action['selectDoc']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSize" class="col-sm-3 col-form-label"
+              >Tamaño máximo (MB)</label
+            >
+            <div class="col-sm-9">{{=action['selectSize']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputStart" class="col-sm-3 col-form-label"
+              >Fecha inicio</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control datetime"
+                id="inputStart"
+                name="inputStart"
+                value="{{=action['item']['inputStart']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputFinish" class="col-sm-3 col-form-label"
+              >Fecha Finalización</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="datetime form-control"
+                id="inputFinish"
+                name="inputFinish"
+                value="{{=action['item']['inputFinish']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >¿Requiere Firma?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">{{=action['checkSignature']}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputActivate" class="col-sm-3 col-form-label"
+              >¿Está Activo?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">{{=action['checkActivate']}}</div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{pass}}
+        <br />
+        {{ if "message" in action: }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {{pass}}
+      </div>
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<style>
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
+  }
+  .table td,
+  .table th {
+    vertical-align: middle;
+  }
+</style>

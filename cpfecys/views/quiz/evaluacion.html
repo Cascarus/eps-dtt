@@ -1,0 +1,428 @@
+{{extend 'dashboard.html'}}
+
+    <script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
+    <script type="text/javascript">
+        $(document).ready(
+            function(){  
+                $('#btnTerminar').click(function() {
+                    var actual = parseInt($('#pActual').text());
+                    var limite = parseInt($('#pCantidad').text());
+                    //voy a ir al boton guardar pregunta, voy a devolver si la sesion esta activa, si esta activa solo guardo
+                    //Sino esta activa, llamo otra vez a este mismo controlador evaluacion con los mismo paramatros, esto hara que cargue la pantalla de innactiva.
+        
+                    if(actual < limite) {
+                        var pregunta_actual = `#Pregunta_${actual}`;
+                        BuildingJson(actual);
+                        actual = (parseInt(actual) + parseInt(1));
+                        var pregunta_nueva = `#Pregunta_${actual}`;
+                        $('#pActual').text(actual);
+                        $('#pActual').val(actual);
+
+                        $(pregunta_actual).hide();
+                        $(pregunta_nueva).show();
+
+                        if(actual == limite) {
+                            $("#btnTerminar").show();
+                        }
+                    } else {
+                        var pregunta_actual = `#Pregunta_${actual}`;
+                        BuildingJson(actual);
+                        $("#btnTerminar").show();
+                    }
+                    
+                    var userid = document.getElementById("userid").value;
+                    var id_actividad = document.getElementById("id_actividad").value;
+                    var parametros = `?uid=${userid}&actividad=${id_actividad}&state=1`;
+                    window.location.href = `https://${location.hostname}/quiz/nota_estudiante${parametros}`;
+                });
+
+                $('#btnDesbloquear').click(function() {
+                    var userid = document.getElementById("userid").value;
+                    var id_actividad = document.getElementById("id_actividad").value;
+                    var parametros = `?uid=${userid}&actividad=${id_actividad}`;
+                    var clave = new Object();
+                    clave.valor = $("#pwd").val();
+                    
+                    var key = JSON.stringify(clave);
+                    SendPost("quiz", "llave", parametros, key);
+                    
+                    var x = document.getElementById("x").value;
+                    var xproject = document.getElementById("project").value;
+                    var xperiod = document.getElementById("period").value;
+                    var para = `/${x}?project=${xproject}&period=${xperiod}`;
+                    window.location.href = `https://${location.hostname}/quiz/evaluacion${para}`;
+                });
+
+                $('#btnAnterior').click(function() {
+                    var actual = parseInt($('#pActual').text());
+                    var limite = parseInt($('#pCantidad').text());
+                    
+                    BuildingJson(actual);
+
+                    if(actual > 1) {
+                        var pregunta_actual = `#Pregunta_${actual}`;
+                        actual -= 1;
+                        var pregunta_nueva = `#Pregunta_${actual}`;
+                        $('#pActual').text(actual);
+                        $('#pActual').val(actual);
+
+                        document.getElementById(`Pregunta_${(actual + 1)}`).style = 'display: none;';
+                        document.getElementById(`Pregunta_${(actual)}`).style = 'display: ;';
+                    }
+
+                    $("#btnTerminar").hide();
+                });
+
+                $('#btnSiguiente').click(function() {
+                    var actual = parseInt($('#pActual').text());
+                    var limite = parseInt($('#pCantidad').text());
+                    //voy a ir al boton guardar pregunta, voy a devolver si la sesion esta activa, si esta activa solo guardo
+                    //Sino esta activa, llamo otra vez a este mismo controlador evaluacion con los mismo paramatros, esto hara que cargue la pantalla de innactiva.
+                    
+                    if(actual < limite) {
+                        let pregunta_actual = `#Pregunta_${actual}`;
+                        BuildingJson(actual);
+                        actual += 1;
+                        let pregunta_nueva = `#Pregunta_${actual}`;
+                        $('#pActual').text(actual);
+                        $('#pActual').val(actual);
+
+                        document.getElementById(`Pregunta_${(actual - 1)}`).style = 'display: none;';
+                        document.getElementById(`Pregunta_${(actual)}`).style = 'display: ;';
+
+                        if(actual == limite) { $("#btnTerminar").show(); }
+                    } else {
+                        var pregunta_actual = `#Pregunta_${actual}`;
+                        BuildingJson(actual);
+                        $("#btnTerminar").removeAttr('hidden');
+                    }
+                });
+
+                function BuildingJson(id) {
+                    var idTipoActual = `#Tipo_${id}`;
+                    var tipo_actual = $(idTipoActual).text();
+                    var tipo = "multiple";
+                    if (tipo_actual == 2) { tipo = "veracidad"; }
+                    else if (tipo_actual == 3) { tipo = "directa"; }
+                    var idPregunta = $(`#Id_${id}`).text();
+                    var valor = $(`#Valor_${id}`).text();
+
+                    var miRespuesta = new Object();
+                    miRespuesta.id_pregunta = idPregunta;
+                    miRespuesta.value = valor;
+                    miRespuesta.tipo = tipo;
+                    
+                    /***
+                     * Tipo 1: Multiple
+                     * Tipo 2: Veracidad
+                     * Tipo 3: Directa
+                     */
+                    if(tipo_actual == 1) {
+                        var arrayRespuestas = new Array();
+                        var indice = parseInt($(`#Cantidad_${id}`).text());
+                        for (var i = 1; i <= indice; i++) {
+                            var respuestas = new Object();
+
+                            var valorRespuesta = $(`#Pregunta_${id}_Respuesta_${i}`).text();
+                            respuestas.value = valorRespuesta;
+                            respuestas.correcta = $(`#Pregunta_${id}_Correcta_${i}`).is(":checked");
+                            
+                            arrayRespuestas.push(respuestas);
+                        }
+                        
+                        miRespuesta.respuesta = arrayRespuestas;
+                    } else if(tipo_actual == 2) {
+                        var respuesta = new Object();
+                        var checkedValue = "none";
+
+                        if ($(`#VPregunta_${id}`).is(":checked")) { checkedValue = true; }
+                        else if ($(`#FPregunta_${id}`).is(":checked")) { checkedValue = false; }
+                        respuesta.value = checkedValue;
+                        miRespuesta.respuesta = respuesta;
+                    } else {
+                        var respuesta = new Object();
+                        var r = $(`#respuesta__${id}`).val();
+                        if ($(`#respuesta__${id}`).val() != "") {
+                            respuesta.value = $(`#respuesta__${id}`).val();
+                        } else {
+                            respuesta.value = "";
+                        }
+                        miRespuesta.respuesta = respuesta;
+                    }
+                    
+                    var respuestaString = JSON.stringify(miRespuesta);
+                    var userid = document.getElementById("userid").value;
+                    var id_actividad = document.getElementById("id_actividad").value;
+                    var parametros = `?uid=${userid}&actividad=${id_actividad}`;
+                    r = SendPostSinc("quiz", "guardar_respuestas", parametros, respuestaString);
+                    if (r == 0) {
+                        var userid2 = document.getElementById("userid").value;
+                        var id_actividad2 = document.getElementById("id_actividad").value;
+                        var parametros2 = `?uid=${userid}&actividad=${id_actividad}&state=0`;
+                        window.location.href = `https://${location.hostname}/quiz/nota_estudiante${parametros2}`;
+                    }
+                }
+            }
+        );
+    </script>
+<div class="mt-4">
+    <!-- Si la variable vacio es true es porque ha ocurrido un error y el datalle del quiz se ha perdido -->
+    <input type="hidden" id="userid" value="{{=auth.user.id}}">
+    <input type="hidden" id="id_actividad" value="{{=programacion.id_actividad}}">
+    <input type="hidden" id="project" value="{{=project.id}}">
+    <input type="hidden" id="period" value="{{=period.id}}">
+    <input type="hidden" id="x" value="{{=programacion.id}}">
+
+    {{if not vacio:}}
+    <!-- VERIFICO SI NO SE HA VENCIDO EL TIEMPO DE VIGENCIA DEL QUIZ-->
+        {{if activo:}}
+            {{if not session.bloqueado:}}
+                <div class="row-fluid">
+                    <center>
+                        <h2>Evaluación&nbsp;
+                            {{if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):}}
+                                <a onclick="javascript:introJs().setOptions({'skipLabel': 'Quitar', 'nextLabel': 'Siguiente', 'prevLabel': 'Anterior', 'doneLabel': 'Salir'}).start();" href='javascript:void(0);' class="btn btn-primary">
+                                    <span class="fa fa-question-circle"></span>
+                                </a>
+                            {{pass}}
+                        </h2>
+                    </center>
+                </div>
+                <div class="well mt-4" id="div_metainfo_quiz">
+                    <a style="cursor:pointer;">
+                        <center><h4>Información general de la evaluación</h4></center>
+                    </a>
+                    <hr>
+                    <p><strong>Curso: </strong>{{=programacion.nombre_curso}}</p> 
+                    <p><strong>Actividad: </strong>{{=programacion.actividad_nombre}}</p>
+                    <p><strong>Tema de evaluación: </strong>{{=programacion.nombre_quiz}}</p>
+                    <p><strong>Duración: </strong>{{=programacion.duracion}} minutos</p>
+                    {{import json}}
+                    {{json_preguntas = json.loads(json_quiz)}}
+                    <p><strong>Cantidad de preguntas: </strong>{{=len(json_preguntas["PREGUNTAS"])}}</p>
+                    <p><strong>Carnet: </strong>{{=auth.user.username}}</p>
+                </div>
+                <div class="well" id="div_metainfo_quiz">
+                    <a style="cursor:pointer;">
+                        <center><h4>Detalle de la evaluación</h4></center>
+                    </a>
+                    <hr>
+                    <ol>
+                        {{i = 0}}
+                        {{for pregunta in (json_preguntas["PREGUNTAS"]):}}
+                            {{i += 1}}
+                            {{if i == 1:}}
+                                <li id="Pregunta_{{=i}}" value="{{=i}}">
+                            {{else:}}
+                                <li id="Pregunta_{{=i}}" style="display: none;" value="{{=i}}">
+                            {{pass}}
+                                
+                                <h4 id="Valor_{{=i}}">&nbsp;{{=pregunta["value"]}}</h4>
+                                {{if pregunta["tipo"] == "multiple":}}
+                                    <p id="Tipo_{{=i}}" hidden value=1>1</p>
+                                    <p id="Id_{{=i}}" hidden value='{{=pregunta["id_pregunta"]}}'>{{=pregunta["id_pregunta"]}}</p>
+                                    <p><strong>Tipo:</strong> Pregunta de opción múltiple</p>
+                                    <p><strong>Respuestas:</strong></p>
+                                    <center>
+                                        <table width=80%>
+                                            {{j = 0}}
+                                            {{for respuesta in pregunta["respuesta"]:}}
+                                                {{j += 1}}
+                                                <tr width=100%>
+                                                    <td width=10% id="CorrelativoPregunta_{{=i}}_Respuesta_{{=j}}">{{=chr(64+j)}}.</td>      
+                                                    <td width=90% id="Pregunta_{{=i}}_Respuesta_{{=j}}">{{=respuesta["value"]}}</td>
+                                                    <td width=10%><input type="checkbox" class={{=i}} id="Pregunta_{{=i}}_Correcta_{{=j}}"></td>
+                                                </tr>
+                                            {{pass}}
+                                        </table>
+                                    </center>
+                                    <p id="Cantidad_{{=i}}" hidden value="{{=j}}">{{=j}}</p>
+                                {{elif (pregunta["tipo"] == "veracidad"):}}
+                                    <p id="Tipo_{{=i}}" hidden value=2>2</p>
+                                    <p id="Id_{{=i}}" hidden value='{{=pregunta["id_pregunta"]}}'>{{=pregunta["id_pregunta"]}}</p>
+                                    <p><strong>Tipo:</strong> Pregunta de Falso / Verdadero</p>
+                                    <label class="badge badge-danger badge-lg" style="background-color: rgb(255, 0, 0); font-size: small;">
+                                        <input type="radio" name="optradio_{{=i}}" id="FPregunta_{{=i}}">
+                                        <span>{{=XML("&nbsp;"*9)}}FALSO{{=XML("&nbsp;"*9)}}</span>
+                                    </label>
+                                    <br>
+                                    <label class="badge badge-success" style="background-color: green; font-size: small;">
+                                        <input type="radio" name="optradio_{{=i}}" id="VPregunta_{{=i}}">
+                                        <strong>&nbsp;VERDADERO&nbsp;</strong>
+                                    </label>
+                                {{else:}}
+                                    <p id="Tipo_{{=i}}" hidden value=3>3</p>
+                                    <p><strong>Tipo: </strong>Repuesta corta</p>
+                                    <p id="Id_{{=i}}" hidden value='{{=pregunta["id_pregunta"]}}'>{{=pregunta["id_pregunta"]}}</p>
+                                    <div class="col-xs-2">
+                                        <label for="ex1">Ingrese su respuesta:</label>
+                                        <input class="form-control mt-2" id="respuesta__{{=i}}" type="text" placeholder="Respuesta">
+                                    </div>
+                                {{pass}}
+                            </li>
+                        {{pass}}
+                        <hr>
+                    </ol>
+                    <p id="pCantidad" value="{{=len(json_preguntas["PREGUNTAS"])}}" hidden>{{=len(json_preguntas["PREGUNTAS"])}}</p>
+                    <p id="pActual" value="=1" hidden>1</p>
+                    <center>
+                        <button name="btnAnterior" type="button" class="btn btn-success" id="btnAnterior">Anterior</button>
+                        <button name="btnSiguiente" type="button" class="btn btn-info" id="btnSiguiente">Siguiente</button>
+                    </center>
+                    <table width="600"> 
+                        <tr>
+                            <td></td>     
+                        </tr> 
+                        <tr> 
+                            <td style="right:inherit"><button name="btnTerminar" type="button" class="btn btn-danger" id="btnTerminar" style="display: none;">Terminar</button></td> 
+                        </tr> 
+                    </table>
+                </div>
+            {{else:}}
+                <table style="width:100%">
+                    <tr>
+                        <td style="width:20%"></td>
+                        <td style="width:20%"></td>
+                        <td style="width:20%;text-align: center;">
+                            <img src="{{=URL('static','images')}}/locked.png" height="70%t" width="70%">
+                        </td>
+                        <td style="width:20%"></td>
+                        <td style="width:20%"></td>
+                    </tr>
+                    <tr>
+                        <td></br></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <div class="form-group">
+                                <input type="password" class="form-control" id="pwd">
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success" style="width:100%" id="btnDesbloquear">
+                                    <i class="fas fa-lock-open"></i>
+                                    Desbloquear
+                                </button>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            {{pass}}
+        {{else:}}
+            <!-- SI EL TIEMPO DE VIGENCIA SE VENCIO-->
+            <table style="width:100%">
+                <tr>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                    <td style="width: 10%"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="2" style="text-align:center;">
+                        <img src="{{=URL('static','images')}}/deactive.png" width="50%">
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="7" style="height: 50px;"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="4" style="font-family:Abel,Thoma; font-size: 14pt; color:#666666;text-align:center;">
+                        Lo sentimos esta actividad ha caducado o fue desactivada.
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        {{pass}}
+    <!-- FINALIZO CODIGO DE QUIZ VENCIDO-->
+    {{else:}}
+        <!-- Si el quiz esta vacio -->
+        <div class="navbar" data-step=1 data-intro="Div detalle del quiz">
+            <div class="navbar-inner">
+                <a style="cursor:pointer;"><center><h4>Informacion</h4></center></a>
+            </div>
+        </div>
+        <div class="well" id="div_metainfo_quiz">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="2" style="text-align:center;">
+                        <img src="{{=URL('static','images')}}/info.png" width="50%">
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">
+                        <label>Ha ocurrido un error al recuperar la evaluacion. El detalle de la evaluacion ha sido eliminado o se ha movido de ubicacion.</label>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    {{pass}}
+    <!-- FINALIZO SEGMENTO SI EL QUIZ ESTA VACIO-->
+</div>

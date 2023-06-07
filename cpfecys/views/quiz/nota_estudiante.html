@@ -1,0 +1,73 @@
+{{extend 'dashboard.html'}}
+<table style="width:100%">
+    <tr>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+        <td style="width: 10%"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="2" style="text-align:center;">
+            <img src="{{=URL('static','images')}}/result.svg" width="100%">
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="7" style="height: 50px;"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        {{if estado == 1:}}
+            <td colspan="4" style="font-family:Abel,Thoma; font-size: 14pt; color:#666666;text-align:center;">
+                Ha finalizado la actividad su nota es: {{=nota}}
+            </td>
+        {{else:}}
+            <td colspan="4" style="font-family:Abel,Thoma; font-size: 14pt; color:#666666;text-align:center;">
+                <strong>TIEMPO EXPIRADO.</strong> Su nota es: {{=nota}}
+            </td>
+        {{pass}}
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="4" style="font-family:Abel,Thoma; font-size: 14pt; color:#666666;text-align:center;">
+            Preguntas correctas:
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td colspan="7" style="height:50px;"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td colspan="4" style="font-family:Abel,Thoma; font-size: 42pt; color:#666666;text-align:center;">
+            {{=buenas}}/{{=total}}
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>

@@ -1,0 +1,672 @@
+{{if request.vars['op'] == "solve_weighting_request":}}
+	{{if request.vars['tip'] == "p":}}
+		{{all_request = db((db.request_change_weighting.status == 'pending') & (db.request_change_weighting.period == int(semestre2.id))
+                        & (db.request_change_weighting.project == int(request.vars['project']))).select()}}
+	{{elif request.vars['tip'] == "a":}}
+		{{all_request = db((db.request_change_weighting.status == 'accepted') & (db.request_change_weighting.period == int(semestre2.id))
+                        & (db.request_change_weighting.project == int(request.vars['project']))).select()}}
+	{{elif request.vars['tip'] == "r":}}
+		{{all_request = db((db.request_change_weighting.status == 'rejected') & (db.request_change_weighting.period == int(semestre2.id))
+                        & (db.request_change_weighting.project == int(request.vars['project']))).select()}}
+	{{elif request.vars['tip'] == "t":}}
+		{{all_request = db((db.request_change_weighting.status != 'edit') & (db.request_change_weighting.period == int(semestre2.id))
+                        & (db.request_change_weighting.project == int(request.vars['project']))).select()}}
+	{{pass}}
+	{{if all_request.first() != None:}}
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>{{=T('User')}}</th>
+                <th>{{=T('Role')}} </th>
+                <th>{{=T('Status')}}</th>
+                <th>Fecha Solicitud</th>
+                <th><center>{{=T('Action')}}</center></th>
+            </tr>
+            {{for change in all_request:}}
+                <tr>
+                    <td>{{=change.user_id.username}}</td>
+                    {{if change.roll == "Student":}}
+                        <td>{{=T('Tutor academico')}}</td>
+                    {{else:}}
+                        <td>{{=T(change.roll)}}</td>
+                    {{pass}}
+                    <td>{{=T(change.status)}}</td>
+                    <td>{{=change.date_request}}</td>
+                    <td>
+                        <center>
+                            <a class="btn btn-primary" title="{{=T('View the change request')}}" onclick="detail({{=change.id}});">{{=T('Detail')}}</a>
+                        </center>
+                    </td>
+                </tr>
+            {{pass}}
+        </table>
+	{{else:}}
+		{{=T('There is no request')}}
+	{{pass}}
+{{pass}}
+
+{{if request.vars['op'] == "solve_request_detail":}}
+	{{request_aux = db(db.request_change_weighting.id==int(request.vars['Idrequest'])).select().first()}}
+	<table class="table table-striped table-bordered">
+		<tr>
+			<th colspan="6"><center>{{=T('Request Change')}}</center></th>
+		</tr>
+		<tr>
+			<th>{{=T('User')}}</th><td>{{=request_aux.user_id.username}}</td>
+			<th>{{=T('Date Request')}}</th><td>{{=request_aux.date_request}}</td>
+			<th>{{=T('Roll')}}</th>
+			{{if request_aux.roll == "Student":}}
+				<td>{{=T('Tutor academico')}}</td>
+			{{else:}}
+				<td>{{=T(request_aux.roll)}}</td>
+			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('User resolution')}}</th>
+			{{if request_aux.status == 'pending':}}
+				<td>---</td>
+			{{else:}}
+				<td>{{=request_aux.resolve_user.username}}</td>
+			{{pass}}
+			<th>{{=T('Date of resolution')}}</th>
+			{{if request_aux.status == 'pending':}}
+				<td>---</td>
+			{{else:}}
+				<td>{{=request_aux.date_request_resolve}}</td>
+			{{pass}}
+			<th>{{=T('Role resolution')}}</th>
+			{{if request_aux.status == 'pending':}}
+				<td>---</td>
+			{{else:}}
+				<td>{{=request_aux.roll_resolve}}</td>
+			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('Status')}}:</th>
+			{{if request_aux.status == 'pending':}}
+				<th colspan="5"><FONT COLOR="#5E610B">{{=T(request_aux.status)}}</font></th>
+			{{elif request_aux.status == 'accepted':}}
+				<th colspan="5"><FONT COLOR="Green">{{=T(request_aux.status)}}</font></th>
+			{{else:}}
+				<th colspan="5"><FONT COLOR="Red">{{=T(request_aux.status)}}</font></th>
+			{{pass}}
+		</tr>
+		<tr>
+			<th>{{=T('Description')}}:</th>
+			<td colspan="5"><pre>{{=request_aux.description}}</pre></td>
+		</tr>
+		<tr>
+			{{if request_aux.status == 'pending':}}
+				<th colspan="3"><center>{{=T('Current Weight')}}</center></th>
+				<th colspan="3"><center>{{=T('Weighting Requested')}}</center></th>
+			{{else:}}
+				<th colspan="6"><center>{{=T('Changes Requested')}}</center></th>
+			{{pass}}
+		</tr>
+		<tr>
+			{{if request_aux.status=='pending':}}
+                <td colspan="3">
+                    <center>
+                        <table class="table table-striped table-bordered">
+                            <tr>
+                                <th>{{=T('Category')}}</th>
+                                <th>{{=T('Grade')}}</th>
+                                <th title="{{=T('Average Grades')}}">{{=T('AG')}}</th>
+                            </tr>
+                            {{total_var = 0}}
+                            {{projects = db((db.course_activity_category.semester == int(request.vars['year'])) & (db.course_activity_category.assignation == request.vars['project']) 
+                                            & (db.course_activity_category.laboratory == True)).select()}}
+                            {{for project in projects:}}
+                                <tr>
+                                    <td>
+                                        {{=project.category.category}}
+                                    </td>
+                                    <td>
+                                        {{=project.grade}}
+                                        {{total_var = total_var + project.grade}}
+                                    </td>
+                                    <td>
+                                        {{var_SG = True}}
+                                        {{if project.specific_grade:}}
+                                            {{var_SG = False}}
+                                        {{pass}}
+                                        {{=T(str(var_SG))}}
+                                    </td>
+                                </tr>
+                            {{pass}}
+                            <tr>
+                                <td style="background-color:#eee;">
+                                    {{=T('Total')}}
+                                </td>
+                                <td style="background-color:#eee;">
+                                    {{if total_var != 100:}}
+                                        <b><font color="red">{{=total_var}}</font></b>
+                                    {{else:}}
+                                        <b><font color="green">{{=total_var}}</font></b>
+                                    {{pass}}
+                                </td>
+                                <td style="background-color:#eee;"></td>
+                            </tr>
+                        </table>
+                    </center>
+                </td>
+                <td colspan="3">
+                    <center>
+                        <div id="div_request_detail_2"></div>
+                    </center>
+                    <script type="text/javascript">
+                        $("#div_request_detail_2")
+                            .load("{{=URL('activity_control', 'request_change_weighting_load.html')}}?op=create_request&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;change_id={{=request.vars['Idrequest']}}"); 
+                    </script>
+                </td>
+			{{else:}}
+				<td colspan="6">
+					<center>
+						<div id="div_request_detail_2">
+							<table class="table table-striped table-bordered">
+								<tr>
+									<th>{{=T('Category')}}</th>
+									<th>{{=T('Grade')}}</th>
+									<th title="{{=T('Average Grades')}}">
+										{{=T('AG')}}
+									</th>
+								</tr>
+								{{total_var = 0}}
+								{{temp = db((db.request_change_w_log.r_c_w_id == request_aux.id) & (db.request_change_w_log.before_status == 'pending')).select().first()}}
+								{{for project in db(db.request_change_w_detail_log.request_change_w_log == temp.id).select():}}
+									<tr>
+										{{try:}}
+											{{if project.operation_request == 'none':}}
+												<td>{{=project.category}}</td>
+												<td>
+													{{=project.after_grade}}
+													{{total_var = total_var + project.after_grade}}
+												</td>
+												<td>
+													{{var_SG = True}}
+													{{if project.after_specific_grade:}}
+														{{var_SG = False}}
+													{{pass}}
+													{{=T(str(var_SG))}}
+												</td>
+											{{elif project.operation_request == 'insert':}}
+												<td>
+													<font color="Green">{{=project.category}}</font>
+												</td>
+												<td>
+													<font color="Green">
+													    {{=project.after_grade}}
+													    {{total_var = total_var + project.after_grade}}
+													</font>
+												</td>
+												<td>
+													<font color="Green">
+                                                        {{var_SG = True}}
+                                                        {{if project.after_specific_grade:}}
+                                                            {{var_SG = False}}
+                                                        {{pass}}
+                                                        {{=T(str(var_SG))}}
+													</font>
+												</td>
+											{{elif project.operation_request == 'update':}}
+												<td>
+													<font color="blue">{{=project.category}}</font>
+												</td>
+												<td>
+													<font color="blue">
+													    {{=project.after_grade}}
+													    {{total_var = total_var + project.after_grade}}
+													</font>
+												</td>
+												<td>
+													<font color="blue">
+                                                        {{var_SG = True}}
+                                                        {{if project.after_specific_grade:}}
+                                                            {{var_SG = False}}
+                                                        {{pass}}
+                                                        {{=T(str(var_SG))}}
+													</font>
+												</td>
+											{{elif project.operation_request == 'delete':}}
+												<td>
+													<font color="red">{{=project.course_category}}</font>
+												</td>
+												<td></td>
+												<td></td>
+											{{pass}}
+										{{except:}}
+											{{None}}
+										{{pass}}
+									</tr>
+								{{pass}}
+								<tr>
+									<td style="background-color:#eee;">
+										{{=T('Total')}}
+									</td>
+									<td style="background-color:#eee;">
+										{{if total_var != 100:}}
+											<b><font color="red">{{=total_var}}</font></b>
+										{{else:}}
+											<b><font color="green">{{=total_var}}</font></b>
+										{{pass}}
+									</td>
+									<td style="background-color:#eee;"></td>
+								</tr>
+							</table>
+							<div align="left">
+							    <br>
+								<b>{{=T('Legend')}}:</b>
+							    <br>
+								<span class="label label-success">&nbsp;&nbsp;&nbsp;</span> {{=T('Category created')}}
+							    <br>
+								<span class="label label-info">&nbsp;&nbsp;&nbsp;</span> {{=T('Category edited')}}
+							    <br>
+								<span class="label label-important">&nbsp;&nbsp;&nbsp;</span> {{=T('Category deleted')}}
+							    <br>
+							</div>
+						</div>
+					</center>
+				</td>
+			{{pass}}
+		</tr>
+		<tr>
+			{{if request_aux.status == 'pending':}}
+				<td colspan="3"></td>
+				<td><center>
+					<a role="button" onclick="acceptRequestChange({{=request_aux.id}});" class="btn btn-success" title="{{=T('Accept the change request planning')}}"> <span class="icon-white icon-ok"></span>{{=T('Accept Request')}}</a>
+				</center></td>
+				<td><center>
+					<a role="button" onclick="rejectRequestChange({{=request_aux.id}});" class="btn btn-danger" title="{{=T('Reject the change request planning')}}"> <span class="fa fa-ban"></span>{{=T('Reject Request')}}</a>
+				</center></td>
+			{{else:}}
+				<td colspan="5"></td>
+			{{pass}}
+			<td><center>
+				<a class="btn btn-primary" title="{{=T('Close the detail of the change request')}}" onclick="closeDetail();">{{=T('Close Detail')}}</a>
+			</center></td>
+		</tr>
+	</table>
+{{pass}}
+
+{{if request.vars['op'] == "rejectRequestChange":}}
+	{{from datetime import datetime}}
+	{{db(db.request_change_weighting.id == int(request.vars['Idrequest'])).update(
+        status='rejected', 
+		resolve_user=auth.user.id, 
+		roll_resolve=rol_log, 
+		date_request_resolve=str(datetime.now())
+	)}}
+	{{temp2 = db(db.request_change_w_log.r_c_w_id == request.vars['Idrequest']).select().first()}}
+	{{temp3 = db.request_change_w_log.insert(
+        r_c_w_id=request.vars['Idrequest'],
+		username=temp2.username,
+		roll=temp2.roll,
+		before_status='pending',
+		after_status='rejected',
+		description=temp2.description,
+		semester=temp2.semester,
+		yearp=temp2.yearp,
+		project=temp2.project,
+		resolve_user=auth.user.username,
+		roll_resolve=rol_log,
+		date_request=temp2.date_request,
+		date_request_resolve=str(datetime.now())
+	)}}
+	{{temp4 = db(db.request_change_weighting.id == request.vars['Idrequest']).select().first()}} 
+	
+	{{for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting == temp4.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():}}
+		{{if var_chang_ins.operation_request == 'insert':}}
+            {{db.request_change_w_detail_log.insert(
+                request_change_w_log=temp3,
+                operation_request=var_chang_ins.operation_request,
+                category=var_chang_ins.category.category,
+                after_grade=var_chang_ins.grade,
+                after_specific_grade=var_chang_ins.specific_grade
+            )}}
+        {{pass}}
+	{{pass}}
+
+    {{categories = db((db.course_activity_category.semester == int(temp4.period)) & (db.course_activity_category.assignation == temp4.project) 
+                    & (db.course_activity_category.laboratory == True)).select()}}
+	{{for categorie in categories:}}
+		{{var_chang = db(db.request_change_weighting_detail.course_category == str(categorie.id)).select().first()}}
+		{{if var_chang != None:}}
+            {{if var_chang.operation_request == 'delete':}}
+                {{cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()}}
+                {{db.request_change_w_detail_log.insert(
+                    request_change_w_log=str(temp3),
+	                operation_request=str(var_chang.operation_request),
+	                course_category=str(cat_temp.category.category),
+	                before_grade=str(cat_temp.grade),
+	                before_specific_grade=str(cat_temp.specific_grade)
+                )}}
+            {{elif var_chang.operation_request == 'update':}}
+            	{{cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()}}
+                {{cat_temp2 = db(db.activity_category.id == var_chang.category).select().first()}}
+                {{db.request_change_w_detail_log.insert(
+                    request_change_w_log=temp3,
+                    operation_request=var_chang.operation_request,
+                    course_category=cat_temp.category.category,
+                    category=cat_temp2.category,
+                    before_grade=cat_temp.grade,                                                                
+                    after_specific_grade=var_chang.specific_grade,
+                    after_grade=var_chang.grade,
+                    before_specific_grade=cat_temp.specific_grade
+                )}}
+            {{pass}}
+            {{db(db.request_change_weighting_detail.id == var_chang.id).update(course_category = None)}}
+		{{else:}}
+			{{add_to_log = True}}
+			{{for req_c_w_d_l in db(db.request_change_w_detail_log.request_change_w_log == temp3).select():}}
+				{{if categorie.category.category == req_c_w_d_l.category:}}
+					{{add_to_log = False}}
+				{{pass}}
+			{{pass}}
+			{{if add_to_log:}}
+				{{db.request_change_w_detail_log.insert(
+                    request_change_w_log=temp3,
+	                operation_request='none',
+	                category=categorie.category.category,
+	                after_grade=categorie.grade,
+	                after_specific_grade=categorie.specific_grade
+                )}}
+			{{pass}}	                                                    
+		{{pass}}
+	{{pass}}
+	<script type="text/javascript">
+		location.href="{{=URL('activity_control', 'solve_request_change_weighting.html')}}?course={{=request.vars['project']}}";
+	</script>
+{{pass}}
+
+{{if request.vars['op']=="acceptRequestChange":}}
+	{{from datetime import datetime}}
+	{{db(db.request_change_weighting.id == int(request.vars['Idrequest'])).update(
+        status = 'accepted', 
+		resolve_user=auth.user.id, 
+		roll_resolve=rol_log, 
+		date_request_resolve=str(datetime.now())
+	)}}
+	{{temp2 = db(db.request_change_w_log.r_c_w_id == request.vars['Idrequest']).select().first()}}
+	{{temp3 = db.request_change_w_log.insert(
+        r_c_w_id=request.vars['Idrequest'],
+		username=temp2.username,
+		roll=temp2.roll,
+		before_status='pending',
+		after_status='accepted',
+		description=temp2.description,
+		semester=temp2.semester,
+		yearp=temp2.yearp,
+		project=temp2.project,
+		resolve_user=auth.user.username,
+		roll_resolve=rol_log,
+		date_request=temp2.date_request,
+		date_request_resolve=datetime.now()
+	)}}
+	{{temp4 = db(db.request_change_weighting.id == request.vars['Idrequest']).select().first()}} 
+	{{for var_chang_ins in db((db.request_change_weighting_detail.request_change_weighting == temp4.id) & (db.request_change_weighting_detail.operation_request == 'insert')).select():}}
+		{{if var_chang_ins.operation_request == 'insert':}}
+            {{db.request_change_w_detail_log.insert(
+                request_change_w_log=temp3,
+                operation_request=var_chang_ins.operation_request,
+                category=var_chang_ins.category.category,
+                after_grade=var_chang_ins.grade,
+                after_specific_grade=var_chang_ins.specific_grade
+            )}}
+            {{db.course_activity_category.insert(
+                category=var_chang_ins.category,
+		        grade=var_chang_ins.grade,
+		        specific_grade=var_chang_ins.specific_grade,
+		        semester=int(temp4.period), 
+		        assignation=temp4.project, 
+		        laboratory=True,
+		        teacher_permition=False
+            )}}
+			{{#--------------------Log-Weighting---------------------}}
+			{{db.course_activity_category_log.insert(
+                user_name=auth.user.username,
+				roll=rol_log,
+				operation_log='insert',
+				after_category=var_chang_ins.category.category,
+				after_grade=var_chang_ins.grade, 
+				after_specific_grade=var_chang_ins.specific_grade,
+				semester=T(temp4.period.period.name),
+				yearp=temp4.period.yearp,
+				assignation=temp4.project.name, 
+				after_laboratory=True,
+				after_teacher_permition=False,
+				description=T('Inserted from Acept Request Change Weighting page')
+            )}}
+        {{pass}}
+	{{pass}}
+    {{categories = db((db.course_activity_category.semester == int(temp4.period)) & (db.course_activity_category.assignation == temp4.project) 
+                    & (db.course_activity_category.laboratory == True)).select()}}
+	{{for categorie in categories:}}
+		{{var_chang = db(db.request_change_weighting_detail.course_category == str(categorie.id)).select().first()}}
+		{{if var_chang != None:}}
+            {{if var_chang.operation_request == 'delete':}}
+                {{cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()}}
+                {{db.request_change_w_detail_log.insert(
+                    request_change_w_log=str(temp3),
+	                operation_request=str(var_chang.operation_request),
+	                course_category=str(cat_temp.category.category),
+	                before_grade=str(cat_temp.grade),
+	                before_specific_grade=str(cat_temp.specific_grade)
+                )}}
+	            {{db(db.course_activity_category.id == cat_temp.id).delete()}}
+	            {{#--------------------Log-Weighting---------------------}}
+				{{db.course_activity_category_log.insert(
+                    user_name=auth.user.username,
+					roll=rol_log,
+					operation_log='delete',
+					before_category=cat_temp.category.category,
+					before_grade=cat_temp.grade, 
+					before_specific_grade=cat_temp.specific_grade, 
+					semester=T(temp4.period.period.name),
+					yearp=temp4.period.yearp,
+					assignation=temp4.project.name, 
+					before_laboratory=cat_temp.laboratory,
+					before_teacher_permition=cat_temp.teacher_permition,
+					description=T('Delete from Acept Request Change Weighting page')
+                )}}
+            {{elif var_chang.operation_request == 'update':}}
+            	{{cat_temp = db(db.course_activity_category.id == var_chang.course_category).select().first()}}
+                {{cat_temp2 = db(db.activity_category.id == var_chang.category).select().first()}}
+                {{db.request_change_w_detail_log.insert(
+                    request_change_w_log=temp3,
+                    operation_request=var_chang.operation_request,
+                    course_category=cat_temp.category.category,
+                    category=cat_temp2.category,
+                    before_grade=cat_temp.grade,                                                                
+                    after_specific_grade=var_chang.specific_grade,
+                    after_grade=var_chang.grade,
+                    before_specific_grade=cat_temp.specific_grade)
+                }}
+                {{query_temp = db(db.course_activity_category.id == cat_temp.id).select().first()}}
+                {{#---------------Update-course-weighting (Insert)------------}}
+                {{new_id = db.course_activity_category.insert(
+                    category=var_chang.category,
+		            grade=var_chang.grade,
+		            specific_grade=var_chang.specific_grade,
+		            semester=int(temp4.period), 
+		            assignation=temp4.project, 
+		            laboratory=True,
+		            teacher_permition=False
+                )}}
+		        {{var_SG = var_chang.specific_grade}}
+            	{{#---------------Specific-grades-to-Average-Grades------------}}
+				{{if (query_temp.specific_grade == True) & (var_SG == False):}}
+					{{var_cac = db((db.course_activity.course_activity_category == query_temp.id) & (db.course_activity.assignation == temp4.project) 
+                                & (db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == int(temp4.period))).select()}}
+					{{for act_temp in var_cac:}}
+						{{db(db.course_activity.id == act_temp.id).update(
+                            course_activity_category=new_id,
+                            grade=0
+                        )}}
+						{{#---------------Activity-LOG------------}}
+						{{db.course_activity_log.insert(
+                            user_name=auth.user.username,
+							roll=rol_log,
+							operation_log='update',
+							course= temp4.project.name,
+							yearp=temp4.period.yearp,
+							period=T(temp4.period.period.name),
+							metric='T',
+							before_course_activity_category = act_temp.course_activity_category.category.category,
+							before_name = act_temp.name,
+							before_description = act_temp.description,
+							before_grade =  act_temp.grade,
+							before_laboratory = act_temp.laboratory,
+							before_teacher_permition = act_temp.teacher_permition,
+							before_date_start = act_temp.date_start,
+							before_date_finish = act_temp.date_finish,												
+							after_course_activity_category = act_temp.course_activity_category.category.category,
+							after_name = act_temp.name,
+							after_description =  act_temp.description,
+							after_grade =  0,
+							after_laboratory = act_temp.laboratory,
+							after_teacher_permition = act_temp.teacher_permition,
+							after_date_start =  act_temp.date_start,
+							after_date_finish = act_temp.date_finish
+                        )}}
+					{{pass}}
+				{{pass}}
+				{{#---------------Average-Grades-to-Specific-grades----------}}
+				{{if (query_temp.specific_grade == False) & (var_SG == True):}}
+					{{act_count = db((db.course_activity.course_activity_category == query_temp.id) & (db.course_activity.assignation == temp4.project) 
+                                    & (db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == int(temp4.period))).count()}}
+					{{var_cac = db((db.course_activity.course_activity_category == query_temp.id) & (db.course_activity.assignation == temp4.project) 
+                                    & (db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == int(temp4.period))).select()}}
+
+					{{category_total = 0}}
+					{{count = 0}}
+					{{cat_grade = round(float(var_chang.grade), 2)}}
+					{{for act_temp in var_cac:}}
+						{{count = count + 1}}
+						{{grade_var = round(((cat_grade) / float(act_count)), 2)}}
+						{{category_total = category_total + grade_var}}
+						{{if (count == act_count) & (category_total != cat_grade):}}
+							{{grade_var = grade_var + (cat_grade - category_total)}}
+						{{pass}}
+						{{db(db.course_activity.id == act_temp.id).update(
+                            course_activity_category=new_id,
+                            grade=grade_var
+                        )}}
+						{{#---------------Activity-LOG------------}}
+						{{db.course_activity_log.insert(
+                            user_name=auth.user.username,
+							roll=rol_log,
+							operation_log='update',
+							course= temp4.project.name,
+							yearp=temp4.period.yearp,
+							period=T(temp4.period.period.name),
+							metric='T',
+							before_course_activity_category=act_temp.course_activity_category.category.category,
+							before_name=act_temp.name,
+							before_description=act_temp.description,
+							before_grade=act_temp.grade,
+							before_laboratory=act_temp.laboratory,
+							before_teacher_permition=act_temp.teacher_permition,
+							before_date_start=act_temp.date_start,
+							before_date_finish=act_temp.date_finish,												
+							after_course_activity_category=act_temp.course_activity_category.category.category,
+							after_name=act_temp.name,
+							after_description=act_temp.description,
+							after_grade=grade_var,
+							after_laboratory=act_temp.laboratory,
+							after_teacher_permition=act_temp.teacher_permition,
+							after_date_start=act_temp.date_start,
+							after_date_finish=act_temp.date_finish
+                        )}}
+					{{pass}}
+				{{pass}}
+				{{#---------------Change-of-grade----------}}
+				{{cat_grade_aft = round(float(var_chang.grade), 2)}}
+				{{cat_grade_bef = round(float(query_temp.grade), 2)}}		
+				{{if (cat_grade_bef != cat_grade_aft) & (query_temp.specific_grade == True) & (var_SG == True):}}
+					{{act_count = db((db.course_activity.course_activity_category == query_temp.id) & (db.course_activity.assignation == temp4.project) 
+                                & (db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == int(temp4.period))).count()}}
+					{{var_cac = db((db.course_activity.course_activity_category == query_temp.id) & (db.course_activity.assignation == temp4.project) 
+                                & (db.course_activity.laboratory == query_temp.laboratory) & (db.course_activity.semester == int(temp4.period))).select()}}
+					{{category_total=0}}
+					{{count = 0}}
+					{{for act_temp in var_cac:}}
+						{{count = count + 1}}
+						{{grade_var_1 = round((float(act_temp.grade) * (100) / cat_grade_bef), 2)}}
+						{{grade_var = round(((grade_var_1)*cat_grade_aft / (100)), 2)}}
+						{{category_total = category_total + grade_var}}
+						{{if (count == act_count) & (category_total != cat_grade_aft):}}
+							{{grade_var = grade_var + (cat_grade_aft - category_total)}}
+						{{pass}}
+						{{db(db.course_activity.id==act_temp.id).update(course_activity_category=new_id, grade=grade_var)}}
+						{{#---------------Activity-LOG------------}}
+						{{db.course_activity_log.insert(
+                            user_name=auth.user.username,
+							roll=rol_log,
+							operation_log='update',
+							course= temp4.project.name,
+							yearp=temp4.period.yearp,
+							period=T(temp4.period.period.name),
+							metric='T',
+							before_course_activity_category=act_temp.course_activity_category.category.category,
+							before_name=act_temp.name,
+							before_description=act_temp.description,
+							before_grade=act_temp.grade,
+							before_laboratory=act_temp.laboratory,
+							before_teacher_permition=act_temp.teacher_permition,
+							before_date_start=act_temp.date_start,
+							before_date_finish=act_temp.date_finish,												
+							after_course_activity_category=act_temp.course_activity_category.category.category,
+							after_name=act_temp.name,
+							after_description=act_temp.description,
+							after_grade=grade_var,
+							after_laboratory=act_temp.laboratory,
+							after_teacher_permition=act_temp.teacher_permition,
+							after_date_start=act_temp.date_start,
+							after_date_finish=act_temp.date_finish
+                        )}}
+					{{pass}}
+				{{pass}}
+				{{#---------------Update-course-weighting (Delete)------------}}
+				{{db(db.course_activity_category.id == cat_temp.id).delete()}}
+				{{#--------------------Log-Weighting---------------------}}
+				{{db.course_activity_category_log.insert(
+                    user_name=auth.user.username,
+					roll=rol_log,
+					operation_log='update',
+					after_category=var_chang.category.category,
+					before_category=cat_temp.category.category,
+					after_grade=cat_grade_aft, 
+					before_grade=cat_grade_bef, 
+					after_specific_grade=var_chang.specific_grade,
+					before_specific_grade=cat_temp.specific_grade, 
+					semester=T(temp4.period.period.name),
+					yearp=temp4.period.yearp,
+					assignation=temp4.project.name, 
+					after_laboratory=cat_temp.laboratory,
+					before_laboratory=cat_temp.laboratory,
+					after_teacher_permition=cat_temp.teacher_permition,
+					before_teacher_permition=cat_temp.teacher_permition,
+					description=T('Edited from Acept Request Change Weighting page')
+                )}}
+            {{pass}}
+		{{else:}}
+			{{add_to_log = True}}
+			{{for req_c_w_d_l in db(db.request_change_w_detail_log.request_change_w_log == temp3).select():}}
+				{{if categorie.category.category == req_c_w_d_l.category:}}
+					{{add_to_log = False}}
+				{{pass}}
+			{{pass}}
+			{{if add_to_log:}}
+				{{db.request_change_w_detail_log.insert(
+                    request_change_w_log=temp3,
+	                operation_request='none',
+	                category=categorie.category.category,
+	                after_grade=categorie.grade,
+	                after_specific_grade=categorie.specific_grade
+                )}}
+			{{pass}}	                                                    
+		{{pass}}
+	{{pass}}
+	<script type="text/javascript">
+		location.href="{{=URL('activity_control','solve_request_change_weighting.html')}}?course={{=request.vars['project']}}";
+	</script>
+{{pass}}

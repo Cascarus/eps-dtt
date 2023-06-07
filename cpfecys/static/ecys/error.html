@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" type="image/x-icon" href="/static/build/images/ecys/favicon.ico">
+    <title>Error Page | DTT-Ecys</title>
+    <link rel="stylesheet" href="/static/build/css/ecys.css">
+</head>
+<body>
+    <header>
+        <div class="dttheader">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <div class="dttheader__logo">
+                        <a class="navbar-brand" href="/">
+                            <picture>
+                                <source media="(min-width: 465px)" srcset="/static/build/images/ecys/logo-ecys-fiusac-min.png">
+                                <img src="/static/build/images/ecys/logo-ecys-fiusac-min.png" alt="Dtt ECYS">
+                            </picture>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <div class="dttheader__hero">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-right">
+                        <div class="dttheader__message">
+                            <p>“Aunque nuestra visión hacia adelante es muy corta, podemos damos cuenta de que hay mucho por hacer”</p>
+                            <p>Alan Turing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id="dttErrorPage">
+        <section class="rntHeroImage rntbanner container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h1>Error 404</h1>
+                    <p>Serás redirigido automáticamente a la pagina principal en 5 segundos...</p>
+                </div>
+                <div class="col-12">
+                    <img src="/static/build/images/ecys/" alt="">
+                </div>
+                <div class="background">
+                    <div class="ground"></div>
+                </div>
+                <div class="container">
+                    <div class="left-section">
+                        <div class="inner-content">
+                            <h1 class="heading">404</h1>
+                            <p class="subheading">Looks like the page you were looking for is no longer here.</p>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <div class="container dttfooter">
+            <div class="row">
+                <div class="col-12 dttfooter__icons">
+                    <ul>
+                        <li class="dttfooter__icons--li">
+                            <a href="https://www.facebook.com/ecysFIUSAC" target="_blank"><i class="fa fa-facebook"></i></a>
+                        </li>
+                        <li class="dttfooter__icons--li">
+                            <a href="https://portal.ingenieria.usac.edu.gt/" target="_blank"><i class="fa fa-university"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <p class="text-center">Universidad de San Carlos de Guatemala uses Simio <a
+                            href="https://www.simio.com/">simulation software</a> under a grant from Simio LLC (<a
+                            href="https://www.simio.com/">www.simio.com</a>).</p>
+                    <p class="text-center">Soporte y Asistencia <br />
+                        <a href="mailto:soporte@dtt-ecys.org">soporte@dtt-ecys.org</a> <br />
+                        Sistema de Seguimiento de la Escuela de Ciencias y Sistemas <br />
+                        Facultad de Ingeniería- Universidad de San Carlos de Guatemala</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Section Script-->
+    <script>
+        window.onload = function () {
+            window.setTimeout(function () {
+                console.log('redirect');
+                location.href = "/";
+            }, 5000);
+        };
+    </script>
+    <!-- End Section Script-->
+    <!-- Section Global Script-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-143827878-1');
+    </script> 
+
+<!-- End Section Global Script-->
+
+</body>
+</html>

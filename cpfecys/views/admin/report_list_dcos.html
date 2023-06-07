@@ -1,0 +1,185 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+	<div class="row">
+		<div class="col-12">
+			<h1>{{=T('Report list')}}</h1>
+		</div>
+		<div class="col-12">
+			<div class="well span12" style="overflow-x:scroll">
+				<a onclick="window.history.back()" class="btn btn-primary" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+				<a class="btn btn-success pull-right"
+				 onclick="tableToExcel('report-list','');">
+				  <i class="icon-download icon-white"></i>
+				  {{=T('Excel (XLS)')}}
+			  </a>
+			  <table id="report-list" class="table table-striped table-bordered">
+				  <tr>
+					  <th colspan="2" style="background-color: #ddd; ">{{=T('Period')}}</th>
+					  <th>{{=T('Pending')}}</th>
+					  <th colspan="4" style="background-color: #ddd; ">{{=T('Action Pending')}}</th>
+					  <th colspan="3">{{=T('Finished')}}</th>
+					  <th colspan="2" style="background-color: #ddd; ">{{=T('DTT')}}</th>
+					  <th colspan="2">{{=T('Entrega')}}</th>
+					  <th style="background-color: #ddd; ">{{=T('All')}}</th>
+				  </tr>
+				  <tr>
+					  <th>
+						  <span>
+							  {{=T('Semester')}}
+						  </span>
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('Year')}}
+						  </span>
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('Pending')}}
+						  </span>
+						  <i class="icon-warning-sign"></i> 
+					  </th>
+					  {{for status in report_total:}}
+					  <th>
+						  <span class="tooltiped" data-content="{{=T(status.report_status.description)}}" 
+						  title="{{=T(status.report_status.name)}}" >
+							  {{=T(status.report_status.name)}}
+						  </span>
+						  <i class="{{=status.report_status.icon or 'icon-star'}}"></i> 
+					  </th>
+					  {{pass}}
+					  <th>
+						  <span>
+							  {{=T('Approved')}}
+						  </span>
+						  <i class="icon-ok"></i> 
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('Reproved')}}
+						  </span>
+						  <i class="icon-remove"></i> 
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('Aprobado DTT')}}
+						  </span>
+						  <i class="icon-ok"></i> 
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('Pendientes DTT')}}
+						  </span>
+						  <i class="icon-edit"></i> 
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('Entregados')}}
+						  </span>
+						  <i class="icon-ok"></i> 
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('No delivered')}}
+						  </span>
+						  <i class="icon-remove"></i> 
+					  </th>
+					  <th>
+						  <span>
+							  {{=T('All')}}
+						  </span>
+						  <i class="icon-list"></i> 
+					  </th>
+				  </tr>
+	  
+				  {{for period in periods:}}
+				  <tr>
+	  
+					  <td>
+						  <b>{{=T(period['name'])}}</b>
+					  </td>
+					  <td>
+						  {{=period['anio']}}
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-7, name=T(period['name'])+' '+str(period['anio'])+' - Pendientes'))}}"> 
+						  <span class="badge badge-inverse">{{=period['pendientes']}}</span>
+						  <span>{{=T('Pendiente')}} </span>
+						  </a>
+					  </td>
+	  
+					  {{contador = 5}}
+	  
+					  {{for status in report_total:}}
+						  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', \
+						  vars=dict(period=period['id'],status=status.report_status.id,name=T(period['name'])+' '+str(period['anio']) +' - '+str(T(status.report_status.name)) ))}}"> 
+							  <span class="badge badge-info">
+							  {{value = period[T(status.report_status.name)]}}
+							   {{=value}}
+							   </span>
+							   </br>
+							   <span>{{=T(status.report_status.name)}} </span>
+						  </a>
+						  </td>
+						  {{contador+=1}}
+					  {{pass}}
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-1 , name=T(period['name'])+' '+str(period['anio'])+' - Aprobado' ))}}"> 
+						  <span class="badge badge-success">{{=period['aprobado']}}</span>
+						  <span>{{=T('Approved')}} </span>
+						  </a>
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-2, name=T(period['name'])+' '+str(period['anio'])+' - Reprobado'))}}"> 
+						  <span class="badge badge-danger">{{=period['reprobado']}}</span>
+						  <span>{{=T('Failed')}} </span>
+						  </a>
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-3, name=T(period['name'])+' '+str(period['anio'])+' - Aprobado DTT'))}}"> 
+						  <span class="badge badge-inverse">{{=period['condtt']}}</span>
+						  </br>
+						  <span>{{=T('Aprobado DTT')}} </span>
+						  </a>
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-4, name=T(period['name'])+' '+str(period['anio'])+' - Pendiente DTT'))}}"> 
+						  <span class="badge badge-warning">{{=period['sindtt']}}</span>
+						  </br>
+						  <span>{{=T('Pendiente DTT')}} </span>
+						  </a>
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-5, name=T(period['name'])+' '+str(period['anio'])+' - Entregados'))}}"> 
+						  <span class="badge badge-success">{{=period['entregado']}}</span>
+						  <span>{{=T('Entregados')}} </span>
+						  </a>
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], status=-6, name=T(period['name'])+' '+str(period['anio'])+' - No Entregados'))}}"> 
+						  <span class="badge badge-danger">{{=period['noentregado']}}</span>
+						  </br>
+						  <span>{{=T('No entregados')}} </span>
+						  </a>
+					  </td>
+					  <td>
+						  <a href="{{=URL('admin', 'report_filter_dcos', vars=dict(period=period['id'], name=T(period['name'])+' '+str(period['anio']) ))}}">
+						  <span class="badge badge-info">{{=period['total']}}</span><span>{{=T('All')}}</span>
+						  </a>
+					  </td>
+				  </tr>
+				  {{pass}}
+			  </table>
+		  </div>
+	  </div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	$(function(){
+		$('.tooltiped').popover({placement:'top'});	
+	})
+	
+</script>

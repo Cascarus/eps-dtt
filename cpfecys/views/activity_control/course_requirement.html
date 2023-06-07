@@ -1,0 +1,59 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <a href="{{=URL('activity_control', 'general_report_activities', vars=dict(project = project.id, period = year.id, type="class"))}}" class="btn btn-primary" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
+            </div>
+            <h2>
+                {{=T('Course Requeriment')}} <a href="#myModal" role="button" class="btn btn-primary"data-toggle="modal"><span class="fa fa-question-circle"></span></a>
+                <br>
+                <small>
+                    {{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+                </small>
+            </h2>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">{{=T('Help')}} {{=T('Course Requeriment')}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="well">
+                                <p>{{=T('Within this space you can create, edit or delete a requirement to apply to the course.')}}</p>
+                                <p>
+                                    {{=T('Created to be a requirement, all students this course is applied and only students who have passed the requirement will pass the course.')}}
+                                </p>
+                                <p>
+                                    {{=T('Sample requirements:')}}
+                                    <br>
+                                    *) {{=T('ISE')}}
+                                    <br>
+                                    *) {{=T('SQM')}}
+                                    <br>
+                                    *) {{=T('SA')}}
+                                    <br>
+                                    *) {{=T('Accounting Lab')}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{=grid}}
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    jQuery('#course_requirement_teacher_permition__label').empty();
+    jQuery('#course_requirement_teacher_permition__label')
+        .append('<b>{{=T('Teacher Permition')}}</b><div class=\"alert alert-warning\">{{=T('When yoy active this option the academic tutors')}}<br>{{=T('can manage the requeriment')}}</div>');
+</script>

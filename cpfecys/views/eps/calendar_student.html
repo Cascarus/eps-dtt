@@ -1,0 +1,62 @@
+{{response.files.append(URL(r=request,c='static',f='css/fullcalendar.min.css'))}}
+{{response.files.append(URL(r=request,c='static',f='js/moment.min.js'))}}
+{{response.files.append(URL(r=request,c='static',f='js/fullcalendar.min.js'))}}
+
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <h1>{{=T('Calendario')}}</h1>
+    {{=form}}
+    {{if (request.vars.Proyect != None) & (rows != None):}}
+        {{=form1}}
+        <script type='text/javascript'>
+            jQuery(document).ready(function() {
+                var date = new Date();
+                var d = date.getDate();
+                var m = date.getMonth();
+                var y = date.getFullYear();
+
+                $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,basicWeek,basicDay'
+                    },
+                    editable: false,
+                    events: [
+                        {{for row in rows:}}
+                            {
+                                title: '{{=row.eps_activity.name}}',
+                                allDay: true,
+                                start: new Date("{{=row.eps_activity_calendar.date_assign.strftime('%B %d, %Y %H:%M:%S')}}"),
+                                end: new Date("{{=row.eps_activity_calendar.date_assign.strftime('%B %d, %Y %H:%M:%S')}}"),
+                                url: "{{=URL('activity_details_student',args=[row.eps_activity.id,row.eps_activity.modality, row.eps_activity_calendar.period_year,form.vars.Proyect,0])}}"
+                            },
+                        {{pass}}
+                    ]
+                });
+            });
+        </script>
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#data{{=1}}" data-toggle="tab">
+                        Calendario
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#data{{=2}}" data-toggle="tab">
+                        Entregables
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div  class="tab-pane active" id="data{{=1}}">
+                    <div id='calendar'></div>
+                </div>
+                <div  class="tab-pane" id="data{{=2}}">
+                    {{=form3}}
+                </div>
+            </div>
+        </div>
+    {{pass}}
+</div>

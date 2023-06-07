@@ -1,0 +1,667 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+  <h1>Asignación de Firmas</h1>
+  <h4>{{=action['doc_name']}}</h4>
+</div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{=URL('admin', 'manage_document_ecys')}}">Entregables</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a
+        href="{{=URL('admin', 'manage_document_ecys', args=['show', action['document']])}}"
+        >{{=action['doc_name']}}</a
+      >
+    </li>
+    <li class="breadcrumb-item">
+      <a
+        href="{{=URL('admin', 'signature_assignment_ecys',vars={'document' : action['document']})}}"
+        >Asignación de Firmas</a
+      >
+    </li>
+    {{if action['type'] == 'new':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'signature_assignment_ecys', args=['new'], vars={'document' : action['document']})}}"
+        >Nuevo</a
+      >
+    </li>
+    {{elif action['type'] == 'show':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'signature_assignment_ecys', args=['show', action['item'][0]['id']], vars={'document' : action['document']})}}"
+        >Ver</a
+      >
+    </li>
+    {{elif action['type'] == 'delete':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'signature_assignment_ecys', args=['delete', action['item'][0]['id']], vars={'document' : action['document']})}}"
+        >Eliminar</a
+      >
+    </li>
+    {{elif action['type'] == 'edit':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'signature_assignment_ecys', args=['edit', action['item']['id']], vars={'document' : action['document']})}}"
+        >Editar</a
+      >
+    </li>
+    {{pass}}
+  </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+  <div class="col-md-4">
+    <a href="{{=URL('admin', 'manage_document_ecys')}}">
+      <button class="btn btn-primary">
+        <span class="fa fa-arrow-circle-left"></span>
+        &nbsp;Regresar
+      </button>
+    </a>
+    <a
+      href="{{=URL('admin', 'signature_assignment_ecys',args=['new'], vars={'document' : action['document']})}}"
+    >
+      <button class="btn btn-primary">
+        <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+        &nbsp;Añadir Registro
+      </button>
+    </a>
+  </div>
+</div>
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th style="width: 150px">Id</th>
+            <th style="width: 300px">Firma</th>
+            <th style="width: 200px; text-align: center">Posición en X</th>
+            <th style="width: 200px; text-align: center">Posición en Y</th>
+            <th style="width: 190px; text-align: center">Altura</th>
+            <th style="width: 190px; text-align: center">Ancho</th>
+            <th style="width: 190px; text-align: center">No. Página</th>
+            <th style="width: 350px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{for signature in action['list']: }}
+          <tr>
+            <td>{{=signature['id']}}</td>
+            <td
+              style="
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                max-width: 1px;
+              "
+            >
+              {{=signature['name']}}
+            </td>
+            <td style="text-align: center">{{=signature['position_x']}}</td>
+            <td style="text-align: center">{{=signature['position_y']}}</td>
+            <td style="text-align: center">{{=signature['height']}}</td>
+            <td style="text-align: center">{{=signature['width']}}</td>
+            <td style="text-align: center">{{=signature['page']}}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  href="{{=URL('admin', 'signature_assignment_ecys',args=['show', signature['id']], vars={'document' : action['document']})}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'signature_assignment_ecys',args=['edit', signature['id']], vars={'document' : action['document']})}}"
+                >
+                  <button class="btn btn-success btn-sm">
+                    <span
+                      class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"
+                    ></span>
+                    &nbsp;Editar
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'signature_assignment_ecys',args=['delete', signature['id']], vars={'document' : action['document']})}}"
+                >
+                  <button class="btn btn-danger btn-sm">
+                    <span
+                      class="icon trash icon-trash glyphicon glyphicon-trash"
+                    ></span>
+                    &nbsp;Eliminar
+                  </button></a
+                >
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{else:}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-6 well">
+        {{if action['type'] == 'new':}}
+        <form
+          action="{{URL('admin', 'signature_assignment_ecys', args=['new'], vars={'document': action['document']})}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >Firma</label
+            >
+            <div class="col-sm-9">{{=action['select']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPositionX" class="col-sm-3 col-form-label"
+              >Posición en eje X</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0.0"
+                step="0.1"
+                class="form-control"
+                id="inputPositionX"
+                title="Valor que corresponde a centimetros"
+                name="inputPositionX"
+                value="{{if 'item' in action:}}{{=action['item']['inputPositionX']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPositionY" class="col-sm-3 col-form-label"
+              >Posición en eje Y</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0.0"
+                step="0.1"
+                class="form-control"
+                id="inputPositionY"
+                title="Valor que corresponde a centimetros"
+                name="inputPositionY"
+                value="{{if 'item' in action:}}{{=action['item']['inputPositionY']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputHeight" class="col-sm-3 col-form-label"
+              >Altura</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0"
+                step="1"
+                class="form-control"
+                id="inputHeight"
+                title="Valor que corresponde a pixeles"
+                name="inputHeight"
+                value="{{if 'item' in action:}}{{=action['item']['inputHeight']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputWidth" class="col-sm-3 col-form-label"
+              >Ancho</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0"
+                step="1"
+                class="form-control"
+                id="inputWidth"
+                title="Valor que corresponde a pixeles"
+                name="inputWidth"
+                value="{{if 'item' in action:}}{{=action['item']['inputWidth']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputWidth" class="col-sm-3 col-form-label"
+              >No. Página</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0"
+                step="1"
+                class="form-control"
+                id="inputPage"
+                name="inputPage"
+                value="{{if 'item' in action:}}{{=action['item']['inputPage']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{elif action['type'] == 'show':}}
+        <div class="form-group row">
+          <label for="inputSignature" class="col-sm-3 col-form-label"
+            >Firma</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['name']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputPositionX" class="col-sm-3 col-form-label"
+            >Posición en eje X</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['position_x']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputPositionY" class="col-sm-3 col-form-label"
+            >Posición en eje Y</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['position_y']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputHeight" class="col-sm-3 col-form-label"
+            >Altura</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['height']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputWidth" class="col-sm-3 col-form-label">Ancho</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['width']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputPage" class="col-sm-3 col-form-label"
+            >No. Página</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['page']}}"
+            />
+          </div>
+        </div>
+        <a
+          href="{{=URL('admin', 'signature_assignment_ecys',vars={'document' : action['document']})}}"
+        >
+          <button class="btn btn-primary">
+            <span class="fa fa-arrow-circle-left"></span>
+            &nbsp;Regresar
+          </button>
+        </a>
+        {{elif action['type'] == 'delete':}}
+        <form
+          action="{{=URL('admin', 'signature_assignment_ecys',args=['delete', action['item'][0]['id']], vars={'document' : action['document']})}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >Firma</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['name']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPositionX" class="col-sm-3 col-form-label"
+              >Posición en eje X</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['position_x']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPositionY" class="col-sm-3 col-form-label"
+              >Posición en eje Y</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['position_y']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputHeight" class="col-sm-3 col-form-label"
+              >Altura</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['height']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputWidth" class="col-sm-3 col-form-label"
+              >Ancho</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['width']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPage" class="col-sm-3 col-form-label"
+              >No. Página</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['page']}}"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+        {{elif action['type'] == 'edit':}}
+        <form
+          action="{{=URL('admin', 'signature_assignment_ecys',args=['edit', action['item']['id']], vars={'document' : action['document']})}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >Firma</label
+            >
+            <div class="col-sm-9">{{=action['select']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPositionX" class="col-sm-3 col-form-label"
+              >Posición en eje X</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0.0"
+                step="0.1"
+                class="form-control"
+                id="inputPositionX"
+                title="Valor que corresponde a centimetros"
+                name="inputPositionX"
+                value="{{=action['item']['inputPositionX']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPositionY" class="col-sm-3 col-form-label"
+              >Posición en eje Y</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0.0"
+                step="0.1"
+                class="form-control"
+                id="inputPositionY"
+                title="Valor que corresponde a centimetros"
+                name="inputPositionY"
+                value="{{=action['item']['inputPositionY']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputHeight" class="col-sm-3 col-form-label"
+              >Altura</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0"
+                step="1"
+                class="form-control"
+                id="inputHeight"
+                title="Valor que corresponde a pixeles"
+                name="inputHeight"
+                value="{{=action['item']['inputHeight']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputWidth" class="col-sm-3 col-form-label"
+              >Ancho</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0"
+                step="1"
+                class="form-control"
+                id="inputWidth"
+                title="Valor que corresponde a pixeles"
+                name="inputWidth"
+                value="{{=action['item']['inputWidth']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputPage" class="col-sm-3 col-form-label"
+              >No. Página</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="number"
+                placeholder="0"
+                step="1"
+                class="form-control"
+                id="inputPage"
+                name="inputPage"
+                value="{{=action['item']['inputPage']}}"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{pass}}
+        <br />
+        {{ if "message" in action: }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {{pass}}
+      </div>
+      {{if action['type'] == 'edit' or action['type'] == 'new':}}
+      <div class="col-6">
+        <div class="row">
+          <div class="col-sm-10">
+            <label for="documentExample">Seleccionar Archivo</label>
+            <input type="file" id="documentFile" name="documentFile" />
+          </div>
+          <div class="col-sm-2">
+            <button
+              type="button"
+              class="btn btn-info btn-sm"
+              onclick="sign_sample();"
+            >
+              Ver Firma
+            </button>
+          </div>
+        </div>
+        <object
+          class="pdfview"
+          id="pdfViewer"
+          type="application/pdf"
+          data=""
+          value="Fit"
+        ></object>
+      </div>
+      {{pass}}
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(documentFile).change(function () {
+      var reader = new FileReader();
+      reader.readAsDataURL(this.files[0]);
+      reader.onload = function () {
+        base64 = reader.result;
+        var element = document.getElementById("pdfViewer");
+        element.setAttribute("data", base64);
+        $.post(
+          "{{=URL('admin', 'upload_sample_signed_file')}}",
+          {
+            file: base64.split(",")[1],
+          },
+          function (result, status) {
+            if (status == "success") {
+              data = JSON.parse(result);
+              if (data.ok == 1) {
+                alert("Archivo cargado correctamente!");
+              } else {
+                alert(data.message);
+              }
+            } else {
+              alert("No se ha podido cargar el archivo");
+            }
+          }
+        );
+      };
+      reader.onerror = function (error) {
+        console.log("Ocurrio un error");
+      };
+    });
+  });
+
+  function sign_sample() {
+    sign = $("#inputSignature").val();
+    x = $("#inputPositionX").val();
+    y = $("#inputPositionY").val();
+    h = $("#inputHeight").val();
+    w = $("#inputWidth").val();
+    page = $("#inputPage").val();
+
+    $.post(
+      "{{=URL('admin', 'sign_sample_document')}}",
+      {
+        sign: sign,
+        x: x,
+        y: y,
+        h: h,
+        w: w,
+        page: page,
+      },
+
+      (result, status) => {
+        if (status == "success") {
+          data = JSON.parse(result);
+          if (data.ok == 0) {
+            alert(data.message);
+          } else {
+            getPdf();
+          }
+        }
+      }
+    );
+  }
+
+  function getPdf() {
+    console.log("Obteniendo Archivo");
+    $.post(
+      "{{=URL('admin', 'retrieve_pdf_file')}}",
+      {
+        filename: "type_sample_signed.pdf",
+      },
+      (result, status) => {
+        data = JSON.parse(result);
+        if (data.ok == 1) {
+          var element = document.getElementById("pdfViewer");
+          element.setAttribute(
+            "data",
+            "data:application/pdf;headers=filename%3DPendiente;base64," +
+              data.encoded
+          );
+          console.log("Actualizado con exito ");
+        } else {
+          alert(data.message);
+        }
+      }
+    );
+  }
+</script>
+
+<style>
+  .pdfview {
+    margin: auto;
+    display: block;
+    width: 850px;
+    height: 60vh;
+  }
+</style>

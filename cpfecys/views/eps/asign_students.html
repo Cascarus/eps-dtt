@@ -1,0 +1,109 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h3>{{=T('Asignación de Estudiantes a EPS')}}  
+            <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                <span class="fa fa-question-circle"></span>
+            </a>
+        </h3>
+    </div>
+    <div class="col-12 mt-4">
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                <li class="nav-item"><a class="nav-link" href="#setuptab" data-toggle="tab">{{=T('Otros')}}</a></li>
+                {{if (request.vars['year_period']):}}
+                    {{for item in last_periods:}}
+                        {{if (str(request.vars['year_period']) == str(item.eps_period_year.id)):}}
+                            <li class="nav-item"><a class="nav-link" href="{{=URL(vars=dict(year_period=item.eps_period_year.id))}}">
+                                {{=str(item.eps_period_year.yearp) + ' - ' + T(item.eps_period.name)}}
+                            </a></li>
+                        {{else:}}
+                            <li class="nav-item"><a class="nav-link" href="{{=URL(vars=dict(year_period=item.eps_period_year.id))}}">
+                                {{=str(item.eps_period_year.yearp) + ' - ' + T(item.eps_period.name)}}
+                            </a></li>
+                        {{pass}}
+                    {{pass}}
+                {{else:}}
+                    {{total =  len(last_periods)}}
+                    {{contador = 0}}
+                    {{for item in last_periods:}}
+                        {{contador += 1}}
+                        {{if (contador < total):}}
+                            <li class="nav-item"><a class="nav-link" href="{{=URL(vars=dict(year_period=item.eps_period_year.id))}}" >
+                                {{=str(item.eps_period_year.yearp) + ' - ' + T(item.eps_period.name)}}
+                            </a></li>
+                        {{else:}}
+                            <li class="nav-item"><a class="nav-link active"href="{{=URL(vars=dict(year_period=item.eps_period_year.id))}}">
+                                {{=str(item.eps_period_year.yearp) + ' - ' + T(item.eps_period.name)}}
+                            </a></li>
+                        {{pass}}
+                    {{pass}}
+                {{pass}}
+                <li class="nav-item"><a class="nav-link" href="{{=URL('assignation_upload')}}">{{=T('CSV Assignation')}}</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane" id="setuptab">
+                    <form>
+                        <select name="year_period" class="form-control">
+                            {{for item in other_periods:}}
+                                <option value="{{=item.eps_period_year.id}}">
+                                {{=str(item.eps_period_year.yearp) + ' - ' + T(item.eps_period.name) }}
+                                </option>
+                            {{pass}}
+                        </select>
+                        <input type="submit" value="{{=T('go')}}" class="btn btn-primary">
+                    </form>
+                </div>
+                {{valueSelect = 0}}
+                {{if (request.vars['year_period']):}}
+                    {{valueSelect = str(request.vars['year_period'])}}
+                {{else:}}
+                    {{if top1_last_periods is not None:}}
+                        {{valueSelect = str(top1_last_periods.eps_period_year.id)}}
+                    {{else:}}
+                        {{valueSelect = 0}}
+                    {{pass}}
+                {{pass}}
+                <div class="tab-pane active" id="year_period{{=valueSelect}}">
+                    {{=grid}}
+                    {{if request.args:}}
+                        {{if ((request.args[0]=='new') & (request.args[1]=='eps_assignment')):}}
+                            <script>
+                                setSelectValue('eps_assignment_status', 1);
+                                setSelectValue('eps_assignment_period', {{=valueSelect}});
+                            </script>
+                        {{pass}}
+                    {{pass}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">{{=T('Ayuda - Asignación de Estudiantes a EPS')}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {{=T('Este módulo representa la asignación de estudiantes a proyectos de Ejercicio Profesional Supervisado – EPS. Puede consultar y asignar a cualquier usuario o eliminar su asignación aquí.')}}
+                    </p>
+                    <p>
+                        {{=T('Si por ejemplo desea asignar a un estudiante carnet 200010101 a un EPS, primero debe existir el usuario en el sistema y su rol debe ser del tipo Estudiante.')}}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type='text/javascript'>
+    function setSelectValue (id, val) { document.getElementById(id).value = val; }
+</script>

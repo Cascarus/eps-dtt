@@ -1,0 +1,178 @@
+{{extend 'dashboard.html'}}
+{{cont_news_1 = 0}}
+{{cont_news_2 = 0}}
+
+<center>
+    <h1>
+        {{=T('Inbox')}}
+    </h1>
+</center>
+<table style="width:100%;">
+	<tr>
+		<td style="width:90%;">
+			<form action="" enctype="multipart/form-data" method="post">
+				<table>
+					<tr>
+						<td>
+							<input name="_formname" type="hidden" value="select_form">
+			              	<select class="generic-widget form-control" id="semester_id" name="semester_id">
+								{{for per in period_list:}}
+									{{if str(per.id) == str(period_id):}}
+										{{var_sel = "selected='selected'"}}
+									{{else:}}
+										{{var_sel = ''}}
+									{{pass}}
+									<option onclick="refresh_period({{=per.id}});" value="{{=per.id}}" {{=var_sel}}>{{=T(per.period.name)}} {{=per.yearp}}</option>
+								{{pass}}
+							</select>
+						</td>
+						<td><input type="submit" class="btn btn-primary" value="{{=T('go')}}"></td>
+                    </tr>
+              	</table>
+          	</form>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<div style="overflow:auto;">				
+				<table class="table table-bordered">	
+					<tbody bgcolor="#F2F2F2">
+						{{for assignation in assignations:}}							
+							<tr>
+								<td>	
+									{{
+										cont_news = 0
+										mails = db((db.notification_general_log4.yearp == assignation.semester.yearp) & (db.notification_general_log4.period == assignation.semester.period.name) 
+                                            	& (db.notification_general_log4.course == assignation.assignation.name)).select(db.notification_general_log4.id)
+										for a in range(len(mails) - 1, -1, -1):
+											#SHOW JUST EMAILS SENDED TO ME
+											var_query = db.notification_log4((db.notification_log4.register == mails[a].id) & (db.notification_log4.username == auth.user.username))
+											if var_query != None:
+												if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails[a].id)).select(db.read_mail.id).first() == None:
+													cont_news += 1
+												pass
+											pass
+										pass
+									}}
+                                    <table class="table table-bordered" >
+										<tr bgcolor="#D8D8D8"> 
+											<td width="100%" >
+												<span class="icon-book"></span> &nbsp 
+												<a style="cursor:pointer;" onclick="click_link_{{=assignation.assignation.id}}({{=assignation.assignation.id}});">
+													<b>{{=assignation.assignation.name}}</b>
+												</a>
+												<script type="text/javascript">
+													function click_link_{{=assignation.assignation.id}} (var_id) {
+												  		$("#mail_" + var_id).toggle(700);
+												  		$("#mail_" + var_id)
+                                                            .load("{{=URL('notification_student', 'inbox_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;project_id=" + var_id);
+													}
+												</script>
+											</td>
+											{{if cont_news > 0:}}
+												<td align="right">
+													<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=cont_news}}</span> 
+												</td>
+											{{pass}}												
+										</tr>
+									</table>
+									{{if len(mails) <= 3:}}
+										<div id="mail_{{=assignation.assignation.id}}" style="display:none; overflow:auto;" >
+									{{else:}}
+										<div id="mail_{{=assignation.assignation.id}}" style="display:none; height:300px; overflow:auto;" >
+									{{pass}}									
+											{{=T('Loading')}}...
+                                        </div>
+								</td>
+							</tr>
+						{{pass}}
+
+						{{for course in courses_admin:}}							
+							<tr>
+								<td>
+									{{
+										cont_news = 0
+										cont_mails = 0
+										mails = db((db.academic_send_mail_log.yearp == period_var.yearp) & (db.academic_send_mail_log.period == period_var.period.name) 
+                                            & (db.academic_send_mail_log.course == course.project.name)).select(db.academic_send_mail_log.id)
+                                        for mail in mails:    
+								            var_query = db.academic_send_mail_detail((db.academic_send_mail_detail.academic_send_mail_log == mail.id) & (db.academic_send_mail_detail.username == auth.user.username))
+								            if var_query != None:
+								            	cont_mails += 1
+								                if db((db.read_mail_student.id_auth_user == auth.user.id) & (db.read_mail_student.id_mail == mail.id)).select(db.read_mail_student.id).first() == None:
+								                    cont_news += 1
+								                pass
+								            pass
+								        pass
+								    
+										cont_news_1 = cont_news
+										mails2 = db((db.notification_general_log4.yearp == period_var.yearp) & (db.notification_general_log4.period == period_var.period.name) 
+                                                & (db.notification_general_log4.course == course.project.name)).select(db.notification_general_log4.id)
+										for a in range(len(mails2) - 1, -1, -1):	
+											#SHOW JUST EMAILS SENDED TO ME
+											var_query = db.notification_log4((db.notification_log4.register == mails2[a].id) & (db.notification_log4.username == auth.user.username))
+											if var_query != None:
+												if db((db.read_mail.id_auth_user == auth.user.id) & (db.read_mail.id_mail == mails2[a].id)).select(db.read_mail.id).first() == None:
+													cont_news += 1
+													cont_news_2 += 1
+												pass
+											pass
+										pass
+									}}
+									<table class="table table-bordered" >
+										<tr bgcolor="#FAFAFA">
+											<td width="100%">
+												<span class="icon-book"></span> &nbsp; 
+												<a style="cursor:pointer;" onclick="click_link2_{{=course.project.id}}({{=course.project.id}});">
+													{{=course.project.name}}
+												</a>
+												<script type="text/javascript">
+													function click_link2_{{=course.project.id}}(var_id){
+												  		$("#mail_"+var_id).toggle(700);
+												  		$("#mail_"+var_id)
+                                                            .load("{{=URL('notification_student','inbox_student_mails_load.html')}}?operation=mails_list&amp;email={{=email}}&amp;period_id={{=period_id}}&amp;cont_news={{=cont_news_2}}&amp;cont_news_1={{=cont_news_1}}&amp;cont_mails={{=cont_news}}&amp;project_id=" + var_id);
+													}
+												</script>
+											</td>
+											{{cont_news_2 = 0}}
+											{{if cont_news > 0:}}
+												<td align="right">
+													<span id="information_text" class="badge btn-success">{{=T('New Mails')}} {{=cont_news}}</span> 
+												</td>
+											{{pass}}										
+										</tr>
+									</table>
+
+									{{if (cont_mails) <= 3:}}
+										<div id="mail_{{=course.project.id}}" style="display:none; overflow:auto;" >
+									{{else:}}
+										<div id="mail_{{=course.project.id}}" style="display:none; height:300px; overflow:auto;" >
+									{{pass}}
+									
+										{{=T('Loading')}}...
+                                    </div>
+								</td>
+							</tr>
+						{{pass}}
+					</tbody>
+				</table>
+			</div>
+		</td>
+	</tr>
+</table>
+
+<!-- Modal -->
+<div class="modal" id="mailModal" tabindex="-1" role="dialog" aria-labelledby="mailModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="mail_div" style=" overflow:auto;"></div>
+            </div>
+        </div>
+	</div>
+</div>

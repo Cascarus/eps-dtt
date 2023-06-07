@@ -1,0 +1,101 @@
+{{extend 'dashboard.html'}}
+
+{{project_var = db(db.user_project.id == assignation).select().first()}}
+<script type="text/javascript">
+	var category = -1;
+	var createRequest = 0;
+</script>
+
+<h2>
+	{{=T('Laboratory Scheduler')}} - {{=T('Change Request')}}
+	<br>
+    <small>{{=name}} - {{=T(semester)}}, {{=year}}</small>
+</h2>
+
+<div class="row-fluid">
+    <div class="well span12" style="overflow:auto;">
+		<div>
+			<a class="btn btn-primary" href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}">
+				<i class="icon-arrow-left"></i>{{=T('Back')}}
+			</a>
+		</div>
+		<br>
+		<div id="contentSuper">
+			<div align="center" id="controlActivity">
+				<ul id="myTab" class="nav nav-tabs">
+					<li class="nav-item" id="var_requestCreate"><a class="nav-link active" href="#" data-toggle="tab">{{=T('Create Request')}}</a></li>
+					<li class="nav-item" id="request_var_pendingRequest"><a class="nav-link" href="#" data-toggle="tab">{{=T('Pending requests')}}</a></li>
+					<li class="nav-item" id="request_var_allRequest"><a class="nav-link" href="#" data-toggle="tab">{{=T('All request')}}</a></li>
+					<li class="nav-item" id="request_var_acceptedRequest"><a class="nav-link" href="#" data-toggle="tab">{{=T('Accepted request')}}</a></li>
+					<li class="nav-item" id="request_var_rejectedRequest"><a class="nav-link" href="#" data-toggle="tab">{{=T('Rejected request')}}</a></li>
+				</ul>
+				<div id="content">
+					<div class="well span11" id="div_request_show"></div>
+					<div class="well span11" id="div_request_done" style="display: none;"></div>
+                  	<div class="well span11" id="div_request_detail" style="display: none;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#request_var_pendingRequest").click(function() {
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			jQuery('#div_request_done').empty();
+			jQuery('#div_request_done').append("{{=T('Loading')}}...");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','request_change_activity.html')}}?op=showRequestDone&amp;tip=p&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+
+		$("#request_var_allRequest").click(function() {
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			jQuery('#div_request_done').empty();
+			jQuery('#div_request_done').append("{{=T('Loading')}}...");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','request_change_activity.html')}}?op=showRequestDone&amp;tip=t&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+
+		$("#request_var_acceptedRequest").click(function() {
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			jQuery('#div_request_done').empty();
+			jQuery('#div_request_done').append("{{=T('Loading')}}...");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','request_change_activity.html')}}?op=showRequestDone&amp;tip=a&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+
+		$("#request_var_rejectedRequest").click(function() {
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			$("#div_request_show").css("display", "none");
+			jQuery('#div_request_done').empty();
+			jQuery('#div_request_done').append("{{=T('Loading')}}...");
+			$("#div_request_done").css("display", "block");
+			$("#div_request_done").load("{{=URL('activity_control','request_change_activity.html')}}?op=showRequestDone&amp;tip=r&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+		});
+
+		jQuery('#div_request_show').empty();
+		jQuery('#div_request_show').append("{{=T('Loading')}}...");
+		$("#div_request_show").load("{{=URL('activity_control','request_change_activity.html')}}?op=createRequest&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+
+		$("#var_requestCreate").click(function() {
+			jQuery('#div_request_detail').empty();
+			$("#div_request_detail").css("display", "none");
+			jQuery('#div_request_done').empty();
+			$("#div_request_done").css("display", "none");
+			if (createRequest == 0){
+				jQuery('#div_request_show').empty();
+				jQuery('#div_request_show').append("{{=T('Loading')}}...");
+				$("#div_request_show").load("{{=URL('activity_control','request_change_activity.html')}}?op=createRequest&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}");
+			}
+			$("#div_request_show").css("display", "block");
+		});
+	});
+</script>

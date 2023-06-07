@@ -1,0 +1,7 @@
+{{extend 'layout-index.html'}}
+
+{{if school == 'ecys':}}
+	{{include 'schools/ecys/home.html'}}  
+{{elif school == 'emi':}}
+	{{include 'schools/emi/home.html'}}         
+{{pass}}

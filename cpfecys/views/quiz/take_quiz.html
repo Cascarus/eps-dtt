@@ -1,0 +1,83 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+	<div class="col-12">
+		<h2>Evaluaciones disponibles</h2>
+		<h3>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</h3>
+	</div>
+	<div class="col-12">
+		<nav class="navbar navbar-light bg-light">
+			<a class="navbar-brand" href="#">Listado de evaluaciones disponibles</a>
+		</nav>
+	</div>
+	<div class="col-12 mt-4">
+		<div id="div_seleccionar_tipo_pregunta" class="table-responsive">
+			<table class="table">
+				<thead class="thead-dark">
+				  <tr>
+					<th scope="col">Actividad</th>
+					<th scope="col">Clasificación</th>
+					<th scope="col">Tema de<br/>evaluación</th>
+					<th scope="col">Fecha de<br/>evaluación</th>
+					<th scope="col">Horario</th>
+					<th scope="col">Duración</th>
+					<th scope="col">Estado</th>
+					<th scope="col">Opciones</th>
+					<th scope="col">Resultado</th>
+				  </tr>
+				</thead>
+				<tbody>
+					{{for programacion in programaciones:}}
+						<tr>
+							<td>{{=programacion.actividad_nombre}}</td>
+							{{if (programacion.laboratorio == 'T'):}}
+								<td>Laboratorio</td>
+							{{else:}}
+								<td>Clase</td>
+							{{pass}}
+							<td>{{=programacion.nombre_quiz}}</td>
+							<td>{{=programacion.fecha}}</td>
+							<td>{{=programacion.inicio}}</td>
+							<td>{{=programacion.duracion}} Minutos</td>
+							<td>{{=programacion.Estado_actual}}</td>
+							<td>
+								{{if programacion.Estado_actual == 'Activo':}}
+									<button name="btTomar" type="button" class="btn btn-success btnTakeQuiz" id={{=programacion.id}}>Tomar Evaluacion</button>				
+								{{else:}}
+									<button name="btTomar" type="button" class="btn btn-info" disabled id={{=programacion.id}}>Tomar Evaluacion</button>				
+								{{pass}}					
+							</td>
+							<td>
+								{{if programacion.Estado_actual == 'Inactivo':}}
+									<a name="btReview" href="/quiz/obtener_revision_quiz/{{=programacion.id_actividad}}?period={{=period}}&project={{=course}}&user={{=user}}&quid={{=programacion.id_quiz}}"  class="btn btn-warning btnReview" id={{=programacion.id}}>Ver resultados</a>
+								{{else:}}
+									<a name="btReview"  class="btn btn-warning disabled" id={{=programacion.id}}>Ver resultados</a>
+								{{pass}}
+							</td>
+						</tr>
+					{{pass}}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<p id="pPeriod" hidden value="{{=periodo.id}}">{{=periodo.id}}</p>
+<p id="pProject" hidden value="{{=project.id}}">{{=project.id}}</p>
+
+<script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
+<script type="text/javascript">
+$(document).ready(
+    function(){
+		$('.btnTakeQuiz').click(function(){
+			var id_programacion = $(this).attr("id");
+			var period = $('#pPeriod').text();
+			var project = $('#pProject').text();
+			var parametros = "/" + id_programacion + "?project=" + project + "&period=" + period;
+			submitLoad("quiz", "verificar_privacidad_quiz/" + id_programacion, "?project=" + project + "&period=" + period);
+			
+			window.location.href = `https://${location.hostname}/quiz/evaluacion${parametros}`;
+    	});
+	}
+);
+</script>

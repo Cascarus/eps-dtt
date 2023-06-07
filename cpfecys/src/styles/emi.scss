@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Montserrat:400,700|Nunito:400,700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+// Customization
+@import "node_modules/bootstrap/scss/bootstrap";
+@import "./modules/variablesCustomEmi";
+@import "./modules/header";
+@import "./modules/content";
+@import "./modules/footer";
+@import "./modules/bootstrap-toggle";
+
+html {
+  background-color: #fafafa;
+}
+
+body {
+  font-family: 'Lato', sans-serif;
+  font-size: 14px;
+}
+h1,h2,h3,h4,h5,h6{
+    font-family: 'Montserrat', sans-serif;
+}
+
+.separator {
+  margin: 0 auto 10px;
+  color: #ccc;
+  font-weight: 700;
+  font-size: 24px;
+}
+
+#dttresources{
+  ul{
+    list-style: none;
+  }
+}
+
+.dttheader{
+  &__logo{
+      img{
+          width: 194px;
+      }
+  }
+  &__message{
+      color: #fff;
+       margin-top: 35px;
+      p{
+          margin-bottom: 0;
+         
+      }
+  }
+  &__logodtt{
+      img{
+          width: 130px;
+          
+          @include media-breakpoint-up(lg){
+              margin-left: 190px;
+              margin-top: 50px;
+          }
+      }
+  }
+  &__hero {
+      background: url('/static/build/images/emi/hero-emi.jpg');
+      min-height: 328px;
+      overflow: initial;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: cover;
+      margin-bottom: 15px;
+      border-top: 4px solid $School;
+      
+  }
+}

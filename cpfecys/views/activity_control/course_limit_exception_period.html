@@ -1,0 +1,49 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>
+                {{=T('Course Time Limit Exception')}}
+                <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                    <span class="fa fa-question-circle"></span>
+                </a>
+            </h1>
+        </div>
+        <div class="col-12">
+            <input id="chkTipoCurso" type="checkbox" checked data-toggle="toggle" data-on="Periodos" data-off="Semestres" data-size="mini">
+        </div>
+        <div class="col-12">
+            {{=grid}}
+        </div>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">{{=T('Course and Laboratory Exceptions Help')}}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        {{=T('In this area you can add and indicate the courses in which academic tutor can edit the course grades and / or the professor can edit the lab grades.')}}
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+  //emarquez
+  $(document).ready(function(){
+    $('#chkTipoCurso').change(function() {
+      if($(this).prop('checked')) window.location.href  = "course_limit_exception_period"; //enviar a pagina de semestres
+      else window.location.href = "course_limit_exception";
+    });
+  });
+</script>

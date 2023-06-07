@@ -1,0 +1,108 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h3>Labor DSI</h3>
+        </div>
+        <div class="col-12">
+            <div class="well span12">
+            <a onclick="window.history.back()" class="btn btn-primary" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+            <a class="btn btn-success pull-right"
+               onclick="tableToExcel('delivered','');">
+                <i class="icon-download icon-white"></i>
+                {{=T('Excel (XLS)')}}
+            </a>
+            <div class="table-responsive">
+                <table class="table-striped table-bordered" style="align:0 auto;">
+                    <tr>
+                      <td>
+                      <form class="form-inline" action="{{=URL('admin','delivered')}}" 
+                        method='get'>
+                          <input name="restriction" type="hidden" 
+                    {{if restrictions:}}
+                            value="{{=restrictions[0].id}}"{{pass}}>
+                             <select name="period" class="form-control">
+                                {{for cperiod in periods:}}
+                                  <option value="{{=cperiod.id}}"
+                                  {{ if period.id == cperiod.id:}}
+                                    selected 
+                                  {{pass}}
+                                  >
+                                  {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
+                                  </option>
+                                {{pass}}
+                              </select>
+                            <input class="btn btn-primary" type="submit" value="{{=T('Filter')}}">
+                      </form>
+                      </td>
+                    </tr>
+                </table>
+            </div> 
+            <h1 class="pull-left">{{=T(period.period.name)}} - {{=period.yearp}}</h1>
+            <div class="table-responsive">
+                <table id="delivered" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                {{=T('Item name')}}
+                            </th>
+                            <th>
+                                {{=T('Actions')}}
+                            </th>
+                            <th>
+                                {{=T('Pending')}}
+                            </th>
+                            <th>
+                                {{=T('Graded')}}
+                            </th>
+                            <th>
+                                {{=T('Total')}}
+                            </th>
+                            <th class='success'>
+                                {{=T('Approved')}}
+                            </th>
+                            <th class='success'>
+                                {{=T('Failed')}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for restriction in restrictions:}}
+                        <tr>
+                            <td>
+                                {{=restriction.name}}
+                            </td>
+                            <td>
+                                <a class="btn btn-primary" href="{{=URL('dsi','item_detail', \
+                                vars=dict(restriction=restriction.id))}}">
+                                    <i class="icon-eye-open"></i> {{=T('View Items')}}
+                                </a>
+                            </td>
+                            {{ pending, graded, total, approved, failed = \
+                                calculate_by_restriction(restriction.id)}}
+                            <td>
+                               {{=pending}} 
+                            </td>
+                            <td>
+                                {{=graded}}
+                            </td>
+                            <td>
+                                {{=total}}
+                            </td>
+                            <td>
+                                {{=approved}}
+                            </td>
+                            <td>
+                                {{=failed}}
+                            </td>
+                        </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+            
+        </div>
+        </div>
+    </div>
+</div>
+

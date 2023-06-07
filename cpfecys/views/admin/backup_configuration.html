@@ -1,0 +1,349 @@
+{{extend 'dashboard.html'}}
+<div class="navbar-inner mt-5">
+	<div class="text-center"><h4>Programación de Copias de Seguridad</h4></div>
+</div>
+
+<div id="div_p" class="well" style="background-color:#FFF; {{if bandera==False: }} pointer-events:none; {{pass}}">
+	<div class="row">
+		<div class="col-12">
+			{{if estado=="A":}}
+			<h4 id="lb_estado">Copias de Seguridad Activadas</h4>
+			<label class="switch">
+				<input name="cbk_estado" id="ckb_estado" type="checkbox" checked>
+				<span class="slider round"></span>
+			</label>
+			{{else:}}
+			<h4 id="lb_estado">Copias de Seguridad Desactivadas</h4>
+			<label class="switch">
+				<input name="cbk_estado" id="ckb_estado" type="checkbox" >
+				<span class="slider round"></span>
+			</label>
+			{{pass}}
+		</div>
+	</div>
+	<div id="div_bk_configuration">
+		<div class="row">
+			<div class="div_clear"></div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Fecha de Proxima Copia
+					</div>
+					<div class="card-body">
+						<input type="date" class="form-control" name="bk_fecha" id="bk_fecha" value="{{=fecha}}"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Ruta en Servidor de Almacenamiento
+					</div>
+					<div class="card-body">
+						<input type="text" class="form-control" name="bk_ruta" id="bk_ruta"	value="{{=ruta}}" placeholder="Ingrese ruta en servidor"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Tipo
+					</div>
+					<div class="card-body">
+						<select id="bk_tipo" name="bk_tipo" class="form-control">
+							{{if tipo=="U":}}
+							<option value="I" >Incremental Semanal</option>
+							<option value="U" selected>Completo Unico</option>
+							{{else:}}
+							<option value="I" selected>Incremental Semanal</option>
+							<option value="U" >Completo Unico</option>
+							{{pass}}
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Copias de Seguridad Almacenadas
+					</div>
+					<div class="card-body">
+						<input type="number" min="1" max="10" name="bk_cantidad" id="bk_cantidad" value="{{=cantidad}}" class="form-control"/>
+					</div>
+				</div>
+			</div>
+		<div class="div_clear"></div>
+		</div>
+	</div>
+	<div class="text-right">
+		<button class="btn btn-success" type="submit" onclick="guardar()">Guardar</button>
+	</div>
+	<div id="div_info" style="margin-top:5px;">
+	</div>
+</div>
+
+<div class="navbar-inner">
+	<div class="text-center"><h4>Configuración de Servidor de Almacenamiento</h4></div>
+</div>
+<div id="div_l" class="well" style="background-color:#FFF; {{if bandera==False: }} pointer-events:none; {{pass}} " >
+	<div id="div_bk_configuration">
+		<div class="row">
+			<div class="div_clear"></div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						IP Servidor de Almacenamiento
+					</div>
+					<div class="card-body">
+						<input type="text" class="form-control" name="bk_servidor" id="bk_servidor"	pattern="((^|\.)((25[0-5]_*)|(2[0-4]\d_*)|(1\d\d_*)|([1-9]?\d_*))){4}_*$"
+						value="{{=servidor}}" placeholder="Ingrese IP de servidor" />
+					</div>
+				  </div>
+			</div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Puerto SSH
+					</div>
+					<div class="card-body">
+						<input type="number" class="form-control" name="bk_puerto" id="bk_puerto" value="{{=puerto}}" placeholder="Ingrese Puerto"/>
+					</div>
+				  </div>
+			</div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Usuario SSH
+					</div>
+					<div class="card-body">
+						<input type="text" class="form-control" name="bk_usuario" id="bk_usuario" value="{{=usuario}}" placeholder="Ingrese Usuario" />
+					</div>
+				  </div>
+			</div>
+			<div class="col-12 col-md-3">
+				<div class="card">
+					<div class="card-header">
+						Contraseña SSH
+					</div>
+					<div class="card-body">
+						<input type="password" class="form-control"	name="bk_clave" id="bk_clave" value="{{=clave}}" placeholder="***********" />
+						<span id="bk_closebtnverpass" class="bk_closebtn fa fa-eye" style="float: none;" onclick="bk_verpass()"></span>
+					</div>
+				  </div>
+			</div>
+			
+		</div>
+	</div>
+	<div class="text-right">
+		<button class="btn btn-success" type="submit" onclick="guardar_servidor()">Guardar</button>
+	</div>
+	<div id="div_info2" style="margin-top:5px;"></div>
+
+</div>
+
+<div class="navbar-inner">
+	<div class="text-center"><h4>Listado de Copias de Seguridad</h4></div>
+</div>
+<div id="div_l" class="accordion" style="background-color:#FFF;" >
+	{{num=1}}
+	{{for back in backups:}}
+	<div class="card">
+		<div class="card-header" id="heading-{{=num}}">
+			<h2 class="mb-0">
+			  <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapselbk-{{=num}}" aria-expanded="false" aria-controls="collapselbk-{{=num}}">
+				<strong> {{=num}}  -  Copia de Seguridad - {{="INCREMENTAL SEMANAL" if back.tipoconf == "I" else "COMPLETO UNICO" }} </strong>
+			  </button>
+			</h2>
+		</div>
+		<div id="collapselbk-{{=num}}" class="collapse" aria-labelledby="heading-{{=num}}" data-parent="#div_l">
+			<div class="card-body">
+				<div>
+					<strong>Servidor: {{=back.servidor}}</strong><br>
+					<strong>Ruta: {{=back.ruta}}</strong>
+				</div>
+				<div class="table-responsive">
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>Fecha Creacion</th>
+								<th>Nombre</th>
+								<th>Tipo</th>
+								<th>Estado</th>
+								<th>Tamaño</th>
+								<th>Log</th>
+							</tr>
+						</thead>
+						<tbody>
+							{{bk_list=backup_list(back.ruta,back.servidor)}}
+							{{for bkl in bk_list:}}
+							<tr>
+								<td>{{=bkl.fecha}}</td>
+								<td>{{=bkl.nombre}}</td>
+								<td>{{="Incremental" if bkl.tipo == "I" else "Completo"}}</td>
+								<td style="color: {{="#0F0" if bkl.estado == "E" else "#F00"}}">{{="Exitoso" if bkl.estado == "E" else "Fallido"}}</td>
+								<td>{{=int(bkl.tamano)/1000 if bkl.tamano!='' and bkl.tamano>0 else "--"}} MB </td>
+								<td style="text-align: center;">
+								<span id="bk_closebtnlog{{=bkl.id}}" class="bk_closebtn icon-plus-sign" style="float: none;" onclick="bk_detallelog({{=bkl.id}})"></span>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="6" id="bk_listalog{{=bkl.id}}" style="display: none; background-color: #DDD">
+								<p>					
+								{{=XML(bkl.procesolog.replace('\n','<br />')) or '--'}}				
+								</p>
+								</td>
+							</tr>
+							{{pass}}	
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{num=num+1}}
+	{{pass}}
+</div>
+{{block page_js}}
+ <!-- Include SmartWizard JavaScript source -->
+<script type="text/javascript">
+	window.setTimeout(function () {
+		$(".alert-success").fadeTo(500, 0).slideUp(100, function () {
+			$(this).remove();
+		});
+	}, 2000);
+
+	$('#ckb_estado').change(function() {
+		if(this.checked) {
+			$(this).prop("checked", true);
+			$('#lb_estado').html("Copias de Seguridad Activadas");
+		}
+	});
+
+
+	function guardar_servidor() {
+
+
+		var servidor = $('#bk_servidor').val();
+		var puerto = $('#bk_puerto').val();
+		var usuario = $("#bk_usuario").val();
+		var clave = $('#bk_clave').val();
+
+		$.ajax({
+			dataType: "json",
+			type:"POST",
+			async: false,
+			url: "{{=URL('admin','backup_configuration_save_server')}}",
+			data: {
+				"bk_servidor":servidor,
+				"bk_puerto":puerto,
+				"bk_usuario":usuario,
+				"bk_clave":clave
+			},
+			success: function(data)
+			{
+				if(data==""){
+					$('#div_info2').html("<div class='alert alert-success'>Guardado Exitosamente</div>");
+					window.setTimeout(function () {
+						$(".alert-success").fadeTo(500, 0).slideUp(100, function () {
+							$(this).remove();
+						});
+					}, 2000);
+				}
+				else{
+					$('#div_info2').html("<div class='alert alert-error'><button type='button' class='close' data-dismiss='alert'>&times;</button><b>"+data+"</b></div>")
+				}
+			},
+			error: function(error)
+			{
+				
+			}
+		});		
+	}
+
+	function guardar() {
+
+		if($('#ckb_estado').is(':checked')){
+			var estado="A";
+		}
+		else{
+			var estado="I";
+		}
+		var fecha = $('#bk_fecha').val();
+		var ruta = $('#bk_ruta').val();
+		var tipo = $("#bk_tipo option:selected" ).val();
+		var cantidad = $('#bk_cantidad').val();
+
+		$.ajax({
+			dataType: "json",
+			type:"POST",
+			async: false,
+			url: "{{=URL('admin','backup_configuration_save')}}",
+			data: {
+				"bk_estado":estado,
+				"bk_fecha":fecha,
+				"bk_ruta":ruta,
+				"bk_tipo":tipo,
+				"bk_cantidad":cantidad
+			},
+			success: function(data)
+			{
+				if(data==""){
+					$('#div_info').html("<div class='alert alert-success'>Guardado Exitosamente</div>");
+					window.setTimeout(function () {
+						$(".alert-success").fadeTo(500, 0).slideUp(100, function () {
+							$(this).remove();
+						});
+					}, 2000);
+				}
+				else{
+					$('#div_info').html("<div class='alert alert-error'><button type='button' class='close' data-dismiss='alert'>&times;</button><b>"+data+"</b></div>")
+				}
+			},
+			error: function(error)
+			{
+				
+			}
+		});		
+	}
+
+	function bk_detalle(numero) {
+		var x = document.getElementById('bk_lista'+numero);
+		if (x.style.display === 'none') {
+			x.style.display = 'block';
+			$('#bk_closebtn'+numero).addClass("icon-minus");			
+			$('#bk_closebtn'+numero).removeClass("icon-plus");
+		} else {
+			x.style.display = 'none';
+			$('#bk_closebtn'+numero).addClass("icon-plus");			
+			$('#bk_closebtn'+numero).removeClass("icon-minus");
+		}
+	}
+
+	function bk_detallelog(numero) {
+		var x = document.getElementById('bk_listalog'+numero);
+		if (x.style.display === 'none') {
+			x.style.display = 'table-cell';
+			$('#bk_closebtnlog'+numero).addClass("icon-minus-sign");
+			$('#bk_closebtnlog'+numero).removeClass("icon-plus-sign");
+		} else {
+			x.style.display = 'none';
+			$('#bk_closebtnlog'+numero).addClass("icon-plus-sign");
+			$('#bk_closebtnlog'+numero).removeClass("icon-minus-sign");
+		}
+	}
+
+	function bk_verpass(){
+		if($('#bk_clave').attr("type")=="password"){
+			$('#bk_clave').prop("type","text");
+			$('#bk_closebtnverpass').addClass("icon-eye-close");
+			$('#bk_closebtnverpass').removeClass("icon-eye-open");
+		}
+		else{
+			$('#bk_clave').prop("type","password");
+			$('#bk_closebtnverpass').addClass("icon-eye-open");
+			$('#bk_closebtnverpass').removeClass("icon-eye-close");			
+		}
+	}
+
+</script>
+{{end page_js}}

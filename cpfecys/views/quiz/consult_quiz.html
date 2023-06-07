@@ -1,0 +1,124 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+	<div class="col-12 text-center">
+		<h2>{{=f"{T(periodo.period.name)} {periodo.yearp}"}}</h2>
+	</div>
+	<div class="col-12">
+        {{=back_button}}
+		<div class="table-responsive">
+			<table class="table">
+				<thead>
+					<tr>
+					<th><center>ID de quiz</center></th>
+					<th><center>Titulo</center></th>
+					<th><center>Creado por</center></th>
+					<th><center>Curso</center></th>
+					<th><center>Fecha</center></th>
+					<th><center>Ver</center></th>
+					<th><center>Editar</center></th>
+					<th><center>Crear programación</center></th>
+					<th><center>Eliminar</center></th>
+					</tr>
+				</thead>
+				<tbody>
+                    {{for quiz in lista:}}
+                        <tr>
+                            <td><center>{{=quiz.tb_metadata_quiz.id_quiz}}</center></td>
+                            <td><center>{{=quiz.tb_metadata_quiz.nombre}}</center></td>
+                            <td><center>{{=f"{quiz.auth_user.first_name} {quiz.auth_user.last_name}"}}<center></td>
+                            <td><center>{{=quiz.project.name}}</center></td>
+                            <td><center>{{=quiz.tb_metadata_quiz.fecha_creacion}}</center></td>
+                            <td>
+                                <center>
+                                    <button name="btVerQuiz" id={{=quiz.tb_metadata_quiz.id_quiz}} type="button" class="btn btn-info btVerQuiz">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                        Ver
+                                    </button>
+                                </center>
+                            </td>
+                            <td>
+                                <center>
+                                    <button name="btnEditQuiz" id={{=quiz.tb_metadata_quiz.id_quiz}} type="button" class="btn btn-warning btnEditQuiz" 
+                                        {{if quiz.tb_quiz_actividad.id is not None:}}disabled{{pass}}>
+                                            <i class="fa fa-pencil" ></i>
+                                            Editar
+                                    </button>
+                                </center>
+                            </td>
+                            <td>
+                                <center>
+                                    <button name="btActive" id={{=quiz.tb_metadata_quiz.id_quiz}} type="button" class="btn btn-success btActive"
+                                        {{if quiz.tb_quiz_actividad.id is not None:}}disabled{{pass}}>
+                                            <i class="fa fa-file-text" aria-hidden="true"></i>
+                                            Ir a programación
+                                    </button>
+                                </center>
+                            </td>
+                            <td>
+                                <center>
+                                    <button name="btnDeleteQuiz" id={{=quiz.tb_metadata_quiz.id_quiz}} attr-uid="{{=quiz.tb_metadata_quiz.creador}}" type="button" class="btn btn-danger btnDeleteQuiz"
+                                        {{if quiz.tb_quiz_actividad.id is not None:}}disabled{{pass}}>
+                                            <i class="fa fa-trash"></i>
+                                            Borrar
+                                    </button>
+                                </center>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+			</table>
+		</div>
+	</div>
+	<div class="col-12">
+		<p id="pPeriod" hidden value="{{=periodo.id}}">{{=periodo.id}}</p>
+		<p id="pProject" hidden value="{{=project.id}}">{{=project.id}}</p>
+	</div>
+</div>
+
+<script type="text/javascript" src="{{=URL('static', 'js/quiz-js/super.js')}}"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.btVerQuiz').click(function(){
+            var idquiz = $(this).attr("id");
+            var parametros = `/${idquiz}?period={{=id_periodo_c}}&project={{=id_project}}`;
+            window.location.href = `https://${location.hostname}/quiz/test${parametros}`;
+        });
+
+        $('.btActive').click(function(){
+            var idquiz = $(this).attr("id");
+            var period = $('#pPeriod').text();
+            var project = $('#pProject').text();
+            var parametros = `/${idquiz}?project=${project}&period=${period}`;
+            window.location.href = `https://${location.hostname}/quiz/programacion_test${parametros}`;
+        });
+        
+        $('.btnEditQuiz').click(function(e){
+            e.preventDefault();
+            var idquiz = $(this).attr("id");
+            var parametros = `/${idquiz}?period={{=id_periodo_c}}&project={{=id_project}}`;
+            window.location.href = `https://${location.hostname}/quiz/edit_quiz${parametros}`;
+        });
+
+        $('.btnDeleteQuiz').click(function(e){
+            e.preventDefault();
+            var r = confirm(`Estas seguro que deseas eliminar el test con id: ${$(this).attr("id")}`);
+            if (r) {
+                var idquiz = $(this).attr("id");
+                var uid = $(this).attr("attr-uid");
+                $.ajax({
+                    data: {
+                        id: idquiz,
+                        uid: uid,
+                        period:{{=id_periodo_c}},
+                        project:{{=id_project}}
+                    },
+                    url: '/quiz/eliminar_quiz',
+                    type: 'post',
+                    success: function(response) {
+                        location.reload();
+                    }
+                });		
+            } 
+        });
+    });
+</script>

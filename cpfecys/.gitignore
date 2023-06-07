@@ -1,0 +1,20 @@
+#gitignroe dentro de cpfecys
+*.pyc
+cache/
+databases/*
+errors/
+sessions/
+private/
+uploads/*
+.hg/
+modules/config.py
+static/pdf
+languages/es.py
+node_modules/
+static/fn_files
+node_modules/
+static/mgz_files/*
+static/img_nvo/*
+static/bolsa_trabajo/reportes/*
+static/bolsa_trabajo/ofertas/*
+

@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" type="image/x-icon" href="/static/build/images/ecys/favicon.ico">
+    <title>Error Page | DTT-Ecys</title>
+    <link rel="stylesheet" href="/static/build/css/ecys.css">
+    <style>
+        #Polygon-1 , #Polygon-2 , #Polygon-3 , #Polygon-4 , #Polygon-4, #Polygon-5 {
+            animation: float 1s infinite ease-in-out alternate;
+            }
+            #Polygon-2 {
+            animation-delay: .2s; 
+            }
+            #Polygon-3 {
+            animation-delay: .4s; 
+            }
+            #Polygon-4 {
+            animation-delay: .6s; 
+            }
+            #Polygon-5 {
+            animation-delay: .8s; 
+            }
+
+            @keyframes float {
+                100% {
+                transform: translateY(20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="dttheader">
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <div class="dttheader__logo">
+                        <a class="navbar-brand" href="/">
+                            <picture>
+                                <source media="(min-width: 465px)" srcset="/static/build/images/ecys/logo-ecys-fiusac-min.png">
+                                <img src="/static/build/images/ecys/logo-ecys-fiusac-min.png" alt="Dtt ECYS">
+                            </picture>
+                        </a>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <div class="dttheader__hero">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-right">
+                        <div class="dttheader__message">
+                            <p>“Aunque nuestra visión hacia adelante es muy corta, podemos damos cuenta de que hay mucho por hacer”</p>
+                            <p>Alan Turing</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <section id="dttErrorPage">
+        <section class="rntHeroImage rntbanner container">
+            <div class="row">
+                <div class="col-6 text-center d-flex align-content-center flex-wrap">
+                    <h1>Error 404</h1>
+                    <p>Serás redirigido automáticamente a la pagina principal en 5 segundos...</p>
+                </div>
+                <div class="col-6">
+                    <svg width="380px" height="500px" viewBox="0 0 837 1045" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+                        <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+                            <path d="M353,9 L626.664028,170 L626.664028,487 L353,642 L79.3359724,487 L79.3359724,170 L353,9 Z" id="Polygon-1" stroke="#007FB2" stroke-width="6" sketch:type="MSShapeGroup"></path>
+                            <path d="M78.5,529 L147,569.186414 L147,648.311216 L78.5,687 L10,648.311216 L10,569.186414 L78.5,529 Z" id="Polygon-2" stroke="#EF4A5B" stroke-width="6" sketch:type="MSShapeGroup"></path>
+                            <path d="M773,186 L827,217.538705 L827,279.636651 L773,310 L719,279.636651 L719,217.538705 L773,186 Z" id="Polygon-3" stroke="#795D9C" stroke-width="6" sketch:type="MSShapeGroup"></path>
+                            <path d="M639,529 L773,607.846761 L773,763.091627 L639,839 L505,763.091627 L505,607.846761 L639,529 Z" id="Polygon-4" stroke="#F2773F" stroke-width="6" sketch:type="MSShapeGroup"></path>
+                            <path d="M281,801 L383,861.025276 L383,979.21169 L281,1037 L179,979.21169 L179,861.025276 L281,801 Z" id="Polygon-5" stroke="#36B455" stroke-width="6" sketch:type="MSShapeGroup"></path>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+    </section>
+    <footer>
+        <div class="container dttfooter">
+            <div class="row">
+                <div class="col-12 dttfooter__icons">
+                    <ul>
+                        <li class="dttfooter__icons--li">
+                            <a href="https://www.facebook.com/ecysFIUSAC" target="_blank"><i class="fa fa-facebook"></i></a>
+                        </li>
+                        <li class="dttfooter__icons--li">
+                            <a href="https://portal.ingenieria.usac.edu.gt/" target="_blank"><i class="fa fa-university"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <p class="text-center">Universidad de San Carlos de Guatemala uses Simio <a
+                            href="https://www.simio.com/">simulation software</a> under a grant from Simio LLC (<a
+                            href="https://www.simio.com/">www.simio.com</a>).</p>
+                    <p class="text-center">Soporte y Asistencia <br />
+                        <a href="mailto:soporte@dtt-ecys.org">soporte@dtt-ecys.org</a> <br />
+                        Sistema de Seguimiento de la Escuela de Ciencias y Sistemas <br />
+                        Facultad de Ingeniería- Universidad de San Carlos de Guatemala</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- Section Script-->
+    <script>
+        window.onload = function () {
+            window.setTimeout(function () {
+                location.href = "/";
+            }, 5000);
+        };
+    </script>
+    <!-- End Section Script-->
+    <!-- Section Global Script-->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-143827878-1');
+    </script> 
+
+<!-- End Section Global Script-->
+
+</body>
+</html>

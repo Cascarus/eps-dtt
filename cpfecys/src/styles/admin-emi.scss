@@ -1,0 +1,17 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css');
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Montserrat:400,700|Nunito:400,700&display=swap');
+// Import Custom Variables
+
+@import "node_modules/bootstrap/scss/bootstrap";
+
+// Import Custom SCSS
+@import "modules/variablesCustomEmi";
+@import "modules/mixins";
+@import "modules/admin/web2py-bootstrap4";
+@import "modules/admin/web2py";
+@import "modules/sb-admin";
+@import "modules/bootstrap-toggle";
+@import "modules/moduleBackup";
+@import "modules/admin/bootstrap-select";
+@import "modules/dttdashboard";
+@import "modules/dashboard";

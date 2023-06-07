@@ -1,0 +1,141 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    {{if permiso:}}
+        <div class="row-fluid">
+            <center>
+                <h2>
+                    Reporte de notas de actividad tipo quiz
+                    {{if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):}}
+                        <a onclick="javascript:introJs().setOptions({'skipLabel': 'Quitar', 'nextLabel': 'Siguiente', 'prevLabel': 'Anterior', 'doneLabel': 'Salir'}).start();" href='javascript:void(0);' class="btn btn-primary" >
+                            <span class="fa fa-question-circle"></span>
+                        </a>
+                    {{pass}}
+                    <br>
+                </h2>
+            </center>
+        </div>
+        {{=back_button}}
+        <div class="well mt-2" id="div_metainfo_quiz">
+            <a style="cursor:pointer;">
+                <center><h4>Información general de la evaluación</h4></center>
+            </a>
+            <hr>
+            <p><strong>Nombre de la actividad:</strong> {{=metadata[0][1]}}</p> 
+            <p><strong>Tema:</strong>  {{=metadata[0][7]}}</p>
+            <p><strong>Fecha de ejecución:</strong>  {{=metadata[0][2]}}</p>
+            <p><strong>Hora de ejecución:</strong>  {{=metadata[0][3]}}</p>
+        </div>
+        {{if not vacio:}}
+            <div class="well" id="div_metainfo_quiz">
+                <a style="cursor:pointer;"><center><h4>Detalle de la evaluación</h4></center></a>
+                <table style="width: 100%" class="table">
+                    <thead>
+                        <tr>
+                            <th><center>Carnet</center></th>
+                            <th><center>Total de preguntas</center></th>
+                            <th><center>Preguntas correctas</center></th>
+                            <th><center>Nota</center></th>
+                            <th><center>Nota sobre 100</center></th>
+                            <th><center>Revisión</center></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for nota in notas:}}
+                            <tr>
+                                <td><center>{{=nota[6]}}</center></td>
+                                <td><center>{{=nota[3]}}</center></td>
+                                <td><center>{{=nota[4]}}</center></td>
+                                {{if nota[7] >= 80:}}
+                                    <td><center><font color="Green">{{=nota[5]}}</font></center></td>
+                                    <td><center><font color="Green">{{=nota[7]}}</font></center></td>
+                                {{elif nota[7] >= 60:}}
+                                    <td><center><font color="Yellow">{{=nota[5]}}</font></center></td>
+                                    <td><center><font color="Yellow">{{=nota[7]}}</font></center></td>
+                                {{else:}}
+                                    <td><center><font color="Red">{{=nota[5]}}</font></center></td>
+                                    <td><center><font color="Red">{{=nota[7]}}</font></center></td>
+                                {{pass}}
+                                <td><center><a href="/quiz/obtener_revision_quiz/{{=actividad}}?period={{=periodo}}&project={{=project}}&user={{=nota[8]}}&quid={{=metadata[0][8]}}" class="btn btn-success">Ver revision</a></center></td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        {{else:}}
+            <div class="well" id="div_metainfo_quiz">
+                <a style="cursor:pointer;">
+                    <center><h4>Información</h4></center>
+                </a>
+                <hr>
+                <table style="width:100%;">
+                    <tr>
+                        {{=XML("<td style='width:10%;'></td>"*10)}}
+                    </tr>
+                    <tr>
+                        <td colspan="4"></td>
+                        <td colspan="2" style="text-align:center;">
+                            <img src="{{=URL('static','images')}}/info.png" width="50%">
+                        </td>
+                        <td colspan="4"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="10"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="10">
+                            <center>No se han encontrado notas para esta actividad.</center>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        {{pass}}
+    {{else:}}
+        <div class="navbar" data-step=1 data-intro="Div detalle del quiz">
+            <div class="navbar-inner">
+                <a style="cursor:pointer;"><center><h4>ACCESO DENEGADO</h4></center></a>
+            </div>
+        </div>
+        <div class="well" id="div_metainfo_quiz">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                    <td style="width:10%;"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td colspan="2" style="text-align:center;">
+                        <img src="{{=URL('static','images')}}/ACCESODENEGADO.png" width="100%">
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="7"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">
+                        <label>Usted no tiene permisos para ingresar a este recurso, este intento de acceso quedo registrado y sera reportado.</label>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+    {{pass}}
+</div>

@@ -1,0 +1,472 @@
+{{extend 'dashboard.html'}}
+
+
+
+<div class="mt-4">
+    <div class="col-12">
+        <div class="navbar-inner">
+            <a style="cursor:pointer;">
+                <center><h4>Solicitud de practicas finales</h4></center>
+            </a>
+        </div>
+        <div id="div_error_0" class="alert alert-error" hidden>
+          <strong>Atención:</strong> Debe seleccionar almenos 1 proyecto.
+        </div>
+        <div id="div_error" class="alert alert-error" hidden>
+          <strong>Atención:</strong> Debe corregir los errores en el formulario.
+        </div>
+        <div id="div_info" class="alert alert-info" hidden>
+          <strong>Atención:</strong> Solo puede seleccionar 5 proyectos.
+        </div>
+    </div>
+    <div class="col-12">  
+        <!-- SmartWizard html -->
+        <div id="smartwizard">
+            <ul class="nav">
+                <li><a href="#step-1">Paso 1<br/><small>Verificación de proceso</small></a></li>
+                <li><a href="#step-2">Paso 2<br/><small>Datos personales</small></a></li>
+                <li><a href="#step-3">Paso 3<br/><small>Area de interés</small></a></li>
+                <li><a href="#step-4">Paso 4<br/><small>Ingreso de CV</small></a></li>
+            </ul>
+            <div>
+                <div id="step-1">      
+                    <div id="form-step-0" role="form" data-toggle="validator">
+                        <div class="form-group">
+                            <center>
+                                {{=tabla_validacion}}
+                            </center>
+                        </div>
+                    </div>
+                </div>
+                <div id="step-2" style="height: 320px; overflow-y:auto;">
+                    <h2>Verifique sus datos personales</h2>
+                    <div id="form-step-1" role="form" data-toggle="validator">
+                        {{if usuario != None:}}
+                            <form id="frm_datos_personales" class="mt-3 mb-3">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="span5">
+                                            <label for="inp_nombre">Nombre:</label>
+                                            <input type="text" class="form-control" name="inp_nombre" id="inp_nombre" value="{{=usuario.first_name}}" placeholder="Ingrese su nombre"/>
+                                            <label for="inp_apellido">Apellido:</label>
+                                            <input type="text" class="form-control" name="inp_apellido" id="inp_apellido" value="{{=usuario.last_name}}" placeholder="Ingrese su apellido"/>
+                                            <label for="inp_cui">No de CUI:</label>
+                                            <input type="number" class="form-control" name="inp_cui" id="inp_cui"  value="{{=usuario.cui}}" placeholder="Ingrese su CUI"/>
+                                        </div>
+                                        <div class="span5">
+                                            <label for="inp_direccion">Dirección:</label>
+                                            <input type="text" class="form-control" name="inp_direccion" id="inp_direccion" value="{{=usuario.home_address}}" placeholder="Ingrese su dirección"/>
+                                            <label for="inp_telefono">Telefono:</label>
+                                            <input type="number" class="form-control" name="inp_telefono" id="inp_telefono" value="{{=usuario.phone}}" placeholder="Ingrese su número de teléfono"/>
+                                            <label for="sel_trabaja">Trabaja:</label>
+                                            <select  name="sel_trabaja" id="sel_trabaja" class="form-control">
+                                                <option value="1">Si</option>
+                                                <option value="0">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        {{pass}}
+                    </div>
+                </div>
+                <div id="step-3" style="height: 500px; overflow-y:auto;">
+                    <h2>Seleccione el área de interés y proyecto</h2>
+                    <div id="form-step-2" role="form" data-toggle="validator">
+                        <div class="form-group">
+                            <label class="control-label"><b>Areas disponibles</b></label>
+                            {{if area_level!=None:}}
+                                <select name="selectArea" class="form-control">
+                                    {{for area in area_level:}}
+                                        <option value="{{=area.id}}"/>{{=area.name}}
+                                    {{pass}}
+                                </select>
+                                <button class="btn btn-primary mt-3" type="button" id="aceptar"><i class="icon-ok-sign icon-white"></i> Aceptar</button>
+                            {{pass}}
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row" id="div_proyectos">
+                                    <div class="col-12 col-md-4" id="div_proyectos_dis">
+                                        <h3 id="h3_proyectos_dis"></h3>
+                                        <table class="table table-striped" id="tb_proyectos_dis">
+                                            <thead>
+                                                <tr>
+                                                    <th width="80%" align="left">Nombre del proyecto</th>
+                                                    <th width="20%" align="left">Acción</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-12 col-md-7" id="div_pr_seleccionados">
+                                        <h3>Proyectos seleccionados</h3>
+                                        <form id="frm_pr_seleccionados">
+                                            <table class="table table-striped" id="tb_seleccionados">
+                                                <thead>
+                                                    <tr id="enc">
+                                                        <td width="40%" align="left"><b>Nombre del proyecto</b></td>
+                                                        <td width="10%" align="left"><b>Año aprobado</b></td>
+                                                        <td width="20%" align="left"><b>Semestre aprobado</b></td>
+                                                        <td width="10%" align="left"><b>Nota aprobado</b></td>
+                                                        <td width="10%" align="left"><b>Catedrático</b></td>
+                                                        <td width="10%" align="left"><b>Acción</b></td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="step-4" class="">
+                    <h2>Ingreso de curriculum vitae y listado de cursos aprobado</h2>
+                    <div id="form-step-3" role="form" data-toggle="validator">
+                        <center>
+                            <form id="frm_documentos" method="post" enctype="multipart/form-data">
+                                <table style="background-color: #f5f5f5;">
+                                    <tr>
+                                        <td>
+                                            <h4>
+                                                <img src="{{=ruta_iconos}}/curriculum.png" height="32" width="32"> Curriculum vitae:
+                                            </h4>
+                                        </td>
+                                        <td>
+                                            <h4>
+                                                <img src="{{=ruta_iconos}}/lista_cursos.png" height="32" width="32"> Listado de cursos:
+                                            </h4>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input id="inp_cv" name="inp_cv" type="file" class="file">
+                                        </td>
+                                        <td>
+                                            <input id="inp_lis_cursos" name="inp_lis_cursos" type="file" class="file">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                            <form id="why" method="post" enctype="multipart/form-data"></form>
+                        </center>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+<!-- Include SmartWizard CSS -->
+<link href="{{=URL('static', 'sources/css/smart_wizard.min.css')}}" rel="stylesheet" type="text/css" />
+<!-- Optional SmartWizard theme -->
+<link href="{{=URL('static', 'sources/css/smart_wizard_theme_arrows.min.css')}}" rel="stylesheet" type="text/css" />
+<!-- Include SmartWizard JavaScript source -->
+<script src="{{=URL('static', 'sources/js/jquery.smartWizard.min.js')}}"></script>
+<!-- Include jQuery Validator plugin -->
+<script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','sources/js/accion.js')}}"></script>
+<script type="text/javascript">
+    var cv, lst;
+    //*************************************** VALIDATOR PLUGIN **********************************************
+    jQuery.validator.setDefaults({
+        debug: true,
+        success: "valid"
+    });
+
+    var obj_frm_datos_personales = $("#frm_datos_personales");
+    obj_frm_datos_personales.validate({
+        rules: {
+            inp_nombre: "required",
+            inp_apellido: "required",
+            inp_cui: {
+                required: true,
+                minlength: 12,
+                maxlength: 14
+            },
+            inp_direccion: "required",
+            inp_telefono: {
+                required: true,
+                minlength: 8,
+                maxlength: 8
+            }
+        },
+        messages: {
+            inp_nombre: "*Este campo es obligatorio",
+            inp_apellido: "*Este campo es obligatorio",
+            inp_cui: {
+                required: "*Este campo es obligatorio",
+                minlength: "*Debe ingresar un valor entre 12 y 14 digitos",
+                maxlength: "*Debe ingresar un valor entre 12 y 14 digitos"
+            },
+            inp_direccion: "*Este campo es obligatorio",
+            inp_telefono: {
+                required: "*Este campo es obligatorio",
+                minlength: "*Debe ingresar un valor de 8 digitos",
+                maxlength: "*Debe ingresar un valor de 8 digitos"
+            }
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-error").removeClass("has-success");
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-success").removeClass("has-error");
+        }
+    });
+
+    // Reglas de formulario para proyectos seleccionados
+    $.validator.messages.required = 'Campo obligatorio';
+    jQuery.validator.addClassRules({
+        cls_sel_anio: {
+            required: true,
+            digits: true,
+            range: [1980, 2050]
+        },
+        cls_sel_nota:{
+            required: true,
+            digits: true,
+            range: [61, 100]
+        },
+        cls_sel_cat:{
+            required: true
+        }
+    });
+    
+    var obj_frm_pr_seleccionados = $("#frm_pr_seleccionados");
+    obj_frm_pr_seleccionados.validate({
+        highlight: function (element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-error").removeClass("has-success");
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-success").removeClass("has-error");
+        }
+    });
+
+    // Reglas para formulario de archivos:
+    var obj_frm_documentos = $("#frm_documentos");
+    $.validator.addMethod('filesize', function(value, element, param) {
+        return this.optional(element) || (element.files[0].size <= param) 
+    });
+    obj_frm_documentos.validate( {
+        rules:{
+            inp_cv:{
+                required: true,
+                accept: "pdf",
+                filesize: 1048576
+            },
+            inp_lis_cursos:{
+                required: true,
+                accept: "pdf",
+                filesize: 1048576
+            }
+        },
+        messages:{
+            inp_cv:{
+                required: "*Campo obligatorio",
+                accept: "*Solo se admiten archivos con extensión .pdf",
+                filesize: "*Tamaño máximo 1 Mb"
+            },
+            inp_lis_cursos:{
+                required: "*Campo obligatorio",
+                accept: "*Solo se admiten archivos con extensión .pdf",
+                filesize: "*Tamaño máximo 1 Mb"
+            }
+        },
+        submitHandler: function(form) {
+            // do other things for a valid form
+            form.submit();
+        },
+        highlight: function (element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-error").removeClass("has-success");
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            $(element).parents(".col-sm-5").addClass("has-success").removeClass("has-error");
+        }
+    });
+
+    //********************************** TERMINA VALIDATOR PLUGIN *******************************************
+    $(document).ready(function(){
+        //********************************* EVENTOS SMART WIZARD *************************************************
+        $("#fixheight").click(function() { $("#wizard").smartWizard("fixHeight"); });
+        // Step show event 
+        $("#smartwizard").on("showStep", function(e, anchorObject, stepNumber, stepDirection, stepPosition) {
+            if(stepPosition === 'first') {
+               $("#prev-btn").addClass('disabled');
+               $("#final-btn").attr("disabled", true);
+            } else if(stepPosition === 'final') {
+               $("#next-btn").addClass('disabled');
+                $("#final-btn").attr("disabled", false);
+            } else {
+               $("#prev-btn").removeClass('disabled');
+               $("#next-btn").removeClass('disabled');
+               $("#final-btn").attr("disabled", true);
+            }
+        });
+
+        // Toolbar extra buttons
+        var btnFinish = $('<button id="final-btn"></button>').text('Finalizar').addClass('btn btn-success').on('click', function() {
+            if(obj_frm_documentos.valid()) {
+                var fd = new FormData();
+                fd.append('nombre', $('#inp_nombre').val());
+                fd.append('apellido', $('#inp_apellido').val());
+                fd.append('cui', $('#inp_cui').val());
+                fd.append('carnet', carnet);
+                fd.append('direccion', $('#inp_direccion').val());
+                fd.append('telefono', $('#inp_telefono').val());
+                fd.append('trabaja', $('#sel_trabaja option:selected').val());
+                fd.append('idproceso', id_proceso);
+                fd.append('anioproceso', anio_proceso);
+                fd.append('periodoproceso', periodo_proceso);
+                fd.append('proyectos', JSON.stringify(get_obj_table()));
+                $.each(cv, function(key, value) {
+                    fd.append('inp_cv', value);
+                });
+                $.each(lst, function(key, value) {
+                    fd.append('inp_lis_cursos', value);
+                });
+                $.ajax({
+                    url: 'mtd_guardar',
+                    type: 'POST',
+                    //dataType: 'json',
+                    data: fd,
+                    success:function(resp){
+                        if(resp == 'ok') { location.reload(); }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            }
+        });
+
+        // Smart Wizard
+        $('#smartwizard').smartWizard({
+            selected: 0,
+            theme: 'arrows',
+            autoAdjustHeight:true,
+            transitionEffect:'slide',
+            showStepURLhash: true,
+            useURLhash: false,                        
+            toolbarSettings:{
+                toolbarPosition: 'bottom',
+                toolbarButtonPosition: 'left',
+                showPreviousButton: true,
+                toolbarExtraButtons: [btnFinish]
+            },
+            anchorSettings: {
+                anchorClickable: false, // Enable/Disable anchor navigation
+                enableAllAnchors: false, // Activates all anchors clickable all times
+            },            
+            lang: {
+                next: 'Siguiente',
+                previous: 'Anterior'
+            }
+        });
+
+        $("#prev-btn").on("click", function() {
+            // Navigate previous
+            $('#smartwizard').smartWizard("prev");
+            return true;
+        });
+
+        $("#next-btn").on("click", function() {
+            // Navigate next
+            $('#smartwizard').smartWizard("next");
+            return true; 
+        });
+
+        $("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber, stepDirection) {
+            if ({{=activo}} == 1){
+                if(stepDirection === 'forward' && stepNumber == 1){
+                    if (obj_frm_datos_personales.valid()){
+                        $('#div_error').hide('slow');
+                        return true;
+                    } else {
+                        $('#div_error').show('slow');
+                        return false;
+                    }
+                } else if(stepDirection === 'forward' && stepNumber == 2) {
+                    if (obj_frm_pr_seleccionados.valid()) {
+                        if(cantidad > 0 && cantidad <= max_seleccionados) {
+                            $('#div_error').hide('slow');
+                            $('#div_info').hide('slow');
+                            return true;
+                        } else if(cantidad == 0) {
+                            $('#div_error_0').show('slow');
+                            return false;
+                        }
+                    } else {
+                        $('#div_error').show('slow');
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        $("#inp_cv").on('change', function(){
+            var upload = document.getElementById('inp_cv');
+            cv = upload.files;
+        });
+
+        $("#inp_lis_cursos").on('change', function(){
+            var upload = document.getElementById('inp_lis_cursos');
+            lst = upload.files;
+        });
+
+        //********************************* TERMINA EVENTOS SMART WIZARD *************************************************
+        $('#aceptar').click(function(){
+            var cod_area = $('select[name=selectArea]').val();
+            var json_lista_proyectos = JSON.parse(string_proyectos);            
+            var codigo_area = -1;
+            var nombre_area = '';
+            var json_proyectos = null;
+            $.each(json_lista_proyectos, function(i, json_area) {
+                //use obj.id and obj.name here, for example:
+                if (json_area.area_codigo == cod_area){
+                    cod_area = json_area.area_codigo;
+                    nombre_area = json_area.area_nombre;
+                    json_proyectos = json_area.proyectos;
+                }
+            });
+
+            if (json_proyectos != null){
+                $('#h3_proyectos_dis').html(`Proyectos ${nombre_area}`);
+                $('#tb_proyectos_dis').empty();
+                $.each(json_proyectos, function(i, json_item) {
+                    if(esta_seleccionado(json_item.codigo) == 0){ //0 NO está seleccionado, 1 SI está seleccionado
+                        $('#tb_proyectos_dis').append(`
+                            <tr id="${json_item.codigo}">
+                                <td>${json_item.nombre}</td>
+                                <td>
+                                    <button title="Agregar proyecto" class="btn btn-primary" type="button" id="btn_agregar_pr" href="javascript:void(0);" 
+                                        onclick="javascript:agregar_curso('${json_item.codigo}', '${json_item.nombre}', '${cod_area}');">
+                                            <i class="fa fa-chevron-right"></i>
+                                    </button>
+                                </td>
+                            </tr>`
+                        );
+                    }
+                });
+            }
+
+            $('#div_proyectos').show(); 
+        });
+    });
+    
+    // ------------------------------- JAVASCRIPT --------------------------------
+    var string_proyectos = {{=XML(json_proyectos)}};
+    var cantidad = 0;
+    var max_seleccionados = 5;
+    var id_proceso = {{=id_proceso}}
+    var anio_proceso = {{=act_anio}}
+    var periodo_proceso = {{=act_periodo_numero}}
+    var carnet = {{=usuario.username}}
+</script>
+{{end page_js}}

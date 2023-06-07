@@ -1,0 +1,8 @@
+{{extend 'dashboard.html'}}
+<div class="col-12 text-center">
+    <h1>{{=T('Roles Administration')}}</h1>
+</div>
+{{=grid}}
+{{if request.is_local:}}
+    {{=response.toolbar()}}
+{{pass}}

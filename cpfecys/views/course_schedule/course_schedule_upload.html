@@ -1,0 +1,137 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2>Carga de Horarios de Cursos
+                <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
+                    <span class="fa fa-question-circle"></span>
+                </a>
+            </h2>
+            <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="myModalLabel">{{=T('Help Academic Upload')}}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Esta pantalla posee la capacidad de cargar los horarios de los cursos, por medio de un archivo con el formato csv.</p>
+                            <p>A continuación encontrará un ejemplo del formato del archivo de definición de horarios.</p>
+                            <a href="/cpfecys/static/examples/FormatoDeHorarioDeCursos.csv"><input class="btn btn-primary" type="button" value="Descargar archivo"></a>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h3>{{=T(current_period.period.name)}} - {{=current_period.yearp}}</h3>
+            {{if len(errors) > 0:}}
+                <div class="accordion" id="accordion2">
+                    <div class="accordion-group">
+                        <div class="accordion-heading">
+                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                <span class="icon-remove"></span> {{=T('User upload errors')}}
+                                <span class="pull-right">{{=T('Total Errors: ') + len(errors)}}</span>
+                            </a>
+                        </div>
+                        <div id="collapseOne" class="accordion-body collapse">
+                            <div class="accordion-inner">
+                                <table class="table table-striped table-bordered table-condensed">
+                                    <thead>
+                                        <th>Curso</th>
+                                    </thead>
+                                    <tbody>
+                                        {{for curso_error in cursos_error:}}
+                                            <tr><td>{{=curso_error}}</td></tr>
+                                        {{pass}}
+                                    </tbody>
+                                </table>
+                                <table class="table table-striped table-bordered table-condensed">
+                                    <thead>
+                                        <th>Fila</th>
+                                        <th>Código proyecto</th>
+                                        <th>Hora inicial</th>
+                                        <th>Hora final</th>
+                                        <th>Lunes</th>
+                                        <th>Martes</th>
+                                        <th>Miercoles</th>
+                                        <th>Jueves</th>
+                                        <th>Viernes</th>
+                                        <th>Sabado</th>
+                                        <th>Domingo</th>
+                                        <th>Código docente</th>
+                                        <th>Edificio</th>
+                                        <th>Salon</th>
+                                        <th>Errores</ht>
+                                    </thead>    
+                                    <tbody>
+                                        {{for error in errors:}}
+                                            {{print(error)}}
+                                            <tr>
+                                                {{try:}}
+                                                {{i = 0}}
+                                                {{while i < len(error):}}
+                                                    {{if not isinstance(error[i], int):}}
+                                                        {{if 'end_row' != error[i] and 'Error' not in error[i]:}} 
+                                                            {{if 'Error' not in error[i]:}}
+                                                                <td>{{=error[i]}}</td>
+                                                            {{pass}}
+                                                        {{elif 'Error' in error[i]:}}
+                                                            <td> 
+                                                                {{=error[i]}}
+                                                                {{if 'Error' in error[i+1]:}}
+                                                                    <br>
+                                                                    {{i += 1}}
+                                                                    {{=error[i]}}
+                                                                {{pass}} 
+                                                            </td>
+                                                        {{pass}}
+                                                    {{else:}}
+                                                        <td>{{=error[i]}}</td>
+                                                    {{pass}}
+                                                    {{i += 1}}
+                                                {{pass}}
+                                                {{except Exception as e:}}
+                                                    {{print(e)}}
+                                                {{pass}}
+                                            </tr>
+                                        {{pass}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {{else:}}
+                <div class="well">
+                    <div class="custom-file">
+                        {{=FORM(
+                            INPUT(_type='file', _name='csvfile', _id='csvfile', _class='custom-file-input'),
+                            LABEL('Selecionar archivo', _class='custom-file-label'),
+                            SELECT(OPTION(T(current_period.period.name) + '-' + str(current_period.yearp), _value=0),_name='cmbPeriod',_id='cmbPeriod', _class='form-control mb-3 mt-3'),
+                            INPUT(_type='submit',_value='Upload', _class='btn btn-primary')
+                            )
+                        }}
+                    </div>  
+                </div>
+            {{ pass }}
+        </div>
+    </div>
+</div>
+
+<!--emarquez: javascript-->
+<script type="text/javascript">
+    // Get the file input field
+    var inputFile = document.getElementById('csvfile');
+    // Add an event listener to the file input field to detect when a file is selected
+    inputFile.addEventListener('change', function() {
+        // Get the name of the selected file
+        var fileName = this.value.split("\\").pop();
+        // Update the label of the file input field with the selected file name
+        var label = document.querySelector('.custom-file-label');
+        label.innerHTML = fileName;
+    });
+</script>

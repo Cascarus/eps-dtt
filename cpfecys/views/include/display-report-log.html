@@ -1,0 +1,23 @@
+<div class="row-fluid container">
+    <div class="well">
+        <div class="row-fluid">
+            <strong>Tipo de registro:</strong> {{=inc_vars['log_type']}}
+            <strong>Fecha:</strong> {{=inc_vars['date']}}
+            {{if inc_vars['editable']:}}
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <a href="#{{=inc_vars['edit_action']}}" data-toggle="modal" class="btn btn-primary">
+                            <span class="fa fa-pencil"></span>
+                        </a>
+                        <a href="#{{=inc_vars['delete_action']}}" data-toggle="modal" class="btn btn-danger">
+                            <span class="fa fa-trash"></span>
+                        </a>
+                    </div>
+                </div>
+            {{pass}}
+        </div>
+        <div class="row-fluid">
+            {{=inc_vars['content']}}
+        </div>
+    </div>
+</div>

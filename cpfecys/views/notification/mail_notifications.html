@@ -1,0 +1,441 @@
+{{extend 'dashboard.html'}}
+
+<!-- Additional Scripts for MARKMIN -->
+<script src="{{=URL('static','js')}}/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<!-- //Additional Scripts for MARKMIN -->
+
+<div class="mt-4">
+	<div class="col-12">
+		<h1>
+			{{=T('Notices')}} - {{=name}}
+			<br>
+			<small>{{=T(semester)}}, {{=year}}</small>
+		</h1>
+	</div>
+	<div class="col-12">
+		<div class="row-fluid">
+			<div class="well span12" id="principal_div">
+				<a href="{{=URL('activity_control', 'courses_list')}}" class="btn btn-primary" ><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+				<form action="{{=URL('notification', 'mail_notifications/send', vars=dict(period=str(request.vars['period']), assignation=str(request.vars['assignation'])))}}" method="post">	
+					<div style="overflow:auto;">
+						<table>
+							<tr>
+								<td>
+									<!--Tabla de los grupos de estudiantes-->
+									<table class="table-striped table-bordered">
+										<h3>{{=T('Group of Students')}}</h3>
+										<tr>
+											<td>
+												<input type="checkbox" class="tipo_trigger" target="all" name="tipoe" id="all" value="all">
+											</td>
+											<td>{{=T('All')}}</td>
+										</tr>
+										<tr>
+											<td>
+												<input type="checkbox" class="tipo_trigger" target="finalPractice" name="tipoe" id="finalPractice" value="fp">
+											</td>
+											<td>{{=T('Rol Teacher')}}</td>
+										</tr>
+										<tr>
+											<td>
+												<input type="checkbox" class="tipo_trigger" target="claboratorio" name="tipoe" id="claboratorio" value="cl">
+											</td>
+											<td>{{=T('Students with laboratory')}}</td>
+										</tr>
+										<tr>
+											<td>
+												<input type="checkbox" class="tipo_trigger" target="slaboratorio" name="tipoe" id="slaboratorio" value="sl">
+											</td>
+											<td>{{=T('Students without laboratory')}}</td>
+										</tr>
+										<tr>
+											<td>
+												<input type="checkbox" class="tipo_trigger" target="specific" name="tipoe" id="specific" value="specific">	
+											</td>
+											<td>{{=T('Specific Users')}}</td>
+										</tr>
+									</table>
+									<!--Fin de la Tabla de los grupos de estudiantes-->
+								</td>
+								<td><p>&nbsp;&nbsp;</p></td>
+								<td>
+									<div id="students_content" style="display: none;">
+										<h3><small>{{=T('Students with laboratory')}}</small></h3>
+										<div style="overflow:auto; height:110px;">
+											<!--Tabla de Alumnos con Laboratorio-->
+											<table class="table-striped table-bordered">
+												{{for project in get_projects(1):}}
+													<tr>
+														<td>
+															<input type="checkbox" class="claboratorio" name="listado" value="{{=project.carnet.id}}">
+														</td>
+														<td>{{=project.carnet.carnet}}</td>
+													</tr>
+												{{pass}}
+											</table>
+											<!--Fin de tabla de alumnos con laboratorio-->
+										</div>
+									</div>
+								</td>
+								<td><p>&nbsp;&nbsp;</p></td>
+								<td>
+									<div id="students_content2" style="display: none;">
+										<h3><small>{{=T('Students without laboratory')}}</small></h3>
+										<div style="overflow:auto; height:110px;">
+											<!--Tabla de Alumnos sin Laboratorio-->
+											<table class="table-striped table-bordered">
+												{{for project in get_projects(2):}}
+													<tr>
+														<td>
+															<input type="checkbox" class="slaboratorio" name="listado" value="{{=project.carnet.id}}">
+														</td>
+														<td>{{=project.carnet.carnet}}</td>
+													</tr>
+												{{pass}}
+											</table>
+											<!--Fin de tabla de alumnos sin laboratorio-->
+										</div>
+									</div>
+								</td>
+								<td>
+									<div id="students_content3" style="display: none;">
+										<h3><small>{{=T('Final Practice Student')}}</small></h3>
+										<div style="overflow:auto; height:110px;">
+											<!--Tabla de Alumnos sin Laboratorio-->
+											<table class="table-striped table-bordered">
+												{{for project in get_projects(3):}}
+													<tr>
+														<td>
+															<input type="checkbox" class="finalPractice" name="listado2" value="{{=project.user_project.assigned_user}}">
+														</td>
+														<td>{{=project.user_project.assigned_user.username}}</td>
+														<td>{{=project.user_project.assigned_user.first_name}}&nbsp;{{=project.user_project.assigned_user.last_name}}</td>
+													</tr>
+												{{pass}}
+											</table>
+											<!--Fin de tabla de alumnos sin laboratorio-->
+										</div>
+									</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<fieldset>
+						<label for="subject">{{=T('Subject')}}:</label>
+						<input type="text" class="form-control" id="subject" name="subject" value="{{=session.notification_subject}}">
+						<label for="message">{{=T('Message')}}:</label>
+						<textarea class="form-control" id="message" name="message" rows="8">{{=session.notification_message}}</textarea>
+						<div id="div_list_attachments">
+							<div class="well">
+								<div>               	
+									<a id="attachments">
+										<span class="fa fa-file"></span>
+										{{=T('Attachments')}}
+										{{
+										files_num = 0
+										if attachment_list != None:
+											for attachment_list_var in attachment_list:
+												for attachment_var in attachment_list_var:
+													files_num += 1
+												pass
+											pass
+										pass
+										}}
+										({{=files_num}})
+									</a> 
+									<div  id="attachmentsDiv" value="attachmentsDiv" style="display:none; overflow:auto; height:100px;"></div>
+									<div align="right" id="remove_div" style="display:none;">
+										<a id="myButton" href="#attachModal" role="button" class="btn btn-danger" title="{{=T('Remove selected')}}"  > 
+											<span class="fa fa-trash">
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<button type="submit" class="btn btn-success">{{=T('Send')}}</button>
+						<a href="#attachModal" role="button" class="btn btn-primary" data-toggle="modal"> 
+							{{=T('Attach')}} <span class="icon-white icon-upload">
+						</a>
+					</fieldset>
+				</form>
+				<form action="#div_list_attachments" enctype="multipart/form-data" method="post" id="myForm">
+					<div align="right">
+						<input name="_formname" type="hidden" value="remove_form">
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Attach Div-->
+		<div id="attachModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true"> 
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="myModalLabel">
+							<span class="icon-upload"></span>
+							{{=T('Attach file')}}
+						</h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body" style="overflow:auto; height:500px;">
+						<ul id="myTab" class="nav nav-tabs">
+							<li class="nav-item" id="var_upload"><a class="nav-link active" href="#" data-toggle="tab">{{=T('Upload')}}</a></li>
+							<li class="nav-item" id="var_all"><a class="nav-link" href="#home" data-toggle="tab">{{=T('All files')}}</a></li>
+							<div align="right" id="div_all_search" style="display: none;">
+								<table>
+									<td>
+										<input type="text" class="form-control" id="search_input" name="search_input" placeholder="{{=T('Name')}}"/>
+									</td>
+									<td>
+										<a role="button"  href="#" class="btn btn-info" id="search_button">
+											<i class="fa fa-xs fa-search"></i>
+										</a>
+									</td>
+								</table>
+							</div>
+						</ul>
+						<div id="div_upload">
+							<form action="" enctype="multipart/form-data" method="post" >
+								<div align="center">
+									<table>
+										<tr>
+											<td align="left">
+												<input name="_formname" type="hidden" value="upload_form">
+												<label>{{=T('File name')}}</label>
+												<input class="string" name="file_name" type="text" value="">
+												<br>
+												<label>{{=T('Select file')}}</label>
+												<input class="upload" name="file_upload" type="file" id="upload_button">
+												<br>
+												<div id="uploadError" style="display: none;" class="alert-error">
+													{{=T('File size must be 2MB or below with pdf, rar or zip extension')}}
+												</div>
+												<br>
+												<label>{{=T('Description')}}</label>
+												<input class="string" name="file_description" type="text" value="">
+												<br>
+												<label>{{=T('Visible')}}&nbsp; &nbsp;<input type="checkbox" name="file_visible"></label>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div align="right">	
+													<input type="submit" class="btn btn-primary" value="{{=T('Upload file')}}">
+												</div>
+											<td>
+										</tr>
+									</table>
+								</div>
+							</form>
+						</div>
+						<div id="div_semester" style="display: none;">
+							<div class="well">			
+								<div>               	
+									<a id="myfiles"> 
+										<span class="icon-folder-open"></span>
+										{{=T('My files')}}
+									</a>
+									<div id="myfilesDiv" value="myfilesDiv" style="display: none; overflow:auto; height:100px;">
+										&nbsp; &nbsp; <input type="checkbox" value="specific"><span class="icon-file"></span>
+										uno
+										<br>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="div_all" style="display: none;">
+							<div class="well" style="overflow:auto;">
+								<div> 
+									<a id="allFiles" > 
+										<span class="fa fa-file"></span>
+										{{=T('All files')}}
+									</a>
+									<div  id="allDiv" value="allDiv" style="overflow:auto;  height:200px; width:1000px;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<form action="#div_list_attachments" enctype="multipart/form-data" method="post" >
+						<div class="modal-footer" align="right">
+							<input name="_formname" type="hidden" value="attach_form">
+							<table align="right">
+								<tr>
+									<td>
+										<div id="attach_button" style="display: none;">
+											<input type="submit" role="button" class="btn btn-primary" value="{{=T('Attach')}}">					    
+										</div>
+									</td>
+									<td>
+										<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<!--Finish Attach Div-->
+
+		<!--Div to load functions-->
+		<div  id="div2" value="div2"></div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){		
+		$("#search_input").width(100);
+
+		$("#myButton").click(function() {
+           $("#myForm").submit();
+       	});
+		
+		$("#div_list_attachments").width(parseInt($("#message").width()) + 15);		
+ 
+		var upload = document.getElementById('upload_button');
+		upload.onchange = function() {
+		    var file = upload.files[0];
+		    if (file.size > 2097152) {		    	
+		    	$("#uploadError").css("display", "block");		       
+		    }else{
+		    	$("#uploadError").css("display", "none");
+		    }
+		    var ext = $('#upload_button').val().split('.').pop().toLowerCase();
+			if($.inArray(ext, ['zip','pdf']) == -1) {
+			    $("#uploadError").css("display", "block");
+			}
+		};
+
+		//hide remove button
+		if({{=files_num}} == 0) {
+			$("#remove_div").css("display", "none");
+		}else{
+			$("#attachmentsDiv").css("display", "block");	
+			$("#remove_div").css("display", "block");
+		}
+
+		//Load list of notifications
+		$("#attachmentsDiv").load("{{=URL('notification','attachment_files')}}", {files_num: {{=files_num}}});
+
+		let value = document.getElementById("search_input").value
+		$("#allDiv").load("{{=URL('notification','search_files')}}", {search_input: value});
+
+		$('#search_input').on('input', function() { 
+			let value = document.getElementById("search_input").value
+		    $("#allDiv").load("{{=URL('notification','search_files')}}", {search_input: value});
+		});
+
+		$("#search_button").click(function(){
+			let value = document.getElementById("search_input").value
+			$("#allDiv").load("{{=URL('notification','search_files')}}", {search_input: value});
+		})
+
+		//
+		$('#subject').on('input', function() { 
+		    $("#div2").load("{{=URL('notification','notification_functions')}}", {subject: document.getElementById('subject').value});
+		});
+
+		$('#message').on('input', function() { 
+		    $("#div2").load("{{=URL('notification','notification_functions')}}", {message: document.getElementById('message').value});
+		});
+		
+		$("#var_all").click(function(){			
+			$("#div_all_search").css("display", "block");
+			$("#div_all").css("display", "block");
+			$("#div_semester").css("display", "none");
+			$("#div_upload").css("display", "none");
+			$("#attach_button").css("display", "block");
+			
+		})
+
+		$("#var_upload").click(function(){			
+			$("#div_upload").css("display", "block");
+			$("#div_semester").css("display", "none");
+			$("#div_all").css("display", "none");
+			$("#div_all_search").css("display", "none");
+			$("#attach_button").css("display", "none");
+			
+		})
+
+		$("#var_semester").click(function(){			
+			$("#div_semester").css("display", "block");
+			$("#div_upload").css("display", "none");
+			$("#div_all").css("display", "none");
+			$("#div_all_search").css("display", "none");
+			$("#attach_button").css("display", "block");
+		})
+
+		$("#attachments").click(function(){			
+			$("#attachmentsDiv").toggle();	
+			$("#remove_div").toggle();	
+					
+		})
+
+		$("#allFiles").click(function(){			
+			$("#allDiv").toggle();			
+		})
+
+		$("#myfiles").click(function(){			
+			$("#myfilesDiv").toggle();			
+		})
+
+		$("#specific").click(function(){
+			let value_property = $("#specific").prop("checked") ? "block" : "none"
+			$("#students_content").css("display", value_property);
+			$("#students_content2").css("display", value_property);
+			$("#students_content3").css("display", value_property);
+			$("#all").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+
+		$("#all").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+
+		$("#finalPractice").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+
+		$("#claboratorio").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#slaboratorio").attr("checked", false);
+		})
+
+		$("#slaboratorio").click(function(){
+			$("#students_content").css("display", "none");
+			$("#students_content2").css("display", "none");
+			$("#students_content3").css("display", "none");
+			$("#specific").attr("checked", false);
+			$("#finalPractice").attr("checked", false);
+			$("#all").attr("checked", false);
+			$("#claboratorio").attr("checked", false);
+		})
+	});
+</script>

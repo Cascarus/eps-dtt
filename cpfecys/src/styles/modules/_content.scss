@@ -1,0 +1,144 @@
+.dttcontent{
+    &__white{
+        padding: 49px 0;
+    }
+    &__grey{
+        background-color: #e3e3e3;
+        padding: 49px 0;
+    }
+    &__first{
+        margin: 12px 0;
+    }
+    &__container{
+        margin-top: 12px;
+        a, a:hover{
+            text-decoration: none;
+        }
+        p{
+            margin-top: 10px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #212529;
+            
+        }
+    }
+    &__icon{
+        width: 50px;
+        height: 50px;
+        background-color: $School;
+        margin: 0 auto;
+        border-radius: 25px;
+        color:#fff;
+        i{
+            position: absolute;
+            top: 13px;
+            right: 47%;
+            font-size: 25px;
+        }
+    }
+    &__escuela{
+        width: 100%;
+    }
+
+    &__news{
+        &--item{
+            color: #fff;
+            height: auto;
+            padding: 20px;
+        }
+    }
+}
+
+.contenedor {
+    display: block;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 600px;
+}
+
+.reproductor {
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding-bottom: 56.25%;
+    overflow: hidden;
+    position: relative;
+    cursor: hand;
+    cursor: pointer;
+}
+
+img.imagen-previa {
+    display: block;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    max-width: 100%;
+    width: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: auto
+}
+
+div.youtube-play {
+    height: 64px;
+    width: 64px;
+    left: 50%;
+    top: 50%;
+    margin-left: -36px;
+    margin-top: -36px;
+    opacity: 0.7;
+    position: absolute;
+    background: url("https://cdn2.iconfinder.com/data/icons/social-icons-color/512/youtube-64.png") no-repeat;
+}
+
+div.youtube-play:hover {
+    opacity: 1;
+}
+
+#youtube-iframe {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.image_inner_container {
+    border-radius: 50%;
+    padding: 5px;
+    background: #833ab4;
+    background: -webkit-linear-gradient(to bottom, #fcb045, #FF5722, #FF5722);
+    background: linear-gradient(to bottom, #fcb045, #FF5722, #FF5722);
+}
+
+.image_inner_container img {
+    height: 100px;
+    width: 100px;
+    border-radius: 50%;
+    border: 5px solid white;
+}
+.image_outer_container {
+    margin-top: auto;
+    margin-bottom: auto;
+    border-radius: 50%;
+    position: relative;
+    width: 114px;
+}
+
+#dttCarousel{
+    height: 574px;
+    text-align: center;
+    background: radial-gradient(ellipse farthest-corner at center top, $School 0%, $SilderDark 100%);
+}
+.ja-ss-desc {
+    background-color: #000;
+    color: #fff;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 20px;
+    z-index: 110;
+    opacity: 0.7;
+}

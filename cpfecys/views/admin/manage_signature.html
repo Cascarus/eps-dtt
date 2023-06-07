@@ -1,0 +1,288 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+    <h1>Firmas</h1>
+</div>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{=URL('admin', 'manage_signature')}}">Firmas</a>
+        </li>
+        {{if action['type'] == 'new':}}
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="{{=URL('admin', 'manage_signature', args=['new'])}}">Nuevo</a>
+            </li>
+        {{elif action['type'] == 'show':}}
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="{{=URL('admin', 'manage_signature', args=['show', action['item'][0]['id']])}}">Ver</a>
+            </li>
+        {{elif action['type'] == 'delete':}}
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="{{=URL('admin', 'manage_signature', args=['delete', action['item'][0]['id']])}}">Eliminar</a>
+            </li>
+        {{elif action['type'] == 'edit':}}
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="{{=URL('admin', 'manage_signature', args=['edit', action['item']['id']])}}">Editar</a>
+            </li>
+        {{elif action['type'] == 'image':}}
+            <li class="breadcrumb-item" aria-current="page">
+                <a href="{{=URL('admin', 'manage_signature', args=['edit', action['item'][0]['id']])}}">Editar</a>
+            </li>
+            {{if action['item'][0]['image'] is None:}}
+                <li class="breadcrumb-item active" aria-current="page">
+                    <a href="{{=URL('admin', 'manage_signature', args=['edit', 'image', 'upload'], vars={'signature' : action['item'][0]['id']})}}">Imagen</a>
+                </li>
+            {{else:}}
+                <li class="breadcrumb-item active" aria-current="page">
+                    <a href="{{=URL('admin', 'manage_signature', args=['edit', 'image', 'upload'], vars={'signature' : action['item'][0]['id']})}}">Imagen</a>
+                </li>
+            {{pass}}
+        {{pass}}
+    </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+    <div class="col-md-4">
+        <a href="{{=URL('admin', 'manage_signature',args=['new'])}}">
+            <button class="btn btn-primary">
+                <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+                &nbsp;Añadir Registro
+            </button>
+        </a>
+    </div>
+    <div class="col-md-7">
+        <!--<form class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-lg-2" style="width:65%;" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>-->
+    </div>
+</div>
+<div class="mt-4">
+	<div class="col-12">
+        <div class="row-fluid">
+            <table class="table table-sm table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:175px;">Id</th>
+                        <th style="width:350px;">Nombre</th>
+                        <th style="width:250px;">Tipo</th>
+                        {{if "Super-Administrator" in session.auth.user_groups.values(): }}
+                            <th style="width:200px;">¿Firma de director?</th>
+                        {{pass}}
+                        <th style="width:300px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ for signature in action['list']: }}
+                        <tr>
+                            <td>{{=signature['id']}}</td>
+                            <td>{{=signature['name']}}</td>
+                            <td>{{=signature['type']}}</td>
+                            {{if "Super-Administrator" in session.auth.user_groups.values(): }}
+                                <td>{{=signature['signature_director']}}</td>
+                            {{pass}}
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{=URL('admin', 'manage_signature',args=['show', signature['id']])}}">
+                                        <button class="btn btn-secondary btn-sm">
+                                            <span class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"></span>
+                                            &nbsp;Vista
+                                        </button></a>
+                                    <a href="{{=URL('admin', 'manage_signature',args=['edit', signature['id']])}}">
+                                        <button class="btn btn-success btn-sm">
+                                            <span class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"></span>
+                                            &nbsp;Editar
+                                        </button></a>
+                                    <a href="{{=URL('admin', 'manage_signature',args=['delete', signature['id']])}}">
+                                        <button class="btn btn-danger btn-sm">
+                                            <span class="icon trash icon-trash glyphicon glyphicon-trash"></span>
+                                            &nbsp;Eliminar
+                                        </button></a>
+                                </div>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{else:}}
+    {{if action['type'] == 'edit' and action['item']['inputType'] == 'Digital Signature':}}
+        <div class="row">
+            <div class="col-md-4">
+                {{if action['item']['inputImage'] is None:}}
+                    <a href="{{=URL('admin', 'manage_signature', args=['edit', 'image', 'upload'], vars={'signature' : action['item']['id']})}}">
+                        <button class="btn btn-primary">
+                            <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+                            &nbsp;Añadir Imagen
+                        </button>
+                    </a>
+                {{else:}}
+                    <a href="{{=URL('admin', 'manage_signature', args=['edit', 'image', 'upload'], vars={'signature' : action['item']['id']})}}">
+                        <button class="btn btn-primary">
+                            <span class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"></span>
+                            &nbsp;Editar Imagen
+                        </button>
+                    </a>
+                {{pass}}
+            </div>
+        </div>
+    {{pass}}
+<div class="mt-4">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-6 well">
+                {{if action['type'] == 'new':}}
+                    <form action="{{=URL('admin', 'manage_signature', args=['new'])}}" method="POST">
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+                            <div class="col-sm-9">
+                              <input type="text" class="form-control" id="inputName" name="inputName" value="{{if 'item' in action:}}{{=action['item']['inputName']}}{{pass}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputType" class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                                {{=action['select']}}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                {{elif action['type'] == 'show':}}
+                    <div class="form-group row">
+                        <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+                        <div class="col-sm-9">
+                          <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['name']}}" >
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputType" class="col-sm-3 col-form-label">Tipo</label>
+                        <div class="col-sm-9">
+                          <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['type']}}" >
+                        </div>
+                    </div>
+                    {{if "Super-Administrator" in session.auth.user_groups.values(): }}
+                        <div class="form-group row">
+                            <label for="inputType" class="col-sm-3 col-form-label">¿Firma de director?</label>
+                            <div class="col-sm-9">
+                              <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['signature_director']}}" >
+                            </div>
+                        </div>
+                    {{pass}}
+                    <a href="{{=URL('admin', 'manage_signature')}}">
+                        <button class="btn btn-primary">
+                            <span class="fa fa-arrow-circle-left"></span>
+                            &nbsp;Regresar
+                        </button>
+                    </a>
+                {{elif action['type'] == 'delete':}}
+                    <form action="{{=URL('admin', 'manage_signature', args=['delete', action['item'][0]['id']])}}" method="POST">
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+                            <div class="col-sm-9">
+                              <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['name']}}" >
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputType" class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                              <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['type']}}" >
+                            </div>
+                        </div>
+                        {{if "Super-Administrator" in session.auth.user_groups.values(): }}
+                            <div class="form-group row">
+                                <label for="inputType" class="col-sm-3 col-form-label">¿Firma de director?</label>
+                                <div class="col-sm-9">
+                                  <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['signature_director']}}" >
+                                </div>
+                            </div>
+                        {{pass}}
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                {{elif action['type'] == 'edit':}}
+                    <form action="{{=URL('admin', 'manage_signature', args=['edit', action['item']['id']])}}" method="POST">
+                        <div class="form-group row">
+                            <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+                            <div class="col-sm-9">
+                              <input type="text" class="form-control" name="inputName" value="{{=action['item']['inputName']}}">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="inputType" class="col-sm-3 col-form-label">Tipo</label>
+                            <div class="col-sm-9">
+                                {{=action['select']}}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                {{elif action['type'] == 'image':}}
+                    <div class="form-group row" style="margin-bottom: 0rem;">
+                        <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+                        <div class="col-sm-9">
+                          <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['name']}}" >
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 0rem;">
+                        <label for="inputType" class="col-sm-3 col-form-label">Tipo</label>
+                        <div class="col-sm-9">
+                          <input type="text" readonly class="form-control-plaintext" value="{{=action['item'][0]['type']}}" >
+                        </div>
+                    </div>
+                    <div class="form-group row" style="margin-bottom: 0rem;">
+                        <label for="inputExtensions" class="col-sm-3 col-form-label">Extensión del archivo</label>
+                        <div class="col-sm-9">
+                          <input type="text" readonly class="form-control-plaintext" value="png,jpg,jpeg" >
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputMaxSize" class="col-sm-3 col-form-label">Tamaño máximo</label>
+                        <div class="col-sm-9">
+                          <input type="text" readonly class="form-control-plaintext" value="2 MB" >
+                        </div>
+                    </div>
+                    {{=form}}
+                {{pass}}
+
+                {{ if "message" in action: }}
+                    <br />
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {{pass}}
+
+                {{if (action['type'] == 'edit' and action['item']['inputImage'] is not None) or ((action['type'] == 'show' or action['type'] == 'delete') and action['item'][0]['image'] is not None):}}
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col-md-2"></div>
+                        <div class="col-md-8">
+                            {{if (action['type'] == 'show' or action['type'] == 'delete') and action['item'][0]['image'] is not None:}}
+                                <img src="{{=URL('admin', 'download_signature', args=action['item'][0]['image'])}}" class="img-fluid" alt="Responsive image">
+                            {{else:}}
+                                <img src="{{=URL('admin', 'download_signature', args=action['item']['inputImage'])}}" class="img-fluid" alt="Responsive image">
+                            {{pass}}
+                        </div>
+                        <div class="col-md-2"></div>
+                    </div>
+                {{pass}}
+            </div>
+        </div>
+    </div>
+</div>
+{{pass}}
+
+<style>
+    .btn-group, .btn-group-vertical {
+        display: inline-block;
+    }
+    .table td, .table th{
+        vertical-align: middle;
+    }
+</style>

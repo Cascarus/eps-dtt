@@ -1,0 +1,35 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+	<div class="row">
+		<div class="col-12 text-center">
+			<h3>DSI Tareas</h3>
+		</div>
+	</div>
+	<div class="row well mt-3">
+		<div class="col-12">
+			<div class="table-responsive">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th>{{=T('Item name')}}</th>
+							<th>{{=T('Actions')}}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{{for restriction in restrictions:}}
+                            <tr>
+                                <td>{{=restriction.name}}</td>
+                                <td>
+                                    <a class="btn btn-primary" href="{{=URL('dsi', 'item_detail', vars=dict(restriction=restriction.id))}}">
+                                        <i class="icon-eye-open"></i>{{=T('View Items')}}
+                                    </a>
+                                </td>
+                            </tr>
+						{{pass}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>

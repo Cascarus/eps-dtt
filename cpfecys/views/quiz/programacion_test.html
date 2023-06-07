@@ -1,0 +1,223 @@
+{{extend 'dashboard.html'}}
+
+<script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
+<script type="text/javascript">
+    function compararTiempos(actual, enviado) {
+        actual = new Date(actual).getTime()
+        enviado = new Date(enviado).getTime()
+        return enviado > actual
+    }
+
+    $(document).ready(function() {
+        function isValidDate(dateString) {
+            var regEx = /^\d{4}-\d{2}-\d{2}$/;
+            if(!dateString.match(regEx)) return false;  // Invalid format
+            var d = new Date(dateString);
+            if(!d.getTime()) return false; // Invalid date (or this could be epoch)
+            return d.toISOString().slice(0, 10) === dateString;
+        }
+
+        $('#cboCategoria').change(function(){
+            if($('#cboCategoria').val() != 0) {
+                var idCategoria = $('#cboCategoria').val();
+                var idCurso = $('#pProject').text();
+                var idPeriodo = $('#pPeriod').text();
+
+                var parametros = `?project=${idCurso}&period=${idPeriodo}&categorie=${idCategoria}`;
+                var result = submitLoad("quiz", "get_activities", parametros);
+                var data = result;
+                $('#cboActividad option').remove();
+                $('#cboActividad').append($('<option>', { 
+                    value: 0,
+                    text : 'Seleccione una actividad' 
+                }));
+
+                for (var i in data) {
+                    $('#cboActividad').append($('<option>', { 
+                        value: data[i]['id'],
+                        text : data[i]['name'] 
+                    }));
+                }
+            }
+        });
+
+        $('#cboActividad').change(function(){      
+            if($('#cboActividad').val() != 0) {
+                var idActividad = $('#cboActividad').val();
+                var idCurso = $('#pProject').text();
+                var idPeriodo = $('#pPeriod').text();
+
+                var parametros = `?project=${idCurso}&period=${idPeriodo}&activity=${idActividad}`;
+                var result = submitLoad("quiz", "get_date_activity", parametros);
+                var data = result;
+                $("#dateInit").val(data); 
+            }
+        });
+
+        $('#chProtegido').change(function(){
+            if(this.checked) { $("#txtPassword").prop('disabled', false); }
+            else { $("#txtPassword").prop('disabled', true); }
+        });
+
+        $('#btGrabar').click(function() {
+            $("#lbMensajeError").attr("hidden","true");
+            if($('#cboCategoria option:selected').val() == 0) {
+                $("#lbMensajeError").removeAttr("hidden");
+                $("#lbMensajeError").text("Por favor seleccione una categoria");
+            } else if($('#cboActividad option:selected').val() == 0) {
+                $("#lbMensajeError").removeAttr("hidden");
+                $("#lbMensajeError").text("Por favor seleccione una actividad");
+            } else if(!isValidDate($("#dateInit").val())) {
+                $("#lbMensajeError").removeAttr("hidden");
+                $("#lbMensajeError").text("Fecha incorrecta");
+            } else if($('#inpHora').val() == '') {
+                $("#lbMensajeError").removeAttr("hidden");
+                $("#lbMensajeError").text("La hora de incio del quiz es incorrecta");
+            } else if($('#txtDuracion').val() == '') {
+                $("#lbMensajeError").removeAttr("hidden");
+                $("#lbMensajeError").text("La duracion del quiz es incorrecta");
+            } else {
+                try {
+                    if ($("#chProtegido").is(':checked')) {
+                        if($("#txtPassword").val() == '') {
+                            $("#lbMensajeError").removeAttr("hidden");
+                            $("#lbMensajeError").text("Para proteger la prueba debe escribir una contraseña.");
+                        } else {
+                            var pass = $('#txtPassword').val();
+                            var idCategoria = parseInt($('#cboCategoria option:selected').val());
+                            var idActividad = parseInt($('#cboActividad option:selected').val());
+                            var duracion = parseInt($('#txtDuracion').val());
+                            var fecha = $("#dateInit").val();
+                            var hora = $("#inpHora").val();
+                            var id_quiz = parseInt($('#pId').text());
+                            let period = $("#pPeriod").text();
+                            let project = $("#pProject").text();
+
+                            console.log(fecha)
+                            if (compararTiempos(submitLoad("quiz", "get_now", ""), `${fecha} ${hora}`)) {
+                                var parametros = `?id_actividad=${idActividad}&id_quiz=${id_quiz}&fecha=${fecha}&inicio=${hora}&duracion=${duracion}&clave=${pass}&project=${project}&period=${period}`;
+                                //window.location.href = `https://${location.hostname}/quiz/test_programacion_protegida${parametros}`;
+                            } else {
+                                $("#lbMensajeError").removeAttr("hidden");
+                                $("#lbMensajeError").text("La fecha y hora de programacion no puede ser anterior a la fecha y hora actual.");
+                            }
+                        }
+                    } else {
+                        var idCategoria = parseInt($('#cboCategoria option:selected').val());
+                        var idActividad = parseInt($('#cboActividad option:selected').val());
+                        var duracion = parseInt($('#txtDuracion').val());
+                        var fecha = $("#dateInit").val();
+                        var hora =  $("#inpHora").val();
+                        var id_quiz = parseInt($('#pId').text());
+                        let period = $("#pPeriod").text();
+                        let project = $("#pProject").text();
+                        
+                        console.log(fecha)
+                        if(compararTiempos(submitLoad("quiz", "get_now", ""), `${fecha} ${hora}`)) {
+                            var parametros = `?id_actividad=${idActividad}&id_quiz=${id_quiz}&fecha=${fecha}&inicio=${hora}&duracion=${duracion}&project=${project}&period=${period}`;
+                            //window.location.href = `https://${location.hostname}/quiz/test_programacion${parametros}`;
+                        } else {
+                            $("#lbMensajeError").removeAttr("hidden");
+                            $("#lbMensajeError").text("La fecha y hora de programacion no puede ser anterior a la fecha y hora actual.");
+                        }
+                    }
+                } catch (error) {
+                    $("#lbMensajeError").removeAttr("hidden");
+                    $("#lbMensajeError").text(`Ha ocurrido un error. Error: ${error}`);
+                }
+            }
+        });
+    });
+</script>
+
+<div class="mt-4">
+    <div class="row-fluid">
+        <center>
+            <h2>Programación de evaluación: {{=metadata.tb_metadata_quiz.nombre}}
+                {{if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):}}
+                    <a onclick="javascript:introJs().setOptions({'skipLabel': 'Quitar', 'nextLabel': 'Siguiente', 'prevLabel': 'Anterior', 'doneLabel': 'Salir'}).start();" href='javascript:void(0);' class="btn btn-primary" >
+                    <span class="fa fa-question-circle"></span>
+                    </a>
+                {{pass}}
+                <br>
+            </h2>
+        </center>
+    </div>
+    {{=back_button}}
+    <div class="well mt-2" id="div_metainfo_quiz" data-intro="Div para informacion del quiz">
+        <a style="cursor:pointer;"><h4>Información general de la evaluación</h4></a>
+        <hr>
+        <p><strong>Creador:</strong> {{=f"{metadata.auth_user.first_name} {metadata.auth_user.last_name}"}}</p> 
+        <p><strong>Curso:</strong>  {{=metadata.project.name}}</p>
+        <p><strong>Fecha de creacion:</strong>  {{=metadata.tb_metadata_quiz.fecha_creacion}}</p>
+    </div>
+
+    <div class="well" id="div_metainfo_quiz">
+        <a style="cursor:pointer;"><h4>Creación de programación para la actividad de tipo evaluación</h4></a>
+        <hr>
+        <table width="100%">
+            <tr>
+                <td width="20%">
+                    <p><strong>Categoria de actividades:</strong></p>
+                </td>
+                <td width="30%">
+                    <select id="cboCategoria" class="form-control">
+                        <option value="0">Seleccion una categoria</option>
+                        {{for categoria in categorias:}}
+                            <option value="{{=categoria.id}}">{{=categoria.category}}</option>
+                        {{pass}}
+                    </select>
+                </td>
+                <td width="20%">
+                    <p><strong>Seleccione una actividad:</strong></p>
+                </td>
+                <td width="30%">
+                    <select id="cboActividad" class="form-control">
+                        <option value="0">Seleccione una actividad</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">
+                    <p><strong>Fecha de ejecución:</strong></p>
+                </td>
+                <td width="30%">
+                    <input class="form-control" id="dateInit" name="log-date" placeholder="YYYY-MM-DD" type="date" style="width: 64%;">
+                </td>
+                <td width="20%">
+                    <p><strong>Horario de ejecución (24 h):</strong></p>
+                </td>
+                <td width="20%">
+                    <input class="time form-control" id="inpHora" name="hora" placeholder="hh:mm" type="text" value="" style="width:64%;">
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">
+                    <p><strong>Duración en minutos:</strong></p>
+                </td>
+                <td width="30%"> 
+                    <input id="txtDuracion" placeholder="mins" type="text" style="width:64%;" class="form-control">
+                </td>
+                <td width="20%">
+                    <label class="checkbox-inline"><input type="checkbox" value="" id="chProtegido">-- Proteger --</label>
+                </td>
+                <td width="30%">
+                    <input id="txtPassword" placeholder="Clave de Seguridad" class="form-control" type="text" style="width:64%;" disabled>
+                </td>
+            </tr>
+            <tr>
+                <td width="20%"></td>
+                <td width="30%"></td>
+                <td width="20%"></td>
+                <td width="30%">
+                    <button id="btGrabar" type="button" class="btn btn-success">Grabar programación</button>
+                </td>
+            </tr>            
+        </table>
+    </div>
+
+    <div class="alert alert-warning" role="alert" id="lbMensajeError" hidden></div>
+    <p id="pPeriod" hidden value="{{=periodo.id}}">{{=periodo.id}}</p>
+    <p id="pProject" hidden value="{{=project.id}}">{{=project.id}}</p>
+    <p id="pId" hidden value="{{=metadata.tb_metadata_quiz.id_quiz}}">{{=metadata.tb_metadata_quiz.id_quiz}}</p>
+</div>

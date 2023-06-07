@@ -1,0 +1,53 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h1>{{=T('Anomalies')}}</h1>
+    </div>
+    <div class="col-12">
+      <div class="well span12">
+        <a onclick="window.history.back()" class="btn btn-primary"
+          ><i class="icon-arrow-left"></i>{{=T('Back')}}</a
+        >
+        <a
+          class="btn btn-success pull-right"
+          onclick="tableToExcel('anomaly-show','');"
+          ><i class="icon-download icon-white"></i>{{=T('Excel (XLS)')}}</a
+        >
+        <table id="anomaly-show" class="table table-bordered">
+          <thead>
+            <tr>
+              <th width="120px">{{=T('Date')}}</th>
+              <th>{{=T('Description')}}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{for anomaly in anomalies:}}
+            <tr>
+              <td>{{anomaly[0]}}</td>
+              <td>
+                <div>
+                  <table class="table-striped">
+                    <tr>
+                      <td>{{=T('Student')}}:</td>
+                      <td>{{=anomaly[3]}} {{=anomaly[4]}}</td>
+                    </tr>
+                    <tr>
+                      <td>{{=T('Section')}}:</td>
+                      <td>{{anomaly[1]}}</td>
+                    </tr>
+                    <tr>
+                      <td>{{=T('Description')}}:</td>
+                      <td>{{=anomaly[2]}}</td>
+                    </tr>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

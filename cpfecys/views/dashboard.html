@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>CPFECYS | DTT</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta name="description"
+            content="Escuela de Ciencias y Sistemas, Desarrollo de Transferencia Tecnológica, Universidad de San Carlos de Guatemala">
+        <meta name="keywords" content="DTT, ECYS, FIUSAC, SISTEMAS, Computación, Ingeniería">
+        <link rel="icon" type="image/x-icon" href="/static/build/images/favicon.ico">
+        <link rel="stylesheet" href="/static/build/css/admin-{{=school}}.css">
+        <meta http-equipv="Content-Type" content="text/html; charset=iso-8859-1">
+        {{include 'web2py_ajax.html'}}
+        <script type="text/javascript">
+            var _URLPERIOD_VARIABLE =  "{{=URL('admin', 'get_periodos_variables') }}";
+            var _URLPERIOD_SEMESTRE = "{{=URL('admin', 'get_periodos_semestre')}}";
+            var _URLNOTIFICATION_NUMBER = "{{=URL('notification','get_notification_number') }}";
+            var _URL_PERIODS = "{{=URL('admin', 'get_periodos') }}";
+            var PERIODOS_VARIABLES;
+            var PERIODOS_SEMESTRE;
+            var tipo_periodo = "{{=request.vars['tipo_periodo']}}";
+            var periodo = "{{=request.vars['period']}}";
+            var userName = "array={{=auth.user.username}}";
+        </script>
+        <script src="{{=URL('static','build/js/jquery.js')}}"></script>
+        <script src="{{=URL('static','build/js/bootstrap.bundle.min.js')}}"></script>
+        <script src="{{=URL('static','build/js/web2py.js')}}"></script>
+        <script src="{{=URL('static','build/js/web2py-bootstrap4.js')}}"></script>
+        <script src="{{=URL('static','build/js/admin-min.js')}}"></script>
+        <script src="{{=URL('static', 'js/excelise.js')}}"></script>
+        <script src="{{=URL('static','js/bootstrap-toggle.min.js')}}"></script>
+        
+        <script  type="text/javascript">
+            {{if 'Student' in session.auth.user_groups.values() or 'Academic' in session.auth.user_groups.values() or 'Teacher' in session.auth.user_groups.values():}}
+                if(window.page != 'update_data'){
+                    refreshData();
+                }        
+            {{pass}}
+    
+            console.log(typeof window.page, window.page)
+            if(window.page != 'update_data' && window.page != undefined) {
+                console.log("a")
+                //emarquez
+                $.ajax({
+                    url:_URLPERIOD_SEMESTRE,
+                    async: false,
+                    success: function(result){
+        
+                        console.log('periodos dashboard', _URLPERIOD_SEMESTRE, result)
+                        //if(result){ 
+                            PERIODOS_SEMESTRE = result;// }
+                        $.ajax({
+                            url:_URLPERIOD_VARIABLE,
+                            success: function(result){
+                                //if(result){ 
+                                    PERIODOS_VARIABLES = result; //}
+                            }
+                        });
+                    },
+                    error: function(result) {
+                        console.log('error', result)
+                    }
+                });
+            }
+        </script>
+        
+        {{if school == 'ecys':}}    
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
+            <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag() { dataLayer.push(arguments); }
+                gtag('js', new Date());
+    
+                gtag('config', 'UA-143827878-1');
+            </script>    
+        {{pass}}
+    </head>
+    <body class="fixed-nav sticky-footer bg-dark" id="page-top">
+     <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top dtt-navbar" id="mainNav">
+        <a class="navbar-brand" href="/home">
+            <img src="/static/build/images/{{=school}}/logo-dtt.png" alt="{{=school}}" height="60"/>
+        </a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse dtt-navbar" id="navbarResponsive">
+            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion" style="overflow-y: auto">
+                <li class="nav-item" title="Home">
+                    <a class="nav-link" href="/home">
+                        <i class="fa fa-fw fa-home"></i>
+                        <span class="nav-link-text">Inicio</span>
+                    </a>
+                </li>
+                {{if "Super-Administrator" in session.auth.user_groups.values(): }}
+                <li class="nav-item" title="Usuarios">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapseAccounts_Users" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-users"></i>
+                        <span class="nav-link-text">Usuarios</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseAccounts_Users">
+                        <li><a href="/cpfecys/admin/users">Usuarios</a></li>
+                        <li><a href="/cpfecys/admin/user_mail_update">Catedráticos</a></li>
+                        <li><a href="/student_academic/academic">Estudiantes</a></li>
+                        <li><a href="/cpfecys/admin/roles">Roles</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" title="Asignacion">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAsignacion"
+                        data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-pencil"></i>
+                        <span class="nav-link-text">Asignación</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseAsignacion">
+                        <li><a href="/cpfecys/admin/assignations">Practicas Finales</a></li>
+                        <li><a href="/reclutamiento_admin/crear_proceso">Reclutamiento</a></li>
+                        <li><a href="/cpfecys/admin/active_teachers">Jefes de Proyecto</a></li>
+                        <li><a href="/cpfecys/admin/final_practice">Gestion de Practica Final</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseGestionHorarios"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">GestionHorarios</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseGestionHorarios">
+                            <li><a href="/course_schedule/course_schedule_upload">Carga de horarios</a></li>
+                            <li><a href="/course_schedule/course_schedules">Ver horarios</a></li>
+                        </ul>
+                    </ul> 
+                </li>
+                <li class="nav-item" title="Gestion de Proyectos">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsegestionproy"
+                        data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-pencil"></i>
+                        <span class="nav-link-text">Gestion de Proyectos</span>
+                    </a>
+                    <ul class="sidenav-third-level collapse" id="collapsegestionproy">
+                        <li><a href="/cpfecys/admin/areas">Areas</a></li>
+                        <li><a href="/cpfecys/admin/projects">Proyectos</a></li>
+                    </ul> 
+                </li>
+                <li class="nav-item" title="DSI">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseDSI"
+                        data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-laptop"></i>
+                        <span class="nav-link-text">DSI</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseDSI">
+                        <li><a href="/dsi/calculate_note">Calcular Nota</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseIncidentes"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Incidentes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseIncidentes">
+                            <li><a href="/iso_reporte_incidente/listar_incidentes">Listar Incidentes Periódo Actual</a></li>
+                            <li><a href="/iso_reporte_incidente/incidentes_dinamicos">Todos los Incidentes</a></li>
+                            <li><a href="/iso_reporte_incidente/incidentes">Tipo Incidente</a></li>
+                        </ul>
+                        <li><a href="/iso_ev_rendimiento/menu">Evaluación de Rendimiento</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAsignacion-dsi-reportes"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Reportes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseAsignacion-dsi-reportes">
+                            <li><a href="/dsi/report_dsi_notas">Reporte de notas</a></li>
+                            <li><a href="/dsi/assistance_report_now">Reporte de <br/>asistencia hoy</a></li>
+                            <li><a href="/dsi/assistance_report_admin">Reporte de Asistencia</a></li>
+                            <li><a href="/dsi/fingerprint_report_admin">Tutores con <br/> huella registrada</a></li>
+                            <li><a href="/dsi/assignation_report_admin">Asignación de <br/>horarios</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAsignacion-dsi-justificaciones"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Omisiones y <br/> Justificaciones</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseAsignacion-dsi-justificaciones">
+                            <li><a href="/dsi/omissions_admin">Omisiones de marcaje</a></li>
+                            <li><a href="/dsi/absence_justifications_admin">Justificaciones</a></li>
+                            
+                            
+                        </ul>
+                        <li><a href="/dsi/resolutions_admin">Resoluciones</a></li>
+                        <li><a href="/cpfecys/admin/delivered">Labor DSI</a></li>
+                        <li><a href="/dsi/holidays_admin">Días de asueto</a></li>
+                        <li><a href="/dsi/schedule_assignation_admin">Asignacion de Horario</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseAsignacion-dsi-configuracion"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Configuración</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseAsignacion-dsi-configuracion">
+                            <li><a href="/dsi/iniciar_semestre">Iniciar Semestre</a></li>
+                            <li><a href="/dsi/exception_courses_admin">Excepciones</a></li>
+                            <li><a href="/dsi/fingerprint_parameters_admin">Huella</a></li>
+                            <li><a href="/dsi/assistance_parameters_admin">Assistance parameters</a></li>
+                            <li><a href="/dsi/system_parameter_admin">Configuración del sistema</a></li>
+                        </ul>  
+
+                    </ul>
+                </li>
+                <li class="nav-item" title="Control Academico">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapsecontrolacademic" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-address-card"></i>
+                        <span class="nav-link-text">Control Académico</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapsecontrolacademic">
+                        <li><a href="/activity_control/courses_list">Administrar Control Académico</a></li>
+                        <li><a href="/activity_control/courses_list_request">Solicitudes Pendientes</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsecontrolacademic-exception"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Excepciones</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsecontrolacademic-exception">
+                            <li><a href="/activity_control/course_laboratory_exception">Curso y Laboratorio</a></li>
+                            <li><a href="/activity_control/course_limit_exception">De tiempo por Curso</a></li>
+                        </ul> 
+                        <li><a href="/activity_control/periodo_variable">Periodos Variables</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" title="Reportes">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapsereports" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-bar-chart"></i>
+                        <span class="nav-link-text">Reportes</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapsereports">
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsereportresumen"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Resumen de Información <br/> de Reportes de Practicas</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsereportresumen">
+                            <li><a href="/cpfecys/admin/courses_report/areas">Reportes Cursos</a></li>
+                            <li><a href="/cpfecys/admin/general_report">Resumen de Semestre</a></li>
+                        </ul> 
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsereportrealtime"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Gerencial <br/> en Tiempo Real</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsereportrealtime">
+                            <li><a href="/management_reports/student_management">Gestión de Estudiantes</a></li> 
+                            <li><a href="/management_reports/student_assignment_management">Asignación de Estudiantes</a></li> 
+                            <li><a href="/management_reports/grades_management">Gestión de Notas</a></li> 
+                            <li><a href="/management_reports/activities_withmetric_management">Actividades con Metrica</a></li> 
+                            <li><a href="/management_reports/change_request_activities_with_metric_management">Solicitud de Cambio <br/>Actividades con Metrica</a></li> 
+                            <li><a href="/management_reports/change_request_grades_management">Solicitud de Cambio de Notas</a></li> 
+                            <li><a href="/management_reports/performance_students">Desempeño de los Estudiantes</a></li> 
+                            <li><a href="/management_reports/evaluation_result">Evaluaciones</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsereportescuela"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Reportes de Escuela</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsereportescuela">
+                            <li><a href="/school_reports/general_information">Información General</a></li>
+                            <li><a href="/school_reports/general_period">Información general <br/> de semestre</a></li>
+                            <li><a href="/school_reports/historic_course">Histórico por curso</a></li>
+                            <li><a href="/school_reports/percentage_change_grades">Porcentaje de cambio de notas</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsereportnotificaciones"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Notificaciones</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsereportnotificaciones">
+                            <li><a href="/audit/audit_teacher_mail_notifications_areas">Avisos Catedrático</a></li>
+                            <li><a href="/audit/audit_student_mail_notifications_areas">Avisos Practicantes Finales</a></li>
+                            <li><a href="/cpfecys/admin/mail_log">Historial de correos</a></li>
+                            <li><a href="/mailer">Registros de <br/> Email de Todo el Sistema</a></li>
+                        </ul>
+                        <li><a href="/cpfecys/admin/scheduler_activity">Reporte Planificador</a></li>
+                        <li><a href="/cpfecys/admin/calificar_practicantes">Calificar Practicantes</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsereportpracticantes"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Reportes de Practicantes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsereportpracticantes">
+                            <li><a href="/cpfecys/admin/report_restrictions">Reportes y Restricciones</a></li>
+                            <li><a href="/cpfecys/admin/report_requirements">Bloques Mínimos <br/> de Reporte</a></li>
+                            <li><a href="/cpfecys/admin/course_report_exception">Excepciones de <br/> Reporte por Curso</a></li>
+                            <li><a href="/cpfecys/admin/report_list_dcos">Reportes por estado</a></li>
+                            <li><a href="/cpfecys/admin/items_manager">ABC de entregables</a></li>
+                            <li><a href="/cpfecys/admin/manage_items/periods">Administrador de <br/> entregables</a></li>
+                            <li><a href="/cpfecys/admin/delivered_download_button/type">Descarga de entregables</a></li>
+                            <!-- Inicio - Prácticas Finales(DS) - Fernando Reyes -->
+                            <li><a href="/cpfecys/admin/manage_items_signature">Firma de entregables</a></li>
+                            <!-- Fin - Prácticas Finales(DS) - Fernando Reyes -->
+                            <li><a href="/cpfecys/admin/anomalies_list/periods">Anomalías por período</a></li>
+                        </ul>
+                        <!-- Inicio - Prácticas Finales(Digital Signature) - Fernando Reyes -->
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsedeliverablepracticafinal"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Entregables Práctica Final</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsedeliverablepracticafinal">
+                            <li><a href="/cpfecys/admin/manage_type_file">Tipos de Archivo</a></li>
+                            <li><a href="/cpfecys/admin/manage_signature">Firmas</a></li>
+                            <li><a href="/cpfecys/admin/manage_document">Entregables</a></li>
+                            <li><a href="/cpfecys/admin/manage_deliverables">Gestión de Entregables</a></li>
+                        </ul>
+                        <!-- Fin - Prácticas Finales(DS) - Fernando Reyes -->
+                        <!-- Fin - Prácticas Finales(DS) - Fernando Reyes -->
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsedeliverablelinguistica"
+                                data-parent="#exampleAccordion" aria-expanded="false">
+                                <span class="nav-link-text">Entregables Documentos ECYS</span>
+                            </a>
+                        </li>
+
+                        <!-- Inicio - Prácticas Finales(Lingüistica) - Juan Pablo Ardón López-->
+                        <!-- Asignacion de firmas a entregables -->
+                        <ul class="sidenav-third-level collapse" id="collapsedeliverablelinguistica">
+                            <!-- Inicio - Prácticas Finales(DSA) - José Carlos I Alonzo Colocho-->
+                            <li><a href="/cpfecys/admin/manage_document_ecys">Entregables</a></li>
+                            <li><a href="/cpfecys/admin/dsa_manage_type_file">Tipos de archivo</a></li>
+                            <li><a href="/cpfecys/admin/documents_roles">Roles</a></li>
+                            <!-- Fin - Prácticas Finales(DSA) - José Carlos I Alonzo Colocho-->
+                        </ul>
+                        <!-- Finn - Prácticas Finales(Lingüistica) - Juan Pablo Ardón López-->
+                    </ul>
+                </li>
+                <li class="nav-item" title="Evaluaciones 360">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapseevaluation" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-window-restore"></i>
+                        <span class="nav-link-text">Evaluaciones 360</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseevaluation">
+                        <li><a href="/evaluation/evaluation_template">Gestiónar Plantillas</a></li>
+                        <li><a href="/evaluation/evaluation">Gestionar Evaluaciones</a></li>
+                        <li><a href="/evaluation/repository_evaluation">Repositorio de Evaluaciones</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseevaluationplantilla"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Parametros de Plantillas</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseevaluationplantilla">
+                            <li><a href="/evaluation/answer">Respuestas</a></li>
+                            <li><a href="/evaluation/template">Plantillas</a></li>
+                            <li><a href="/evaluation/answer_type">Tipo de respuesta</a></li>
+                            <li><a href="/evaluation/question_type">Categoría de pregunta</a></li>
+                            <li><a href="/evaluation/evaluation_type">Tipo de evaluación</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseevaluationresults"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Resultado de Evaluaciones</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseevaluationresults">
+                            <li><a href="/evaluation/results_search">Resultados Generales</a></li>
+                            <li><a href="/evaluation/graph">Gráficas Generales</a></li>
+                            <li><a href="/evaluation/search">Busqueda Individual</a></li>
+                            <li><a href="/management_reports/evaluation_result">Historial de Evaluaciones</a></li>
+                        </ul>
+                    </ul>              
+                </li>
+                <li class="nav-item" title="Configuración">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapseconfiguracion" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-cogs"></i>
+                        <span class="nav-link-text">Configuración</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseconfiguracion">
+                        <li><a href="/cpfecys/admin/parameters">Parámetros del Sistema</a></li>
+                        <li><a href="/configuration/allowed_careers">Carreras permitidas</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseconfiguracionparams"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Parámetros de <br/> Control Académico</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseconfiguracionparams">
+                            <li><a href="/activity_control/activity_category">Categorías para <br/> la Ponderación</a></li>
+                            <li><a href="/activity_control/partials">Gestión de Parciales</a></li>
+                            <li><a href="/activity_control/student_control_period">Periodo</a></li>
+                            <li><a href="/activity_control/periodo_variable">Periodo Variable</a></li>
+                        </ul>
+                        <li><a href="/student_academic/student_validation_parameters">Configuración Servicio Web</a></li>
+                        <li><a href="/cpfecys/admin/assignation_freeze">Fechas de Congelar Asignación</a></li>
+                        <li><a href="/cpfecys/admin/backup_configuration">Copias de Seguridad</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" title="Contenido">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapsecontent" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-globe"></i>
+                        <span class="nav-link-text">Contenido</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapsecontent">
+                        <li><a href="/cpfecys/admin/links">Enlaces</a></li>
+                        <li><a href="/pf_admin/abc_admin">Preguntas frecuentes</a></li>
+                        <li><a href="/cpfecys/admin/files_manager">Archivos</a></li>
+                        <li><a href="/cpfecys/admin/notifications_manager">Noticias</a></li>
+                        <li><a href="/cpfecys/admin/mail_notifications">Enviar Mail</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                {{if "Tesis-Administrator" in session.auth.user_groups.values(): }}
+                <li class="nav-item" title="Tesis">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapsetesis" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-book"></i>
+                        <span class="nav-link-text">Tesis</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapsetesis">
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsetesisgestion"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Gestión de Tesis</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsetesisgestion">
+                            <li><a href="/tesis/status">Estados</a></li>
+                            <li><a href="/tesis/modality">Modalidades</a></li>
+                            <li><a href="/tesis/research_areas">Areas de Investigación</a></li>
+                            <li><a href="/tesis/tutor">Tutores</a></li>
+                            <li><a href="/tesis/adviser">Asesores</a></li>
+                        </ul>
+                        <li><a href="/tesis/asign_topics">Temas de Tesis</a></li>
+                        <li><a href="/tesis/reports">Consultas</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                {{if "Academic" in session.auth.user_groups.values(): }}
+                    {{assign_eps = db(db.eps_assignment.student == auth.user.username).select().first();}}
+                    {{if assign_eps:}}
+                    <li class="nav-item" title="EPS">
+                        <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                        href="#collapseEPS" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-code-fork"></i>
+                        <span class="nav-link-text">EPS</span>
+                        </a>
+                        <ul class="sidenav-second-level collapse " id="collapseEPS">
+                            <li><a href="/eps/calendar_student">Calendario</a></li>
+                        </ul>
+                    </li>
+                    {{pass}}
+                {{pass}}
+                {{if "EPS-Administrator" in session.auth.user_groups.values(): }}
+                <li class="nav-item" title="EPS Administrador">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapseEPSAdministrador" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-code-fork"></i>
+                    <span class="nav-link-text">EPS</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseEPSAdministrador">
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseepsgestion"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Gestión de EPS</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseepsgestion">
+                            <li><a href="/eps/status">Estados</a></li>
+                            <li><a href="/eps/period">Ciclos</a></li>
+                            <li><a href="/eps/modality">Modalidades</a></li>
+                            <li><a href="/eps/activity">Actividades</a></li>
+                            <li><a href="/eps/year">Períodos</a></li>
+                            <li><a href="/eps/institution">Instituciones</a></li>
+                        </ul>
+                        <li><a href="/eps/asign_students">Asignar Estudiantes</a></li>
+                        <li><a href="/eps/calendar_activity">Agendar Actividades</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseepsSeguimiento"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Seguimiento</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseepsSeguimiento">
+                            <li><a href="/eps/tracking_activity">Actividades Digitales</a></li>
+                            <li><a href="/eps/tracking">Entregables</a></li>
+                        </ul>
+                        <li><a href="/eps/send_email">Email</a></li>
+                        <li><a href="/eps/reports">Consultas</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                {{if "Magazine" in session.auth.user_groups.values(): }}
+                <li class="nav-item" title="Magazine Administrador">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapseMagazineAdministrador" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-newspaper-o"></i>
+                    <span class="nav-link-text">Admin Revista</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseMagazineAdministrador">
+                        <li><a href="/magazine/management_magazine">Articulos</a></li>
+                        <li><a href="/magazine/view_edicion_revista">Ediciones</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                {{if "Ecys-Administrator" in session.auth.user_groups.values(): }}
+                <li class="nav-item" title="Magazine Administrador">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapseEcysAdministrador" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-newspaper-o"></i>
+                    <span class="nav-link-text">Admin Control Académico</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseEcysAdministrador">
+                        <li><a href="/activity_control/courses_list">Manage Control Académico</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseEcysAdministradorMReports"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Manage Reportes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseEcysAdministradorMReports">
+                            <li><a href="/management_reports/change_request_grades_management">Grados de solicitud <br/> de cambio</a></li>
+                            <li><a href="/management_reports/performance_students">Desempeño de los estudiantes</a></li>
+                            <li><a href="/management_reports/evaluation_result">Historia de Evaluaciones</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseEcysAdministradorSReports"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Reportes Escuela</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseEcysAdministradorSReports">
+                            <li><a href="/school_reports/general_information">Información General</a></li>
+                            <li><a href="/school_reports/general_period">Resumen del Semestre</a></li>
+                            <li><a href="/school_reports/historic_course">Historico por Curso</a></li>
+                            <li><a href="/school_reports/percentage_change_grades">Porcentaje de <br/> cambio de notas</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseEcysAdministrador360Reports"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Evaluaciones 360</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseEcysAdministrador360Reports">
+                            <li><a href="/evaluation/results_search">Información General</a></li>
+                            <li><a href="/evaluation/graph">Resumen del Semestre</a></li>
+                            <li><a href="/evaluation/search">Historico por Curso</a></li>
+                        </ul>
+                        <!-- Inicio - Prácticas Finales(Digital Signature) - Fernando Reyes -->
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsedeliverablepracticafinal"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Entregables Práctica Final</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapsedeliverablepracticafinal">
+                            <li><a href="/cpfecys/admin/manage_signature">Firmas</a></li>
+                            <li><a href="/cpfecys/admin/manage_deliverables">Gestión de Entregables</a></li>
+                        </ul>
+                        <!-- Fin - Prácticas Finales(DS) - Fernando Reyes -->
+                        <!--Inicio - Entregrables Lingüistica - Juan Pablo Ardón -->
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseddeliverablelinguistica"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Entregables ECYS</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseddeliverablelinguistica">
+                            <li><a href="/cpfecys/admin/manage_deliverables_ecys">Gestión de Entregables</a></li>
+                        </ul>
+                        <!-- Fin - Entregrables Lingüistica - Juan Pablo Ardón -->
+                    </ul>
+                </li>
+                {{pass}}
+                {{if "Student" in session.auth.user_groups.values(): }}
+                <li class="nav-item" title="Student">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapseStudent" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-briefcase"></i>
+                    <span class="nav-link-text">Proyectos</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseStudent">
+                        <li><a href="/student/index">Practica Final</a></li>
+                        <li><a href="/student/periods">Escuela de Vacaciones</a></li>
+                        <!-- Inicio - Prácticas Finales(DS) - Fernando Reyes -->
+                        <li><a href="/student/stationery">Recepción de Papelería</a></li>
+                        <!-- Fin - Prácticas Finales(DS) - Fernando Reyes -->
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseStudentDSI"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">DSI</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseStudentDSI">
+                            <li><a href="/student/periods">DSI</a></li>
+                            <li><a href="/dsi_student/assistance_report">Reporte de asistencia</a></li>
+                            <li><a href="/dsi_student/absence_justifications">Justificaciones</a></li>
+                            <li><a href="/dsi_student/schedule_assignation">Horarios</a></li>
+                            <li><a href="/dsi_student/notifications">Notificaciones</a></li>
+                        </ul>
+                        <li><a href="/student/foros">Foro Semanal</a></li>
+                        <li><a href="/student/conferencias">Conferencias</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                {{ if "Academic" in session.auth.user_groups.values() or "Student" in session.auth.user_groups.values() or "Teacher" in session.auth.user_groups.values():}}
+                <li class="nav-item" title="Mis Cursos">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapsemycourses" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-briefcase"></i>
+                    <span class="nav-link-text">Mis cursos</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapsemycourses">
+                        <li><a href="/activity_control/courses_list">Mis cursos</a></li>
+                        {{if "Academic" in session.auth.user_groups.values():}}
+                            <li><a href="/iso_reporte_incidente/ver_mis_incidentes">Incidentes</a></li>
+                        {{pass}}
+                    </ul>
+                </li>                
+                {{pass}}
+                {{if "Academic" in session.auth.user_groups.values():}}
+                    {{import queries}}
+                    {{if (int(db.executesql(queries.q_count_membership_user().format(str(auth.user.id)))[0][0]) == 1):}}
+                    <li class="nav-item" title="Solicitud de Practicas">
+                        <a class="nav-link nav-link-collapse" href="/reclutamiento_estudiante/registro_solicitud" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-list-ul"></i>
+                        <span class="nav-link-text">Solicitud de Practicas</span>
+                        </a>
+                    </li>
+                    {{pass}}
+                {{pass}}
+                {{if "Teacher" in session.auth.user_groups.values():}}
+                <li class="nav-item" title="Solicitudes">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapseteacherrequest" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-calendar-check-o"></i>
+                    <span class="nav-link-text">Solicitudes</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseteacherrequest">
+                        <li><a href="/teacher/todo_reports">Reportes Pendientes <br/> de Calificación</a></li>
+                        <li><a href="/activity_control/courses_list_request">Control de solicitudes <br/> de cursos</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                <!-- Inicio - Practicas Finales(DSA) - Jose Carlos I Alonzo Colocho -->
+                {{ if "Documents-ECYS" in session.auth.user_groups.values():}}
+                <li class="nav-item" title="Documentos ECYS">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseDocumentosLinguistica" 
+                    data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-file-text"></i>
+                        <span class="nav-link-text">Entregables</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseDocumentosLinguistica">
+                        <li><a href="/documents_ecys/documents">Crear entregable</a></li>
+                        <li><a href="/documents_ecys/documents_view">Visualizar entregables</a></li> 
+                        <li><a href="/documents_ecys/documents_view_individual">Entregables por estudiante</a></li>
+                    </ul>
+                </li>
+                {{ pass }}
+            <!-- Fin - Practicas Finales(DSA) - Jose Carlos I Alonzo Colocho -->    
+                {{ if "DSI" in session.auth.user_groups.values() and not "Super-Administrator" in session.auth.user_groups.values():}}
+                <li class="nav-item" title="DSI">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#collapseDSI" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-cubes"></i>
+                    <span class="nav-link-text">DSI</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseDSI">
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseIncidentes"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Incidentes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseIncidentes">
+                            <li><a href="/iso_reporte_incidente/listar_incidentes">Listar Incidentes Periódo Actual</a></li>
+                            <li><a href="/iso_reporte_incidente/incidentes_dinamicos">Todos los Incidentes</a></li>
+                            <li><a href="/iso_reporte_incidente/incidentes">Tipo Incidente</a></li>
+                        </ul>
+                        <li><a href="/iso_ev_rendimiento/menu">Evaluación de Rendimiento</a></li>
+                        <li><a href="/iso_prestamo/ingresar_estudiante">Registrar préstamo</a></li>
+                        <li><a href="/iso_prestamo/listar_prestamos">Listar Préstamos</a></li>
+                        <li><a href="/iso_prestamo/reporte_prestamo">Reporte Préstamos</a></li>
+                        <li><a href="/iso_prestamo/registrar_utensilio">Registrar utensilio</a></li>
+                        <li><a href="/dsi/index">DSI Tasks</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseDSIReports"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Reportes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseDSIReports">
+                            <li><a href="/dsi_dsi/assistance_report_now">Reporte de asistencia hoy</a></li>
+                            <li><a href="/dsi_dsi/assistance_report">Reporte de asistencia</a></li>
+                            <li><a href="/dsi_dsi/fingerprint_report">Tutores con huella registrada</a></li>
+                            <li><a href="/dsi_dsi/assignation_report">Asignación de horarios</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseDSIJustificaciones"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Justificaciones</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseDSIJustificaciones">
+                            <li><a href="/dsi_dsi/absence_justifications">Faltas</a></li>
+                            <li><a href="/dsi_dsi/absence_justifications_resolution">Resoluciones</a></li>
+                        </ul>
+                        <li><a href="/dsi_dsi/schedule_assignation">Horarios</a></li>
+                        <li><a href="/dsi_dsi/holidays_admin">Asuetos</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+                <li class="nav-item" title="Perfil Estudiante">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsePerfil" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-user"></i>
+                        <span class="nav-link-text">Perfil</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapsePerfil">
+                        <li><a href="/myprofile/profile">Mis Datos</a></li>
+                        <li><a href="/user/change_password">Contraseña</a></li> 
+                    </ul>
+                </li>
+                <li class="nav-item" title="Archivos">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseArchivos" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-user"></i>
+                        <span class="nav-link-text">Ayuda</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseArchivos">
+                        <li><a href="/files_dashboard">Archivos</a></li>
+                        <li><a href="/links_dashboard">Enlaces</a></li>
+                        {{ if "Student" in session.auth.user_groups.values():}}
+                        <li><a href="/pf_admin/ver_preguntas">Preguntas frecuentes</a></li>
+                        {{pass}}
+                    </ul>
+                </li>
+                <li class="nav-item" title="Logout">
+                    <a class="nav-link" href="/user/logout?_next=/user/login">
+                        <i class="fa fa-power-off"></i>
+                        <span class="nav-link-text">Salir</span>
+                        
+                    </a>
+                </li>   
+            </ul>
+            <ul class="navbar-nav sidenav-toggler">
+                <li class="nav-item">
+                    <a class="nav-link text-center" id="sidenavToggler">
+                        <i class="fa fa-fw fa-angle-left"></i>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                {{ if "Student" in session.auth.user_groups.values() or "Academic" in session.auth.user_groups.values() or "Teacher" in session.auth.user_groups.values():}}
+                <li class="nav-item rnt-hide-md-down">
+                    <a class="nav-link dttInbox"  href="/notification_student/inbox">Bandeja de Entrada</a>
+                </li>
+                {{pass}}
+                <li class="nav-item rnt-hide-md-down">
+                    <a class="nav-link" href="/home">
+                        {{=session.auth.user.first_name}} {{=session.auth.user.last_name}}
+                    </a>
+                </li>
+                <li class="nav-item rnt-hide-md-down">
+                    <a class="nav-link" href="/user/logout?_next=/user/login">
+                        <i class="fa fa-power-off"></i>
+                        Salir
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="content-wrapper">
+        <div class="container-fluid pt-3 pr-3 pl-4">
+            <div class="row">
+                <div class="col-12">
+                    <div class="w2p_flash">{{=response.flash or ''}}</div>
+                </div>
+                <div class="col-12">
+                    {{include}}
+                </div>
+            </div>
+        </div>
+        <!-- /.container-fluid-->
+        <!-- /.content-wrapper-->
+        <footer class="sticky-footer">
+            <div class="container">
+                <div class="text-center">
+                    <small>FIUSAC © DTT</small>
+                </div>
+            </div>
+        </footer>
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fa fa-angle-up"></i>
+        </a>
+        
+        <!-- Bootstrap core JavaScript-->
+    </div>
+    
+
+
+<!-- Include SmartWizard CSS -->
+<link href="{{=URL('static', 'sources/css/smart_wizard.min.css')}}" rel="stylesheet" type="text/css" />
+<!-- Optional SmartWizard theme -->
+<link href="{{=URL('static', 'sources/css/smart_wizard_theme_arrows.min.css')}}" rel="stylesheet" type="text/css" />
+<!-- Include SmartWizard JavaScript source -->
+<script src="{{=URL('static', 'sources/js/jquery.smartWizard.min.js')}}"></script>
+
+<!-- Include jQuery Validator plugin -->
+<script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','sources/js/accion.js')}}"></script>
+    </body>
+</html>

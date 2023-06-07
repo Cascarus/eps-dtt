@@ -1,0 +1,66 @@
+<!-- START->log-desertion-activity -->
+<div id="{{=inc_vars['id']}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="aria-{{=inc_vars['id']}}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form action="{{=inc_vars['url']}}" method="POST">
+                <div class="modal-header">
+                    <span class="row-fluid">
+                        <span class="row">
+                            <span class="col-12">
+                                <h3 id="aria-{{=inc_vars['id']}}">Registrar deserciónes</h3>
+                            </span>
+                        </span>
+                    </span>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" style="display:none;" id="desertion-error-{{=inc_vars['id']}}">
+                        <strong>Alerta!</strong> Todos los campos son obligatorios, intente nuevamente.
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="desertion-started">Estudiantes que iniciaron</label>
+                        <div class="controls">
+                            <input type="text" class="form-control" id="desertion-started-{{=inc_vars['id']}}"
+                            name="desertion-started" placeholder="Estudiantes que iniciaron"
+                            value="{{=inc_vars['desertion_started']}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="desertion-gone">Estudiantes retirados</label>
+                        <div class="controls">
+                            <input type="text" class="form-control" id="desertion-gone-{{=inc_vars['id']}}"
+                            name="desertion-gone" placeholder="Estudiantes retirados"
+                            value="{{=inc_vars['desertion_gone']}}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="desertion-continued">Estudiantes que continúan</label>
+                        <div class="controls">
+                            <input type="text" class="form-control" id="desertion-continued-{{=inc_vars['id']}}"
+                            name="desertion-continued" placeholder="Estudiantes que continúan"
+                            value="{{=inc_vars['desertion_continued']}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary"
+                            data-dismiss="modal"
+                            aria-hidden="true">Cerrar</button>
+                    <input type="submit"
+                    onclick="if(
+                            parseInt($('#desertion-started-{{=inc_vars['id']}}').val()) > 0 
+                            && parseInt($('#desertion-started-{{=inc_vars['id']}}').val())
+                            == parseInt($('#desertion-gone-{{=inc_vars['id']}}').val()) 
+                            + parseInt($('#desertion-continued-{{=inc_vars['id']}}').val())) {
+                            return true;
+                        } else {
+                            $('#desertion-error-{{=inc_vars['id']}}').show();
+                            return false;
+                        }"
+                    class="btn btn-primary"
+                    value="{{=T('Save Changes')}}"></input>
+                </div>
+            </form>
+         </div>
+     </div>
+</div>
+<!-- END->log-desertion-activity -->

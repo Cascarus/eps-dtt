@@ -1,0 +1,130 @@
+/* CSS PARA EL MODULO DE BACKLUPS */
+
+/********************************  CHECK BOX *************************/
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {display:none;}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #00890F;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #00890F;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/******************** CARDS *************/
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    float: left;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Add some padding inside the card container */
+.container {
+    padding: 2px 16px;
+}
+
+/********************* DIVS ********************/
+
+#div_bk_configuration
+{
+	padding-bottom: 15px;
+}
+.div_clear
+{
+	clear:both;
+	width: 100%;
+	height: 1px;
+}
+
+/********************** DIV LIST ******************************/
+/* The alert message box */
+.bk_row {
+    padding: 15px;
+    background-color: #EEE; /* Red */
+    color: black;
+    border-bottom: 1px solid #888;
+}
+
+/* The close button */
+.bk_closebtn {
+    margin-left: 15px;
+    color: #00890F;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.bk_closebtn:hover {
+    color: black;
+}
+
+.bk_content {
+    background-color: #fefefe;
+    padding: 10px;
+    padding-left: 35px;
+    border-bottom: 2px solid #888;
+}
+
+.popover {
+    z-index: 9999;
+    position: fixed;
+}

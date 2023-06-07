@@ -1,0 +1,52 @@
+.dttheader {
+  &__logo {
+    img {
+      width: 220px;
+      @include media-breakpoint-down(xs){
+        width: 171px;
+      }
+    }
+  }
+
+  &__message {
+    color: #fff;
+    position: absolute;
+    top: 262px;
+    right: 0;
+    @include media-breakpoint-down(xs){
+        top:32px;
+        text-align: center;
+    }
+
+    p {
+      margin-bottom: 0;
+
+    }
+  }
+
+  &__logodtt {
+    img {
+      width: 130px;
+
+      @include media-breakpoint-up(lg) {
+        margin-left: 190px;
+        margin-top: 50px;
+      }
+    }
+  }
+
+  &__hero {
+    background: url('../images/fiusac03-black.jpg');
+    min-height: 328px;
+    overflow: initial;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    margin-bottom: 15px;
+    border-top: 4px solid $School;
+    @include media-breakpoint-down(xs){
+         min-height: 130px;
+    }
+
+  }
+}

@@ -1,0 +1,49 @@
+.stars-outer {
+    display: inline-block;
+    position: relative;
+    font-family: FontAwesome;
+    font-size: 3em;
+  }
+
+  .stars-outer::before{
+    content: "\f006 \f006 \f006 \f006 \f006";
+  }
+
+  .stars-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 0;
+  }
+
+  .stars-inner::before {
+    content: "\f005 \f005 \f005 \f005 \f005";
+    color: #f8ce0b;
+  }
+
+  .flotante {
+    display: scroll;
+    position: fixed;
+    right: .2em;
+    bottom: 4em;
+  }
+
+  .btn_circle {
+    height: 2.1em;
+    width: 2.1em;
+    font-size: 2em;
+    border-radius: 50%;
+    margin-top:0.1em;
+  }
+  .boton {
+    border-radius: 50%;
+  }
+
+  .boton2{
+    height: 3em;
+    width: 3em;
+    border-radius: 50%;
+
+  }

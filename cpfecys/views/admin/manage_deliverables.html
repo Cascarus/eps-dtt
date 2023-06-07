@@ -1,0 +1,622 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+    <h1>Gestión de Entregables</h1>
+</div>
+{{if action['type'] == 'deliverable_type' or action['type'] == 'deliverables' or action['type'] == 'items':}}
+    <div class="text-center">
+        <h5>{{=action['control_period_name']}}</h5>
+    </div>
+    {{if action['type'] == 'items' and action['document'] != 0:}}
+        <div class="text-center">
+            <h6>{{=action['doc_name']}}</h6>
+        </div>
+    {{pass}}
+{{pass}}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{{=URL('admin', 'manage_deliverables')}}">Gestión de Entregables</a>
+        </li>
+        {{if action['type'] == 'deliverables' or action['type'] == 'items':}}
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="{{=URL('admin', 'manage_deliverables',args=['deliverable_type'], vars={'control_period' : action['control_period']})}}">{{=action['type_name']}}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <a href="{{=URL('admin', 'manage_deliverables',args=['deliverables'],
+                vars={'control_period' : action['control_period'], 'type': action['deliverable_type']})}}">Entregables</a>
+            </li>
+            {{if action['type'] == 'items':}}
+                {{if action['document'] == 0:}}
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <a href="{{=URL('admin', 'manage_deliverables',args=['items'],
+                        vars={'control_period' : action['control_period'], 'type': action['deliverable_type']})}}">{{=action['doc_name']}}</a>
+                    </li>
+                {{else:}}
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <a href="{{=URL('admin', 'manage_deliverables',args=['items'],
+                        vars={'control_period' : action['control_period'], 'type': action['deliverable_type'], 'document' : action['document']})}}">{{=action['doc_name']}}</a>
+                    </li>
+                {{pass}}
+            {{pass}}
+        {{pass}}
+    </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+    <div class="col-6">
+        {{if action['is_admin']:}}
+            <form action="{{=URL('admin', 'manage_deliverables',args=['control_period'])}}" method="POST">
+                <div class="form-row">
+                    <div class="col">
+                        {{=action['select']}}
+                    </div>
+                    <div class="col">
+                        {{=action['label_button']}}
+                    </div>
+                </div>
+            </form>
+        {{pass}}
+    </div>
+</div>
+<div class="mt-4">
+	<div class="col-12">
+        <div class="row-fluid">
+            <table class="table table-sm table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:100px;">Id</th>
+                        <th style="width:300px;">Período</th>
+                        <th style="width:200px;">Año</th>
+                        <th style="width:250px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ for item in action['list']: }}
+                        <tr>
+                            <td>{{=item['id']}}</td>
+                            <td>{{=T(item['name'])}}</td>
+                            <td>{{=item['yearp']}}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{=URL('admin', 'manage_deliverables',args=['deliverable_type'], vars={'control_period': item['id']})}}">
+                                        <button class="btn btn-secondary btn-sm">
+                                            <span class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"></span>
+                                            &nbsp;Vista
+                                        </button></a>
+                                    {{if action['is_admin']:}}
+                                        <button class="btn btn-info dropdown-toggle btn-sm" type="button" id="dropdownMenuUpdate" data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                            <span class="fa fa-refresh"></span>
+                                            Actualizar
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuUpdate">
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'manage_deliverables',args=['control_period'],
+                                               vars={'period': item['period_year'], 'action' : 0})}}"  role="button">
+                                                Práctica Inicia
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'manage_deliverables',args=['control_period'],
+                                               vars={'period': item['period_year'], 'action' : 1})}}"  role="button">
+                                                Práctica Finaliza
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'manage_deliverables',args=['control_period'],
+                                               vars={'period': item['period_year'], 'action' : 2})}}"  role="button">
+                                                Ambos
+                                            </a>
+                                        </div>
+                                    {{pass}}
+                                </div>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{elif action['type'] == 'deliverable_type':}}
+<div class="mt-4" style="margin-top: 5.0rem !important;">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-3"></div>
+            <div class="col-6 well">
+                <div class="form-group row"></div>
+                <div class="form-group row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-10">
+                        <a href="{{=URL('admin', 'manage_deliverables',args=['deliverables'], vars={'control_period': action['control_period'], 'type': 0})}}">
+                            <button class="btn btn-info btn-lg btn-block" style="font-size: 2.25rem">
+                                &nbsp;Práctica Inicia
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+                <div class="form-group row"></div>
+                <div class="form-group row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-10">
+                        <a href="{{=URL('admin', 'manage_deliverables',args=['deliverables'], vars={'control_period': action['control_period'], 'type': 1})}}">
+                            <button class="btn btn-secondary btn-lg btn-block" style="font-size: 2.25rem">
+                                &nbsp;Práctica Finaliza
+                            </button>
+                        </a>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+            </div>
+            <div class="col-3"></div>
+        </div>
+    </div>
+</div>
+{{elif action['type'] == 'deliverables':}}
+<div class="mt-4">
+    <div class="col-12">
+        <div class="row-fluid">
+            <table class="table table-sm table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th style="width:325px;">Nombre</th>
+                        <th style="width:75px;text-align:center;">¿Está Activo?</th>
+                        <th style="width:75px;text-align:center;">¿Requiere Firma?</th>
+                        <th style="width:75px;text-align:center;">Habilitados</th>
+                        <th style="width:75px;text-align:center;">Deshabilitados</th>
+                        <th style="width:75px;text-align:center;">Pendientes</th>
+                        <th style="width:75px;text-align:center;">Entregados</th>
+                        <th style="width:75px;text-align:center;">Rechazados</th>
+                        <th style="width:75px;text-align:center;">Revisados</th>
+                        <th style="width:75px;text-align:center;">Firmados</th>
+                        <th style="width:330px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ for item in action['list']: }}
+                        <tr>
+                            <td>{{=item['name']}}</td>
+                            <td style="text-align:center;">
+                                {{if item['is_active']=='T':}}
+                                    Si
+                                {{elif item['is_active']=='F':}}
+                                    No
+                                {{else:}}
+                                    --
+                                {{pass}}
+                            </td>
+                            <td style="text-align:center;">
+                                {{if item['signature_required']=='T':}}
+                                    Si
+                                {{elif item['signature_required']=='F':}}
+                                    No
+                                {{else:}}
+                                    --
+                                {{pass}}
+                            </td>
+                            <td style="text-align:center;"><span class="badge badge-primary">{{=(0 if item['Enabled'] is None else item['Enabled'])}}</span></td>
+                            <td style="text-align:center;"><span class="badge badge-dark">{{=(0 if item['Disabled'] is None else item['Disabled'])}}</span></td>
+                            <td style="text-align:center;"><span class="badge badge-secondary">{{=(0 if item['Pending'] is None else item['Pending'])}}</span></td>
+                            <td style="text-align:center;"><span class="badge badge-success">{{=(0 if item['Delivered'] is None else item['Delivered'])}}</span></td>
+                            <td style="text-align:center;"><span class="badge badge-danger">{{=(0 if item['Rejected'] is None else item['Rejected'])}}</span></td>
+                            <td style="text-align:center;"><span class="badge badge-warning">{{=(0 if item['Revised'] is None else item['Revised'])}}</span></td>
+                            <td style="text-align:center;"><span class="badge badge-info">{{=(0 if item['Signed'] is None else item['Signed'])}}</span></td>
+                            <td>
+                                <div class="btn-group">
+                                    {{if str(item['id']) == '0':}}
+                                        <a href="{{=URL('admin', 'manage_deliverables',
+                                        args=['items'], vars={'control_period' : action['control_period'], 'type': action['deliverable_type']})}}">
+                                            <button class="btn btn-secondary btn-sm">
+                                                <span class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"></span>
+                                                &nbsp;Vista
+                                            </button></a>
+                                    {{else:}}
+                                        <a href="{{=URL('admin', 'manage_deliverables',
+                                        args=['items'], vars={'control_period' : action['control_period'], 'type': action['deliverable_type'], 'document' : item['id']})}}">
+                                            <button class="btn btn-secondary btn-sm">
+                                                <span class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"></span>
+                                                &nbsp;Vista
+                                            </button></a>
+                                    {{pass}}
+                                    <button class="btn btn-success dropdown-toggle btn-sm" type="button" id="dropdownMenuDownload" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        Descargar
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuDownload">
+                                        {{if str(item['id']) == '0':}}
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'download_deliverable', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'delivered' : 1})}}"
+                                               role="button" title="Documentos entregados">
+                                                Entregados
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'download_deliverable', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'delivered' : 0})}}"
+                                               role="button" title="Documentos firmados">
+                                                Firmados
+                                            </a>
+                                        {{else:}}
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'download_deliverable', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'delivered' : 1, 'document' : item['id']})}}"
+                                               role="button" title="Documentos entregados">
+                                                Entregados
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'download_deliverable', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'delivered' : 0, 'document' : item['id']})}}"
+                                               role="button" title="Documentos firmados">
+                                                Firmados
+                                            </a>
+                                        {{pass}}
+                                    </div>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        Acciones
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        {{if str(item['id']) == '0':}}
+                                            {{if action['is_admin']:}}
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'enable' : '1'})}}"
+                                               role="button" title="Habilitar todos los items">
+                                                Habilitar todos
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'enable' : '0'})}}"
+                                               role="button" title="Deshabilitar todos los items">
+                                                Deshabilitar todos
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'status' : '3'})}}"
+                                               role="button" title="Revisar todos los items">
+                                                Revisar todos
+                                            </a>
+                                            {{pass}}
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'status' : '4'})}}"
+                                               role="button" title="Firmar todos los items">
+                                                Firmar todos
+                                            </a>
+                                        {{else:}}
+                                            {{if action['is_admin']:}}
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'document' : item['id'], 'enable' : '1'})}}"
+                                               role="button" title="Habilitar todos los items">
+                                                Habilitar todos
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'document' : item['id'], 'enable' : '0'})}}"
+                                               role="button" title="Deshabilitar todos los items">
+                                                Deshabilitar todos
+                                            </a>
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'document' : item['id'], 'status' : '3'})}}"
+                                               role="button" title="Revisar todos los items">
+                                                Revisar todos
+                                            </a>
+                                            {{pass}}
+                                            <a class="btn btn-sm dropdown-item"
+                                               href="{{=URL('admin', 'update_all_deliverables', vars={'control_period' : action['control_period'],
+                                               'type': action['deliverable_type'], 'document' : item['id'], 'status' : '4'})}}"
+                                               role="button" title="Firmar todos los items">
+                                                Firmar todos
+                                            </a>
+                                        {{pass}}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{{elif action['type'] == 'items':}}
+<div class="mt-4">
+    <div class="col-12">
+        <div class="row-fluid">
+            <table class="table table-sm table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        {{if action['document'] == 0:}}
+                            {{if action['is_admin']:}}
+                            <th style="width:80px;">Habilitar /<br/>Deshabilitar</th>
+                            {{pass}}
+                            <th style="width:80px;">Carnet</th>
+                            <th style="width:120px;">Usuario</th>
+                            <th style="width:120px;">Área</th>
+                            <th style="width:120px;">Proyecto</th>
+                            <th style="width:140px;">Nombre de entregable</th>
+                            <th style="width:70px; text-align:center;">¿Está Activo?</th>
+                            <th style="width:70px; text-align:center;">¿Requiere Firma?</th>
+                            <th style="width:70px;">Archivo <br/>ingresado/firmado</th>
+                            <th style="width:160px;">Comentario</th>
+                            <th style="width:90px;text-align:center;">Estado</th>
+                            <td style="width:160px;"></td>
+                        {{else:}}
+                            {{if action['is_admin']:}}
+                            <th style="width:70px;">Habilitar/Deshabilitar</th>
+                            {{pass}}
+                            <th style="width:80px;">Carnet</th>
+                            <th style="width:200px;">Usuario</th>
+                            <th style="width:180px;">Área</th>
+                            <th style="width:190px;">Proyecto</th>
+                            <th style="width:70px;">Archivo ingresado/firmado</th>
+                            <th style="width:170px;">Comentario</th>
+                            <th style="width:90px;text-align:center;">Estado</th>
+                            <td style="width:160px;"></td>
+                        {{pass}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for item in action['list']:}}
+                        <tr>
+                            {{if action['is_admin']:}}
+                            <td>
+                                {{if item['is_enabled']=='T':}}
+                                    <a class="btn enable-toggle btn-danger btn-sm" href="#" content="{{=item['id']}}">
+                                        Deshabilitar
+                                    </a>
+                                {{else:}}
+                                    <a class="btn enable-toggle btn-success btn-sm" href="#" content="{{=item['id']}}">
+                                        Habilitar
+                                    </a>
+                                {{pass}}
+                            </td>
+                            {{pass}}
+                            <td>{{=item['username']}}</td>
+                            <td>{{=item['user']}}</td>
+                            <td>{{=item['area']}}</td>
+                            <td>{{=item['project']}}</td>
+                            {{if action['document'] == 0:}}
+                                <td>{{=item['deliverable']}}</td>
+                                <td style="text-align:center;">{{='Si' if item['is_active']=='T' else 'No'}}</td>
+                                <td style="text-align:center;">{{='Si' if item['signature_required']=='T' else 'No'}}</td>
+                            {{pass}}
+                            <td>
+                                {{if item['file_uploaded'] is None:}}
+                                    N/A
+                                {{else:}}
+                                    {{if item['signed_file'] is not None and item['status'] == 'Signed':}}
+                                        <a id="inputImage-{{=item['id']}}" href="{{=URL('admin', 'download_deliverable', args=[item['signed_file']])}}">
+                                            <button class="btn btn-primary btn-sm">
+                                                <span class="fa fa-search"></span>
+                                                &nbsp;Ver item
+                                            </button></a>
+                                    {{else:}}
+                                        <a id="inputImage-{{=item['id']}}" href="{{=URL('admin', 'download_deliverable', args=[item['file_uploaded']])}}">
+                                            <button class="btn btn-primary btn-sm">
+                                                <span class="fa fa-search"></span>
+                                                &nbsp;Ver item
+                                            </button></a>
+                                    {{pass}}
+                                {{pass}}
+                            </td>
+                            <td>
+                                <textarea class="form-control" id="inputComment-{{=item['id']}}" rows="1" style="font-size:12px;"
+                                          name="inputComment-{{=item['id']}}">{{=item['comment'] if item['comment'] is not None else ''}}</textarea>
+                            </td>
+                            <td style="text-align:center;" id="tdStatus-{{=item['id']}}">
+                                {{if item['status']=='Pending':}}
+                                    <span class="badge badge-secondary">Pendiente</span>
+                                {{elif item['status']=='Delivered':}}
+                                    <span class="badge badge-success">Entregado</span>
+                                {{elif item['status']=='Rejected':}}
+                                    <span class="badge badge-danger">Rechazado</span>
+                                {{elif item['status']=='Revised':}}
+                                    <span class="badge badge-warning">Revisado</span>
+                                {{elif item['status']=='Signed':}}
+                                    <span class="badge badge-info">Firmado</span>
+                                {{pass}}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-primary dropdown-toggle btn-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                                            aria-haspopup="true" aria-expanded="false">
+                                        Acciones
+                                    </button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <!--
+                                        <a class="btn btn-sm dropdown-item" href="#" role="button">
+                                            {{=('Enviar correo' if item['notified_mail'] == 'F' else 'Reenviar correo')}}
+                                        </a>-->
+                                        {{if action['is_admin']:}}
+                                            {{if action['document'] == 0:}}
+                                                <a class="btn btn-sm dropdown-item change-date" href="#" role="button" title="Cambiar fecha de entrega"
+                                                   data-content="{{=URL('admin', 'change_date_delivered', args=[item['id']], vars={'control_period' : action['control_period'], 'type': action['deliverable_type']})}}"
+                                                   data-start="{{=item['date_start']}}" data-finish="{{=item['date_finish']}}">
+                                                    Cambiar entrega
+                                                </a>
+                                            {{else:}}
+                                                <a class="btn btn-sm dropdown-item change-date" href="#" role="button" title="Cambiar fecha de entrega"
+                                                   data-content="{{=URL('admin', 'change_date_delivered', args=[item['id']], vars={'control_period' : action['control_period'], 'type': action['deliverable_type'], 'document' : action['document']})}}"
+                                                   data-start="{{=item['date_start']}}" data-finish="{{=item['date_finish']}}">
+                                                    Cambiar entrega
+                                                </a>
+                                            {{pass}}
+                                            <a class="btn btn-sm dropdown-item" onclick="update_deliverable({{=item['id']}}, 3);"
+                                               href="#" role="button" title="Marcar como archivo pendiente de firma">
+                                                Revisar
+                                            </a>
+                                        {{pass}}
+                                        <a class="btn btn-sm dropdown-item" onclick="update_deliverable({{=item['id']}}, 4);"
+                                           href="#" role="button" title="Firmar archivo">
+                                            Firmar
+                                        </a>
+                                        <a class="btn btn-sm dropdown-item" onclick="update_deliverable({{=item['id']}}, 5);"
+                                           href="#" role="button" title="Rechazar archivo">
+                                            Rechazar
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myModalDate" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Editar fecha de entrega</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <form id="formModalDate" action="" method="POST">
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label for="inputStart" class="col-sm-3 col-form-label">Fecha inicio</label>
+                        <div class="col-sm-9">
+                          <input type="text" class="form-control datetime" id="inputStart" name="inputStart" value="">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputFinish" class="col-sm-3 col-form-label">Fecha Finalización</label>
+                        <div class="col-sm-9">
+                          <input type="text" class="form-control datetime" id="inputFinish" name="inputFinish" value="">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{=T('Close')}}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{pass}}
+
+<style>
+    .btn-group, .btn-group-vertical {
+        display: inline-block;
+    }
+    .table td, .table th{
+        vertical-align: middle;
+    }
+    .btn-group > .btn:not(:first-child){
+        margin-left: 0px;
+        border-top-left-radius: 0.2rem;
+        border-bottom-left-radius: 0.2rem;
+    }
+    .badge-warning{
+        color: #fff;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.enable-toggle').click(function(){
+            enable_b = $(this);
+            item_id = enable_b.attr('content');
+            item_comment = $('#inputComment-'+item_id).val();
+
+            $.post("{{=URL('admin','enable_disable_delivered')}}",
+                {
+                  item: item_id,
+                  comment: item_comment
+                },
+                function(result, status){
+                    if(status == 'success'){
+                        data = JSON.parse(result);
+                        if (data.ok == 0){
+                            alert(data.message);
+                        }
+                        else{
+                            enable_b.toggleClass('btn-success');
+                            enable_b.toggleClass('btn-danger');
+                            if(enable_b.hasClass('btn-success')){
+                                enable_b.html("Habilitar")
+                            }
+                            else{
+                                enable_b.html("Deshabilitar")
+                            }
+                        }
+                    }
+                    else{
+                        alert('Ha ocurrido un error al actualizar entregable');
+                    }
+                    //console.log("Data: " + result + "\nStatus: " + status);
+                }
+            );
+            return false;
+        });
+
+        $('.change-date').click(function(){
+            change_date = $(this);
+
+            item_start = change_date.attr('data-start');
+            item_finish = change_date.attr('data-finish');
+            item_content = change_date.attr('data-content');
+
+            $('#inputStart').val(item_start);
+            $('#inputFinish').val(item_finish);
+
+            $('#formModalDate').attr('action', item_content);
+
+            $('#myModalDate').modal('show');
+        });
+
+    });
+
+</script>
+
+<script type="text/javascript">
+    function update_deliverable(id, action){
+        item_comment = $('#inputComment-'+id).val();
+        td_status = $('#tdStatus-' + id);
+        a_image = $('#inputImage-' + id);
+        console.log('item: ' + id + ', acción: ' + action + ', comentario: ' + item_comment);
+
+        $.post("{{=URL('admin','change_deliverable_status')}}",
+            {
+              item: id,
+              action: action,
+              comment: item_comment
+            },
+            function(result, status){
+                if(status == 'success'){
+                    data = JSON.parse(result);
+                    if (data.ok == 0){
+                        alert(data.message);
+                    }
+                    else{
+                        td_status.html(data.message);
+                        text_href = a_image.attr('href');
+                        text_nuevo = text_href.replace(data.uploaded, data.signed);
+                        a_image.attr('href', text_nuevo);
+                        alert(data.alert);
+                    }
+                }
+                else{
+                    alert('Ha ocurrido un error al actualizar entregable');
+                }
+                //console.log("Data: " + result + "\nStatus: " + status);
+            }
+        );
+        return false;
+    }
+</script>

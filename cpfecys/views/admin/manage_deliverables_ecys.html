@@ -1,0 +1,696 @@
+{{extend 'dashboard.html'}}
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+
+<div style="position: relative">
+  <br />
+  <div class="text-center">
+    <h1>Gestión de Entregables ECYS</h1>
+    {{if action['type'] == 'deliverable_type' or action['type'] ==
+    'deliverables' or action['type'] == 'deliverable_role':}}
+    <h3>{{=action['period']}} - {{=action['year']}}</h3>
+    {{if action['type'] == 'deliverable_type':}}
+    <h4>{{=action['rolename']}}</h4>
+    {{pass}} {{if action['type'] == 'deliverables':}}
+    <h4>{{=action['rolename']}} ({{=action['name']}})</h4>
+    {{pass}} {{pass}}
+  </div>
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{{=URL('admin', 'manage_deliverables_ecys')}}"
+          >Gestión de Entregables ECYS</a
+        >
+      </li>
+      {{if action['type'] == 'deliverable_type' or action['type'] ==
+      'deliverables' or action['type'] == 'deliverable_role':}}
+      <li class="breadcrumb-item active" aria-current="page">
+        <a
+          href="{{=URL('admin','manage_deliverables_ecys',args=['deliverable_role'], vars={'period': action['period'], 'year': action['year']})}}"
+          >{{=action['period']}} {{=action['year']}}</a
+        >
+      </li>
+      {{if action['type'] == 'deliverable_type' or action['type'] ==
+      'deliverables':}}
+      <li class="breadcrumb-item active" aria-current="page">
+        <a
+          href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverable_type'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period': action['period'], 'year': action['year']})}}"
+          >{{=action['rolename']}}</a
+        >
+      </li>
+      {{if action['type'] == 'deliverables':}}
+      <li class="breadcrumb-item active" aria-current="page">
+        <a
+          href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverables'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'name': action['name'].encode('utf-8'), 'document': action['document'], 'period': action['period'], 'year': action['year']})}}"
+          >{{=action['name']}}</a
+        >
+      </li>
+      {{pass}} {{pass}} {{pass}}
+    </ol>
+  </nav>
+
+  {{if action['type'] == 'list':}}
+  <div class="row">
+    <div class="col-6">
+      {{if action['is_admin']:}}
+      <form
+        action="{{=URL('admin','manage_deliverables_ecys',args=['control_period'])}}"
+        method="POST"
+      >
+        <div class="form-row">
+          <div class="col">{{=action['select']}}</div>
+          <div class="col">{{action['label_button']}}</div>
+        </div>
+      </form>
+      {{pass}}
+    </div>
+  </div>
+  <div class="mt-4">
+    <div class="col-12">
+      <div class="row-fluid">
+        <table class="table table-sm table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 300px">Periodo</th>
+              <th style="width: 200px">Año</th>
+              <th style="width: 250px">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{for item in action['list']:}}
+            <tr>
+              <td>{{=item['Periodo']}}</td>
+              <td>{{=item['year']}}</td>
+              <td>
+                <div class="btn-group">
+                  <a
+                    href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverable_role'], vars={'period': item['Periodo'], 'year': item['year']})}}"
+                  >
+                    <button class="btn btn-secondary btn-sm">
+                      <span
+                        class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                      ></span>
+                      &nbsp;Ver
+                    </button>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{elif action['type'] == 'deliverable_role':}}
+  <div class="mt-4">
+    <div class="col-12">
+      <div class="row-fluid">
+        <table class="table table-sm table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 300px">Rol</th>
+              <th style="width: 200px">Pendientes de firma</th>
+              <th style="width: 250px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{for item in action['list']:}}
+            <tr>
+              <td>{{=item['name']}}</td>
+              <td>{{=item['amount']}}</td>
+              <td>
+                <div class="btn-group">
+                  <a
+                    href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverable_type'], vars={'rolename': item['name'].encode('utf-8'), 'idrole': item['id'], 'period': action['period'], 'year': action['year']})}}"
+                  >
+                    <button class="btn btn-info btn-sm">
+                      <span
+                        class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                      ></span>
+                      &nbsp;Ver
+                    </button>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{elif action['type'] == 'deliverable_type':}}
+  <div class="mt-4">
+    <div class="col-12">
+      <div class="row-fluid">
+        <table class="table table-sm table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 325px">Nombre</th>
+              <th style="width: 75px">Entregados</th>
+              <th style="width: 75px">Firmados</th>
+              <th style="width: 75px">Rechazados</th>
+              <th style="width: 330px">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{for item in action['list']:}}
+            <tr>
+              <td>{{=item['name']}}</td>
+              <td>
+                <div>
+                  <a
+                    href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverables'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period': action['period'], 'year': action['year'], 'estado': 'entregado', 'name': item['name'].encode('utf-8'), 'document': item['id']})}}"
+                  >
+                    <button class="btn btn-primary btn-sm">
+                      {{=item['Entregados']}}
+                    </button></a
+                  >
+                </div>
+              </td>
+              <td>
+                <div>
+                  <a
+                    href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverables'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period': action['period'], 'year': action['year'], 'estado': 'firmado', 'name': item['name'].encode('utf-8'), 'document': item['id']})}}"
+                  >
+                    <button class="btn btn-success btn-sm">
+                      {{=item['Firmado']}}
+                    </button></a
+                  >
+                </div>
+              </td>
+              <td>
+                <div>
+                  <a
+                    href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverables'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period': action['period'], 'year': action['year'], 'estado': 'rechazado', 'name': item['name'].encode('utf-8'), 'document': item['id']})}}"
+                  >
+                    <button class="btn btn-danger btn-sm">
+                      {{=item['Rechazado']}}
+                    </button></a
+                  >
+                </div>
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a
+                    href="{{=URL('admin', 'manage_deliverables_ecys', args=['deliverables'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period': action['period'], 'year': action['year'], 'name': item['name'].encode('utf-8'), 'document': item['id']})}}"
+                  >
+                    <button class="btn btn-secondary btn-sm">
+                      <span
+                        class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                      ></span>
+                      &nbsp;Ver
+                    </button>
+                  </a>
+                  <button
+                    class="btn btn-success dropdown-toggle btn-sm"
+                    type="button"
+                    id="dropdownMenuDownload"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    Descargar
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuDownload"
+                  >
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'download_deliverable_linguistica', vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period' : action['period'],
+                                        'year': action['year'], 'delivered_type_id' : item['id'], 'delivered_status': 0})}}"
+                      role="button"
+                      title="Documentos entregados"
+                    >
+                      Pendientes de Firma
+                    </a>
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'download_deliverable_linguistica', vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period' : action['period'],
+                                        'year': action['year'], 'delivered_type_id' : item['id'], 'delivered_status': 1})}}"
+                      role="button"
+                      title="Documentos entregados"
+                    >
+                      Firmados
+                    </a>
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'download_deliverable_linguistica', vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period' : action['period'],
+                                        'year': action['year'], 'delivered_type_id' : item['id'], 'delivered_status': 2})}}"
+                      role="button"
+                      title="Documentos entregados"
+                    >
+                      Complementos
+                    </a>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-primary dropdown-toggle btn-sm"
+                    type="button"
+                    id="dropdownMenuOptions"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    Acciones
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuOptions"
+                  >
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'update_all_deliverables_linguistica', vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period': action['period'], 'year': action['year'], 'document': item['id']})}}"
+                      role="button"
+                      title="Documentos entregados"
+                    >
+                      Firmar Todos
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{elif action['type'] == 'deliverables':}}
+  <div class="mt-4">
+    <div class="col-12">
+      <div class="row-fluid">
+        <table class="table table-sm table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th style="width: 80 px">Carnet</th>
+              <th style="width: 200 px">Nombre Usuario</th>
+              <th style="width: 190 px">Nombre Entregable</th>
+              <th style="width: 50 px">¿Requiere Firma?</th>
+              <th style="width: 80 px">
+                Documento (
+                <div
+                  style="display: inline"
+                  data-toggle="tooltip"
+                  data-placement="right"
+                  title="El documento sólo se muestra si es pdf, de lo contrario hay que descargarlo para verlo"
+                >
+                  <span class="fa fa-info"></span>
+                </div>
+                )
+              </th>
+              <th style="width: 50 px">Extension Principal</th>
+              <th style="width: 50 px">Extension Complemento</th>
+              <th style="width: 160 px">Comentario</th>
+              <th style="width: 90 px">Estado</th>
+              <th style="width: 140 px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{for item in action['list']:}}
+            <tr>
+              <td>{{=item['carnet']}}</td>
+              <td>{{=item['name']}} {{=item['last_name']}}</td>
+              <td>{{=item['dname']}}</td>
+              <td>{{='Si'if item['firma'] == 1 else 'No'}}</td>
+              <td>
+                {{if item['filename'] is None:}} N/A {{else:}} {{if
+                item['signed_file'] is not None and item['status'] ==
+                'firmado':}}
+                <a id="inputImage-{{=item['id']}}" href="#popup">
+                  <button
+                    id="file-{{=item['id']}}"
+                    class="btn btn-success btn-sm"
+                    onclick="getPdf('{{=item['signed_file']}}');"
+                  >
+                    <span class="fa fa-search"></span>
+                    &nbsp;Firmado
+                  </button></a
+                >
+                {{else:}}
+                <a id="inputImage-{{=item['id']}}" href="#popup">
+                  <button
+                    id="file-{{=item['id']}}"
+                    class="btn btn-secondary btn-sm"
+                    onclick="getPdf('{{=item['filename']}}');"
+                  >
+                    <span class="fa fa-search"></span>
+                    &nbsp;Entregado
+                  </button></a
+                >
+                {{pass}} {{pass}} {{if item['complemento'] is not None:}}
+                <a id="inputImage-{{=item['id']}}" href="#popup">
+                  <button
+                    class="btn btn-info btn-sm"
+                    onclick="getPdf('{{=item['complemento']}}');"
+                  >
+                    <span class="fa fa-search"></span>
+                    &nbsp;Doc. Complementario
+                  </button></a
+                >
+                {{pass}}
+              </td>
+              <td>{{=item['extension']}}</td>
+              <td>{{=item['extension_complemento']}}</td>
+              <td>
+                <textarea
+                  class="form-control"
+                  id="inputComment-{{=item['id']}}"
+                  rows="1"
+                  style="font-size: 12px"
+                  name=""
+                >
+{{=item['comment'] if item['comment'] is not None else ''}}</textarea
+                >
+              </td>
+              <td style="text-align: center" id="tdStatus-{{=item['id']}}">
+                {{if item['status']=='entregado':}}
+                <span class="badge badge-primary">Entregado</span>
+                {{elif item['status']=='firmado':}}
+                <span class="badge badge-success">Firmado</span>
+                {{elif item['status']=='rechazado':}}
+                <span class="badge badge-danger">Rechazado</span>
+                {{pass}}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-primary dropdown-toggle btn-sm"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    Acciones
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="#"
+                      role="button"
+                      title="Firmar archivo"
+                      onclick="update_deliverable({{=item['id']}}, 1);"
+                    >
+                      Firmar
+                    </a>
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="#"
+                      role="button"
+                      title="Rechazar archivo"
+                      onclick="update_deliverable({{=item['id']}}, 2);"
+                    >
+                      Rechazar
+                    </a>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button
+                    class="btn btn-success dropdown-toggle btn-sm"
+                    type="button"
+                    id="dropdownMenuDownload"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    Descargar
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuDownload"
+                  >
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'download_deliverable_linguistica', args=['download'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period' : action['period'],
+                                        'year': action['year'], 'id' : item['id'], 'delivered_status': 0})}}"
+                      role="button"
+                      title="Documentos entregados"
+                    >
+                      Entregado
+                    </a>
+                    {{if item['status']=='firmado':}}
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'download_deliverable_linguistica', args=['download'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period' : action['period'],
+                                        'year': action['year'], 'id' : item['id'], 'delivered_status': 1})}}"
+                      role="button"
+                      title="Documentos Firmados"
+                    >
+                      Firmado
+                    </a>
+                    {{pass}} {{if item['complemento'] is not None:}}
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'download_deliverable_linguistica', args=['download'], vars={'rolename': action['rolename'].encode('utf-8'), 'idrole': action['idrole'], 'period' : action['period'],
+                                        'year': action['year'], 'id' : item['id'], 'delivered_status': 2})}}"
+                      role="button"
+                      title="Documentos Complementarios"
+                    >
+                      Complemento
+                    </a>
+                    {{pass}}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {{pass}}
+  <div id="popup" class="overlay">
+    <div id="popupBody">
+      <a id="cerrar" href="#" onclick="cerrarPopUp();">&times;</a>
+      <div class="popupContent">
+        <object
+          id="pdfViewer-1"
+          class="pdfview"
+          type="application/pdf"
+          data=""
+          name="asdas"
+          download="renamed"
+        >
+          <param name="title" value="a" />
+        </object>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Intentando hacer un visor de pdf-->
+
+<!-- Termina intento -->
+
+<style>
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
+  }
+
+  .table td,
+  .table th {
+    vertical-align: middle;
+  }
+
+  .btn-group > .btn:not(:first-child) {
+    margin-left: 0px;
+    border-top-left-radius: 0.2rem;
+    border-bottom-left-radius: 0.2rem;
+  }
+</style>
+
+<script type="text/javascript">
+  function update_deliverable(id, action) {
+    item_comment = $("#inputComment-" + id).val();
+    td_status = $("#tdStatus-" + id);
+    a_image = $("#inputImage-" + id);
+    idFile = $("#file-" + id);
+    console.log(
+      "item: " + id + ", acción: " + action + ", comentario: " + item_comment
+    );
+
+    $.post(
+      "{{=URL('admin', 'change_deliverable_status_linguistica')}}",
+      {
+        item: id,
+        action: action,
+        comment: item_comment,
+      },
+      function (result, status) {
+        console.log("Estado: ");
+        console.log(status);
+        if (status == "success") {
+          data = JSON.parse(result);
+          if (data.ok == 0) {
+            alert(data.message);
+          } else {
+            console.log(data);
+            td_status.html(data.message);
+            text_href = a_image.attr("href");
+            text_nuevo = text_href.replace(data.uploaded, data.signed);
+            a_image.attr("href", text_nuevo);
+            idFile.html(data.name);
+            idFile.attr("class", "btn " + data.btnClass + " btn-sm");
+            alert(data.alert);
+            location.reload();
+          }
+        } else {
+          alert("Ha ocurrido un error al actualizar entregable");
+        }
+      }
+    );
+    return false;
+  }
+
+  // PDF Viewer
+
+  myPdfViewer = $("#pdfViewer-1");
+  function getPdf(filename) {
+    $.post(
+      "{{=URL('admin', 'retrieve_pdf_file')}}",
+      {
+        filename: filename,
+      },
+      function (result, status) {
+        data = JSON.parse(result);
+        if (data.ok == 1) {
+          var element = document.getElementById("pdfViewer-1");
+          element.setAttribute(
+            "data",
+            "data:application/pdf;headers=filename%3DPendiente;base64," +
+              data.encoded
+          );
+        } else {
+          alert(data.message);
+        }
+      }
+    );
+    return;
+  }
+
+  function cerrarPopUp() {
+    var element = document.getElementById("pdfViewer-1");
+    element.setAttribute("data", "");
+  }
+</script>
+
+<script type="text/javascript"></script>
+
+<style>
+  .pdfview {
+    margin: auto;
+    display: block;
+    width: 850px;
+    height: 77vh;
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  .overlay:target {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  #popupBody {
+    width: 900px;
+    padding: 1%;
+    border-radius: 15px;
+    box-shadow: 0 0 5px #ccc;
+    background: rgb(24, 23, 23);
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    margin: 5% auto;
+    transition: all 1s ease-in-out;
+    overflow-y: auto;
+  }
+
+  #cerrar {
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+    transition: all 200ms;
+  }
+
+  @media only screen and (max-width: 1920px) {
+    .pdfview {
+      height: 73vh;
+    }
+
+    #popupBody {
+      margin: 7% auto;
+    }
+  }
+
+  @media only screen and (max-width: 960px) {
+    .pdfview {
+      height: 73vh;
+    }
+
+    #popupBody {
+      margin: 10% auto;
+    }
+  }
+
+  @media only screen and (max-width: 480px) {
+    .pdfview {
+      height: 0vh;
+    }
+
+    #popupBody {
+      width: 100%;
+    }
+  }
+
+  /* .tooltip{
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted rgb(247, 0, 0);
+    }
+
+    .tooltip .tooltiptext{
+        visibility: visible;
+        width: 120px;
+        background-color: rgb(69, 0, 231);
+        color: rgb(255, 0, 179);
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+
+        position: absolute;
+        z-index: 2;
+    }
+
+    .tooltip:hover .tooltiptext{
+        visibility: visible;
+    } */
+</style>

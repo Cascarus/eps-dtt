@@ -1,0 +1,191 @@
+{{if request.vars['f_view'] == "weighting_edit":}}
+    <!--Create weighting Modal -->
+    <div style="overflow:auto;"> 
+        <div>
+            <center>
+                <h3>
+                    <small>
+                        {{if request.vars['type'] == 'course':}}
+                        <h2>{{=T('Course Weighting')}} - {{=name}}</h2>
+                        {{else:}}
+                        <h2>{{=T('Laboratory Weighting')}} - {{=name}}</h2>
+                        {{pass}}
+                    </small>
+                </h3>
+            </center>
+        </div>
+        <div id="actions" align="center">
+            <form action="" enctype="multipart/form-data" method="post" >
+                <center>
+                    <table>
+                        <tr>
+                            <td align="left">
+                                <div align="center" id="categoryDiv" value="categoryDiv" class="well span12" style="overflow:auto; width:300px;"></div>
+                                <div align="right">
+                                    <a id="categoryButton" href="#information_text" role="button" class="btn btn-success" title="{{=T('Add category to weighting')}}"> 
+                                        <span class="fa fa-plus"></span>
+                                        {{=T('Add Category')}}
+                                    </a>
+                                </div>
+                            </td>
+                            <td align="left">
+                                <div class="well span11" id="div_weighting_show" style="overflow:auto;  width:400px;"></div>
+                                <br>
+                                <div align="right">
+                                    <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
+                                        <span class="fa fa-check-circle-o"></span>
+                                        {{=T('Finalize')}}
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </center>
+            </form>      
+        </div>
+    </div>
+    <!--Finish Create weighting Modal -->
+{{pass}}
+
+{{if request.vars['f_view'] == "weighting_get":}}
+    <!--Get weighting Modal -->
+    <div> 
+        <div id ="a">
+            <center>
+                <h3>
+                    <small>
+                        {{if request.vars['type'] == 'course':}}
+                            <h2>{{=T('Class Weighting')}} - {{=name}}</h2>
+                        {{else:}}
+                            <h2>{{=T('Laboratory Weighting')}} - {{=name}}</h2>
+                        {{pass}}
+                    </small>
+                </h3>
+            </center>
+        </div>
+        <div id="actions" align="center">
+            <form action="" enctype="multipart/form-data" method="post" >
+                <center>
+                    <table>
+                        <tr>
+                            <td align="left">                 
+                                <div align="center" id="categoryDiv1" value="categoryDiv" class="well span12" style="overflow:auto;  width:300px;"> 
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <select class="generic-widget form-control" id="period_id" name="category" style="width:250px;">
+                                                    {{try:}}
+                                                        {{project_var = db(db.user_project.id == request.vars['assignation']).select().first() }}
+                                                        {{var_project_id = project_var.project.id}}
+                                                    {{except:}}
+                                                        {{var_project_id = request.vars['project']}}
+                                                    {{pass}}
+
+                                                    {{if request.vars['type'] == 'course':}}
+                                                        {{cR = db((db.course_activity_category.assignation == var_project_id) & (db.course_activity_category.semester != cpfecys.current_year_period().id) 
+                                                                & (db.course_activity_category.laboratory == False)).select()}}
+                                                    {{else:}}
+                                                        {{cR = db((db.course_activity_category.assignation == var_project_id)  & (db.course_activity_category.semester != cpfecys.current_year_period().id) 
+                                                                & (db.course_activity_category.laboratory == True)).select()}}
+                                                    {{pass}}
+                                                    
+                                                    {{periodsP = []}}
+                                                    {{for c in cR:}}
+                                                        {{periodsP.append(c.semester)}}
+                                                    {{pass}}
+                                                    {{for period_var in db(db.period_year.id.belongs(periodsP)).select():}}
+                                                        <option value="{{=period_var.id}}">{{=T(period_var.period.name)}} - {{=period_var.yearp}}</option>
+                                                    {{pass}}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <a id="refreshButton" role="button" class="btn btn-info" title="{{=T('Refresh')}}"> 
+                                                    <span class="fa fa-refresh"></span>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>   
+                                    <div align="center" id="getDiv" style="overflow:auto; height:60%; width:100%;"></div>
+                                </div>
+                            </td>
+                            <td align="left">
+                                <div class="well span11" id="getViewDiv" style="overflow:auto; width:300px;"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div align="right">
+                                    <a id="getWeightingButton" role="button" class="btn btn-success" title="{{=T('Get weighting of the chosen semester')}}"> 
+                                        <span class="fa fa-plus"></span>
+                                        {{=T('Get Weighting')}}
+                                    </a>
+                                </div>
+                            </td>
+                            <td>
+                                <div align="right">
+                                    <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" role="button" class="btn btn-info"  > 
+                                        <span class="fa fa-check-circle-o"></span>
+                                        {{=T('Finalize')}}
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </center>      
+            </form>
+        </div>
+    </div>
+    <!--Get  weighting Modal -->
+{{pass}}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        //Create
+        $("#div_weighting_show")
+            .load("{{=URL('activity_control','weighting.html')}}?op=showTable&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+        $("#categoryDiv")
+            .load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+    
+        $("#categoryButton").click(function() {
+            var category_id_var = document.getElementById('category_id').value;
+            var grade_var = document.getElementById('category_grade').value;
+            var SG_var = document.getElementById('SG_check').checked;
+            var TP_var = document.getElementById('TP_check').checked;
+        
+            if (category_id_var == ""){ alert("{{=T('No categories available')}}"); }
+            else {
+                var regex = /^\d+(?:\.\d{0,2})$/; 
+                var regex2 = /^([0-9])*$/; 
+
+                if (grade_var == "" || parseInt(grade_var) == 0 ){ alert("{{=T('The entered value is not correct')}}"); }
+                else {
+                    if (!regex.test(grade_var) && !regex2.test(grade_var)){ alert("{{=T('The entered value is not a decimal')}}"); }
+                    else {
+                        $("#div_weighting_show")
+                            .load("{{=URL('activity_control','weighting.html')}}?op=addCategory&amp;laboratory=true&amp;SG_var=" + SG_var + "&amp;category_id_var=" + category_id_var +"&amp;grade_var=" + grade_var + "&amp;TP=" + TP_var + "&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}");           
+                        $("#categoryDiv")
+                            .load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+                        $("#categoryDiv")
+                            .load("{{=URL('activity_control','weighting.html')}}?op=showInsert&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}"); 
+                    }
+                }
+            }
+        })
+
+        $("#refreshButton").click(function(){
+            var id_period_sel = document.getElementById('period_id').value;
+            if (id_period_sel != ""){
+                $("#getDiv")
+                    .load("{{=URL('activity_control','weighting.html')}}?op=showTableNoEditablePeriod&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par=" + id_period_sel);  
+            } else { alert("{{=T('Semester has not been selected')}}"); }
+        })
+
+        $("#getWeightingButton").click(function() {
+            var id_period_sel = document.getElementById('period_id').value;
+            if (id_period_sel != ""){
+                $("#getViewDiv")
+                    .load("{{=URL('activity_control','weighting.html')}}?op=getPreviousWeighting&amp;project={{=request.vars['project']}}&amp;year={{=request.vars['year']}}&amp;type={{=request.vars['type']}}&amp;period_par=" + id_period_sel);
+            } else { alert("{{=T('Semester has not been selected')}}"); }
+        })
+    });
+</script>

@@ -1,0 +1,35 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h3>Horarios</h3>
+        </div>
+    </div>
+    <div class="row well mt-3">
+        <div class="col-12">
+            {{=create_button}}
+        </div>
+        <br><br><br>
+        <div class="col-12">
+            {{=tutor_search_form}}
+        </div>
+        <div class="col-12">
+            {{=tutor_information_table}}
+        </div>
+        <div class="col-12">
+            {{=assignation_schedule_table}}
+        </div>
+    </div>
+    <div class="row well mt-3">
+        <div class="col-12">
+            {{=create_day_schedule_button}}
+        </div>
+        <br><br><br>
+        <div class="col-12">
+            {{=list_schedules}}
+        </div>
+        <div class="col-12">
+            {{=day_schedule_table}}
+        </div>
+    </div>
+</div>

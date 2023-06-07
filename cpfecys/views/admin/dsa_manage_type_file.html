@@ -1,0 +1,258 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+  <h1>Tipos de Archivo</h1>
+</div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{=URL('admin', 'dsa_manage_type_file')}}">Tipos de archivo</a>
+    </li>
+    {{if action['type'] == 'new':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{=URL('admin', 'dsa_manage_type_file', args=['new'])}}"
+        >Nuevo</a
+      >
+    </li>
+    {{elif action['type'] == 'show':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'dsa_manage_type_file', args=['show'], vars={'id': action['item']['id']})}}"
+        >Ver</a
+      >
+    </li>
+    {{elif action['type'] == 'edit':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'dsa_manage_type_file', args=['edit'], vars={'id': action['item']['id']})}}"
+        >Editar</a
+      >
+    </li>
+    {{pass}}
+  </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+  <div class="col-md-4">
+    <a href="{{=URL('admin', 'dsa_manage_type_file',args=['new'])}}">
+      <button class="btn btn-primary">
+        <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+        &nbsp;Añadir Registro
+      </button>
+    </a>
+  </div>
+</div>
+<br />
+{{ if "message" in action: }}
+<div class="alert alert-danger alert-dismissible" role="alert">
+  <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{{pass}}
+<div class="mt-4">
+  <div class="col-12">
+    <div style="overflow-x: auto" class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Extensiones</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ for typeFile in action['list']: }}
+          <tr>
+            <td>{{=typeFile['id']}}</td>
+            <td>{{=typeFile['name'].encode("utf-8")}}</td>
+            <td>{{=typeFile['extension'].encode("utf-8")}}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  href="{{=URL('admin', 'dsa_manage_type_file', args=['show'], vars={'id': typeFile['id']})}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button>
+                </a>
+                <a
+                  href="{{=URL('admin', 'dsa_manage_type_file', args=['edit'], vars={'id': typeFile['id']})}}"
+                >
+                  <button class="btn btn-success btn-sm">
+                    <span
+                      class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"
+                    ></span>
+                    &nbsp;Editar
+                  </button>
+                </a>
+                <a
+                  href="{{=URL('admin', 'dsa_manage_type_file', args=['delete'], vars={'id': typeFile['id']})}}"
+                >
+                  <button class="btn btn-danger btn-sm">
+                    <span
+                      class="icon trash icon-trash glyphicon glyphicon-trash"
+                    ></span>
+                    &nbsp;Eliminar
+                  </button>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{else:}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-6 well">
+        {{ if "message" in action: }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {{pass}}
+        <br />
+        {{if action['type'] == 'new':}}
+        <form
+          action="{{=URL('admin', 'dsa_manage_type_file', args=['new'])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="inputName"
+                value="{{if 'item' in action:}}{{=action['item']['inputName']}}{{pass}}"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputExtension" class="col-sm-3 col-form-label"
+              >Extensiones</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputExtension"
+                name="inputExtension"
+                value="{{if 'item' in action:}}{{=action['item']['inputExtension']}}{{pass}}"
+                required
+              />
+              <sub>* Ingrese los valores separados por coma y sin punto</sub>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{elif action['type'] == 'show':}}
+        <div class="form-group row">
+          <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item']['name']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputExtension" class="col-sm-3 col-form-label"
+            >Extensiones</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item']['extension']}}"
+            />
+          </div>
+        </div>
+        <a href="{{=URL('admin', 'dsa_manage_type_file')}}">
+          <button class="btn btn-primary">
+            <span class="fa fa-arrow-circle-left"></span>
+            &nbsp;Regresar
+          </button>
+        </a>
+        {{elif action['type'] == 'edit':}}
+        <form
+          action="{{=URL('admin', 'dsa_manage_type_file', args=['edit'], vars={'id': action['item']['id']})}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputNameE" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputNameE"
+                name="inputNameE"
+                value="{{if 'item' in action:}}{{=action['item']['inputNameE']}}{{pass}}"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputExtensionE" class="col-sm-3 col-form-label"
+              >Extensiones</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputExtensionE"
+                name="inputExtensionE"
+                value="{{if 'item' in action:}}{{=action['item']['inputExtensionE']}}{{pass}}"
+                required
+              />
+              <sub>* Ingrese los valores separados por coma y sin punto</sub>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Actualizar</button>
+        </form>
+        {{pass}}
+      </div>
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<style>
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
+  }
+  .table td,
+  .table th {
+    vertical-align: middle;
+  }
+</style>

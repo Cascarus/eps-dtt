@@ -1,0 +1,150 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h3>Detalle Tareas DSI</h3>
+        </div>
+    </div>
+    <div class="row well mt-3">
+        <div class="col-12">
+            {{if admin:}}
+                <div class="table-responsive">
+                    <table class="table-striped table-bordered" style="align:0 auto;">
+                        <tr>
+                            <td>
+                                <form class="form-inline" action="{{=URL('dsi', 'item_detail')}}" method='get'>
+                                    <input name="restriction" type="hidden" value="{{=restrictions[0].id}}">
+                                    <select name="period" class="form-control">
+                                        {{for cperiod in periods:}}
+                                            <option value="{{=cperiod.id}}"
+                                                {{ if period.id == cperiod.id:}}
+                                                    selected 
+                                                {{pass}}
+                                            >
+                                                {{=T(cperiod.period.name)}}-{{=cperiod.yearp}}
+                                            </option>
+                                        {{pass}}
+                                    </select>
+                                    <input class="btn btn-primary" type="submit" value="{{=T('Filter')}}">
+                                </form>
+                            </td>
+                        <!--/tr--><!--aqui habia un td-->
+                            <a class="btn btn-success" href="#myModal" data-toggle="modal">
+                                {{=T('Approve All')}}
+                            </a>  
+                        <!--/td-->
+                        </tr>
+                    </table>
+                    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                            <h3 id="myModalLabel">{{=T('Confirm action')}}</h3>
+                        </div>
+                        <div class="modal-body">
+                            <p>{{=T('Appove all items? this action can\'t be undone')}}</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">
+                                {{=T('Cancel')}}
+                            </button>
+                            <a class="btn btn-primary" href="{{=URL('dsi','approve_all', vars=dict(restrictions=restrictions[0].id, period=period.id))}}">
+                                {{=T('Ok')}}
+                            </a>
+                        </div>
+                    </div>
+                </div> 
+            {{pass}}
+
+            {{for restriction in restrictions:}}
+                <div class="dttother">
+                    <div class="text-center">
+                        <h3>{{=restriction.name}}</h3>
+                        <h4>{{=T(period.period.name)}}-{{=period.yearp}}</h4>
+                    </div>
+                    {{for area in get_areas(restriction).select(db.area_level.ALL):}}
+                        <h4>{{=area.name}}</h4>
+                        {{for project in get_projects(area, restriction).select(db.project.ALL):}}
+                            {{if not is_exception(project, restriction):}}
+                                <h5>{{=project.name}}</h5>
+                                <table class="table table-striped table-bordered">
+                                    {{for assignation in get_students(project):}}
+                                        {{item = get_item(restriction, assignation)}}
+                                        {{score = 0}}
+                                        {{checked = ''}}
+                                        {{status = T('Pending')}}
+                                        {{status_label = 'info'}}
+                                        {{button_message = T('Save')}}
+                                        {{button_class = 'btn-info'}}
+                                        {{if item:}}
+                                            {{if item.item_restriction.item_type.name == 'Activity':}}
+                                                {{if item.done_activity:}}
+                                                    {{status = T('Done')}}
+                                                    {{status_label = 'success'}}
+                                                {{elif not item.done_activity:}}
+                                                    {{status = T('Failed')}}
+                                                    {{status_label = 'important'}}
+                                                {{pass}}
+                                            {{elif item.item_restriction.item_type.name == 'Grade Activity':}}
+                                                {{if item.score >= item.min_score:}}
+                                                    {{status = T('Approved')}}
+                                                    {{status_label = 'success'}}
+                                                {{else:}}
+                                                    {{status = T('Failed')}}
+                                                    {{status_label = 'important'}}
+                                                {{pass}}
+                                            {{pass}}
+                                            {{score = item.score or 0}}
+                                            {{button_message = T('Update')}}
+                                            {{button_class = 'btn-success'}}
+                                            {{if item.done_activity:}}
+                                                {{checked = 'checked'}}
+                                            {{pass}}
+                                        {{pass}}
+                                        <tr>
+                                            <form class="save-form" action="{{=URL('dsi','item_detail/update')}}">
+                                                <td>
+                                                    <div class="label label-{{=status_label}}">
+                                                        {{=status}}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {{=assignation.assigned_user.username}}
+                                                    {{=assignation.assigned_user.first_name}}
+                                                    {{=assignation.assigned_user.last_name}}
+                                                </td>
+                                                {{if restriction.item_type.name != 'Grade Activity':}}
+                                                    <td>
+                                                        <input id="done" type="checkbox" {{=checked}} name="done" class="form-control">
+                                                        <label for="done">{{=T('Done')}}</label>
+                                                    </td>
+                                                {{else:}}
+                                                    <td>
+                                                        <label for="score">{{=T('Score')}}</label>
+                                                        <input type="number" id="score" name="score" class="form-control" value="{{=score}}" required="true">
+                                                    </td>
+                                                    <td>
+                                                        <span class="label label-info">
+                                                            {{=T('Minimum value to aprove')}}:
+                                                            {{=restriction.min_score}}
+                                                        </span>
+                                                    </td>
+                                                {{pass}}
+                                                <td>
+                                                <input class="btn btn-primary {{=button_class}}" type="submit" value="{{=button_message}}">
+                                                </td>
+                                                <input type="hidden" name="user" value="{{=assignation.assigned_user.id}}">
+                                                <input type="hidden" name="project"	value="{{=assignation.project.id}}">
+                                                <input type="hidden" name="restriction"	value="{{=restriction.id}}">
+                                            </form>				
+                                        </tr>
+                                    {{pass}}
+                                </table>
+                            {{pass}}
+                        {{pass}}
+                    {{pass}}
+                </div>
+            {{pass}}
+        </div>
+    </div>
+</div>

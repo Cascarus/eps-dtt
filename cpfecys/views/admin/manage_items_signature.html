@@ -1,0 +1,647 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+  <h1>Firma de Entregables</h1>
+</div>
+{{if action['type'] == 'deliverables' or action['type'] == 'items':}}
+<div class="text-center">
+  <h5>{{=action['control_period_name']}}</h5>
+</div>
+{{if action['type'] == 'items' and action['document'] != 0:}}
+<div class="text-center">
+  <h6>{{=action['doc_name']}}</h6>
+</div>
+{{pass}} 
+{{pass}}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{=URL('admin', 'manage_items_signature')}}"
+        >Firma de Entregables</a
+      >
+    </li>
+    {{if action['type'] == 'deliverables' or action['type'] == 'items':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_items_signature',args=['deliverables'],
+                vars={'control_period' : action['control_period']})}}"
+        >Entregables</a
+      >
+    </li>
+    {{if action['type'] == 'items':}} {{if action['document'] == 0:}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_items_signature',args=['items'],
+                        vars={'control_period' : action['control_period']})}}"
+        >{{=action['doc_name']}}</a
+      >
+    </li>
+    {{else:}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_items_signature',args=['items'],
+                        vars={'control_period' : action['control_period'], 'document' : action['document']})}}"
+        >{{=action['doc_name']}}</a
+      >
+    </li>
+    {{pass}} 
+    {{pass}} 
+    {{pass}}
+  </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+  <div class="col-6">
+    <form
+      action="{{=URL('admin', 'manage_items_signature',args=['control_period'])}}"
+      method="POST"
+    >
+      <div class="form-row">
+        <div class="col">{{=action['select']}}</div>
+        <div class="col">{{=action['label_button']}}</div>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th style="width: 100px">Id</th>
+            <th style="width: 300px">Período</th>
+            <th style="width: 200px">Año</th>
+            <th style="width: 250px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ for item in action['list']: }}
+          <tr>
+            <td>{{=item['id']}}</td>
+            <td>{{=T(item['name'])}}</td>
+            <td>{{=item['yearp']}}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  href="{{=URL('admin', 'manage_items_signature',args=['deliverables'], vars={'control_period': item['id']})}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'manage_items_signature',args=['control_period'], vars={'period': item['period_year']})}}"
+                >
+                  <button class="btn btn-info btn-sm">
+                    <span class="fa fa-refresh"></span>
+                    &nbsp;Actualizar
+                  </button></a
+                >
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{elif action['type'] == 'deliverables':}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th style="width: 325px">Nombre</th>
+            <th style="width: 75px; text-align: center">¿Está Activo?</th>
+            <th style="width: 75px; text-align: center">Activos</th>
+            <th style="width: 75px; text-align: center">Inactivos</th>
+            <th style="width: 75px; text-align: center">Pendientes</th>
+            <th style="width: 75px; text-align: center">Entregados</th>
+            <th style="width: 75px; text-align: center">Rechazados</th>
+            <th style="width: 75px; text-align: center">Revisados</th>
+            <th style="width: 75px; text-align: center">Firmados</th>
+            <th style="width: 330px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ for item in action['list']: }}
+          <tr>
+            <td>{{=item['name']}}</td>
+            <td style="text-align: center">
+              {{if item['is_enabled']=='T':}} 
+                Si 
+              {{elif item['is_enabled']=='F':}} 
+                No 
+              {{else:}} 
+                -- 
+              {{pass}}
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-primary"
+                >{{=(0 if item['Enabled'] is None else item['Enabled'])}}</span
+              >
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-dark"
+                >{{=(0 if item['Disabled'] is None else
+                item['Disabled'])}}</span
+              >
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-secondary"
+                >{{=(0 if item['Pending'] is None else item['Pending'])}}</span
+              >
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-success"
+                >{{=(0 if item['Delivered'] is None else
+                item['Delivered'])}}</span
+              >
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-danger"
+                >{{=(0 if item['Rejected'] is None else
+                item['Rejected'])}}</span
+              >
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-warning"
+                >{{=(0 if item['Revised'] is None else item['Revised'])}}</span
+              >
+            </td>
+            <td style="text-align: center">
+              <span class="badge badge-info"
+                >{{=(0 if item['Signed'] is None else item['Signed'])}}</span
+              >
+            </td>
+            <td>
+              <div class="btn-group">
+                {{if str(item['id']) == '0':}}
+                <a
+                  href="{{=URL('admin', 'manage_items_signature', args=['items'], vars={'control_period' : action['control_period']})}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button></a
+                >
+                {{else:}}
+                <a
+                  href="{{=URL('admin', 'manage_items_signature', args=['items'], vars={'control_period' : action['control_period'],
+                                        'document' : item['id']})}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button></a
+                >
+                {{pass}}
+                <button
+                  class="btn btn-success dropdown-toggle btn-sm"
+                  type="button"
+                  id="dropdownMenuDownload"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Descargar
+                </button>
+                <div
+                  class="dropdown-menu"
+                  aria-labelledby="dropdownMenuDownload"
+                >
+                  {{if str(item['id']) == '0':}}
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'download_item', vars={'control_period' : action['control_period'], 'delivered' : 1})}}"
+                    role="button"
+                    title="Documentos entregados"
+                  >
+                    Entregados
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'download_item', vars={'control_period' : action['control_period'], 'delivered' : 0})}}"
+                    role="button"
+                    title="Documentos firmados"
+                  >
+                    Firmados
+                  </a>
+                  {{else:}}
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'download_item', vars={'control_period' : action['control_period'],
+                                               'delivered' : 1, 'document' : item['id']})}}"
+                    role="button"
+                    title="Documentos entregados"
+                  >
+                    Entregados
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'download_item', vars={'control_period' : action['control_period'],
+                                               'delivered' : 0, 'document' : item['id']})}}"
+                    role="button"
+                    title="Documentos firmados"
+                  >
+                    Firmados
+                  </a>
+                  {{pass}}
+                </div>
+              </div>
+              <div class="btn-group">
+                <button
+                  class="btn btn-primary dropdown-toggle btn-sm"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Acciones
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  {{if str(item['id']) == '0':}}
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'enable' : '1'})}}"
+                    role="button"
+                    title="Activa todos los items"
+                  >
+                    Activar todos
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'enable' : '0'})}}"
+                    role="button"
+                    title="Inactiva todos los items"
+                  >
+                    Inactivar todos
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'status' : '3'})}}"
+                    role="button"
+                    title="Revisar todos los items"
+                  >
+                    Revisar todos
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'status' : '4'})}}"
+                    role="button"
+                    title="Firmar todos los items"
+                  >
+                    Firmar todos
+                  </a>
+                  {{else:}}
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'document' : item['id'], 'enable' : '1'})}}"
+                    role="button"
+                    title="Activa todos los items"
+                  >
+                    Activar todos
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'document' : item['id'], 'enable' : '0'})}}"
+                    role="button"
+                    title="Inactiva todos los items"
+                  >
+                    Inactivar todos
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'document' : item['id'], 'status' : '3'})}}"
+                    role="button"
+                    title="Revisar todos los items"
+                  >
+                    Revisar todos
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    href="{{=URL('admin', 'update_all_items', vars={'control_period' : action['control_period'],
+                                               'document' : item['id'], 'status' : '4'})}}"
+                    role="button"
+                    title="Firmar todos los items"
+                  >
+                    Firmar todos
+                  </a>
+                  {{pass}}
+                </div>
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{elif action['type'] == 'items':}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            {{if action['document'] == 0:}}
+            <th style="width: 80px">Activo /<br />Inactivo</th>
+            <th style="width: 80px">Carnet</th>
+            <th style="width: 120px">Usuario</th>
+            <th style="width: 120px">Área</th>
+            <th style="width: 120px">Proyecto</th>
+            <th style="width: 140px">Nombre de entregable</th>
+            <th style="width: 70px; text-align: center">¿Está Activo?</th>
+            <th style="width: 80px">Archivo <br />ingresado/firmado</th>
+            <th style="width: 160px">Comentario Admin</th>
+            <th style="width: 90px; text-align: center">Estado</th>
+            <td style="width: 140px"></td>
+            {{else:}}
+            <th style="width: 70px">Activo /<br />Inactivo</th>
+            <th style="width: 80px">Carnet</th>
+            <th style="width: 200px">Usuario</th>
+            <th style="width: 180px">Área</th>
+            <th style="width: 190px">Proyecto</th>
+            <th style="width: 70px">Archivo <br />ingresado/firmado</th>
+            <th style="width: 170px">Comentario Admin</th>
+            <th style="width: 90px; text-align: center">Estado</th>
+            <td style="width: 140px"></td>
+            {{pass}}
+          </tr>
+        </thead>
+        <tbody>
+          {{for item in action['list']:}}
+          <tr>
+            <td>
+              {{if item['is_active']=='T':}}
+              <a
+                class="btn enable-toggle btn-success btn-sm"
+                href="#"
+                content="{{=item['id']}}"
+              >
+                Activo
+              </a>
+              {{else:}}
+              <a
+                class="btn enable-toggle btn-danger btn-sm"
+                href="#"
+                content="{{=item['id']}}"
+              >
+                Inactivo
+              </a>
+              {{pass}}
+            </td>
+            <td>{{=item['username']}}</td>
+            <td>{{=item['user']}}</td>
+            <td>{{=item['area']}}</td>
+            <td>{{=item['project']}}</td>
+            {{if action['document'] == 0:}}
+            <td>{{=item['deliverable']}}</td>
+            <td style="text-align: center">
+              {{='Si' if item['is_enabled']=='T' else 'No'}}
+            </td>
+            {{pass}}
+            <td>
+              {{if item['uploaded_file'] is None or item['uploaded_file'] == '':}} 
+                N/A 
+              {{else:}} 
+                {{if item['signed_file'] is not None and item['status'] == 'Signed':}}
+                  <a
+                    id="inputImage-{{=item['id']}}"
+                    href="{{=URL('admin', 'download_item', args=[item['signed_file']])}}"
+                  >
+                    <button class="btn btn-primary btn-sm">
+                      <span class="fa fa-search"></span>
+                      &nbsp;Ver item
+                    </button></a
+                  >
+                {{else:}}
+                  <a
+                    id="inputImage-{{=item['id']}}"
+                    href="{{=URL('admin', 'download', args=[item['uploaded_file']])}}"
+                  >
+                    <button class="btn btn-primary btn-sm">
+                      <span class="fa fa-search"></span>
+                      &nbsp;Ver item
+                    </button></a
+                  >
+                {{pass}} 
+              {{pass}}
+            </td>
+            <td>
+              <textarea
+                class="form-control"
+                id="inputComment-{{=item['id']}}"
+                rows="1"
+                style="font-size: 12px"
+                name="inputComment-{{=item['id']}}"
+              >
+{{=item['admin_comment'] if item['admin_comment'] is not None else ''}}</textarea
+              >
+            </td>
+            <td style="text-align: center" id="tdStatus-{{=item['id']}}">
+              {{if item['status']=='Pending':}}
+              <span class="badge badge-secondary">Pendiente</span>
+              {{elif item['status']=='Delivered':}}
+              <span class="badge badge-success">Entregado</span>
+              {{elif item['status']=='Rejected':}}
+              <span class="badge badge-danger">Rechazado</span>
+              {{elif item['status']=='Revised':}}
+              <span class="badge badge-warning">Revisado</span>
+              {{elif item['status']=='Signed':}}
+              <span class="badge badge-info">Firmado</span>
+              {{pass}}
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-primary dropdown-toggle btn-sm"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Acciones
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    onclick="update_deliverable({{=item['id']}}, 3);"
+                    href="#"
+                    role="button"
+                    title="Marcar como archivo pendiente de firma"
+                  >
+                    Revisar
+                  </a>
+                  <a
+                    class="btn btn-sm dropdown-item"
+                    onclick="update_deliverable({{=item['id']}}, 4);"
+                    href="#"
+                    role="button"
+                    title="Firmar archivo"
+                  >
+                    Firmar
+                  </a>
+                  <!--
+                                    <a class="btn btn-sm dropdown-item send-mail" href="#" role="button" id="{{=item['id']}}"
+                                       content="{{=item['item']}}-{{=item['id_user']}}" title="Rechazar archivo">
+                                        Rechazar
+                                    </a>-->
+                </div>
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<style>
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
+  }
+  .table td,
+  .table th {
+    vertical-align: middle;
+  }
+  .btn-group > .btn:not(:first-child) {
+    margin-left: 0px;
+    border-top-left-radius: 0.2rem;
+    border-bottom-left-radius: 0.2rem;
+  }
+  .badge-warning {
+    color: #fff;
+  }
+</style>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $(".enable-toggle").click(function () {
+      enable_b = $(this);
+      item_id = enable_b.attr("content");
+      item_comment = $("#inputComment-" + item_id).val();
+
+      $.post(
+        "{{=URL('admin','enable_disable_item')}}",
+        {
+          item: item_id,
+          comment: item_comment,
+        },
+        function (result, status) {
+          if (status == "success") {
+            data = JSON.parse(result);
+            if (data.ok == 0) {
+              alert(data.message);
+            } else {
+              enable_b.toggleClass("btn-success");
+              enable_b.toggleClass("btn-danger");
+              if (enable_b.hasClass("btn-success")) {
+                enable_b.html("Activo");
+              } else {
+                enable_b.html("Inactivo");
+              }
+            }
+          } else {
+            alert("Ha ocurrido un error al actualizar item");
+          }
+          //console.log("Data: " + result + "\nStatus: " + status);
+        }
+      );
+      return false;
+    });
+
+    $(".send-mail").click(function () {
+      send_mail = $(this);
+      cad = send_mail.attr("content");
+      delivered_id = send_mail.attr("id");
+      //td_status = $('#tdStatus-' + delivered_id);
+      cad_split = cad.split("-");
+
+      $.post(
+        "{{=URL('admin','send_item_mail')}}",
+        {
+          user: cad_split[1],
+          item: cad_split[0],
+          action: "1",
+        },
+        function (result, status) {
+          if (status == "success") {
+            data = JSON.parse(result);
+            console.log(data);
+            if (data.ok == 1) {
+              //td_status.html(data.message);
+              alert("Documento rechazado");
+            }
+          } else {
+            alert("Ha ocurrido un error al actualizar item");
+          }
+          //console.log("Data: " + result + "\nStatus: " + status);
+        }
+      );
+      return false;
+    });
+  });
+</script>
+
+<script type="text/javascript">
+  function update_deliverable(id, action) {
+    item_comment = $("#inputComment-" + id).val();
+    td_status = $("#tdStatus-" + id);
+    a_image = $("#inputImage-" + id);
+    console.log(
+      "item: " + id + ", acción: " + action + ", comentario: " + item_comment
+    );
+
+    $.post(
+      "{{=URL('admin','change_item_status')}}",
+      {
+        item: id,
+        action: action,
+        comment: item_comment,
+      },
+      function (result, status) {
+        if (status == "success") {
+          data = JSON.parse(result);
+          if (data.ok == 0) {
+            alert(data.message);
+          } else {
+            td_status.html(data.message);
+            a_image.attr("href", data.signed);
+            alert(data.alert);
+          }
+        } else {
+          alert("Ha ocurrido un error al actualizar item");
+        }
+        //console.log("Data: " + result + "\nStatus: " + status);
+      }
+    );
+    return false;
+  }
+</script>

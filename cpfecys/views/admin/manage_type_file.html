@@ -1,0 +1,288 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+  <h1>Tipos de Archivo</h1>
+</div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{=URL('admin', 'manage_type_file')}}">Tipos de archivo</a>
+    </li>
+    {{if action['type'] == 'new':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{=URL('admin', 'manage_type_file', args=['new'])}}">Nuevo</a>
+    </li>
+    {{elif action['type'] == 'show':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_type_file', args=['show', action['item'][0]['id']])}}"
+        >Ver</a
+      >
+    </li>
+    {{elif action['type'] == 'delete':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_type_file', args=['delete', action['item'][0]['id']])}}"
+        >Eliminar</a
+      >
+    </li>
+    {{elif action['type'] == 'edit':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_type_file', args=['edit', action['item']['id']])}}"
+        >Editar</a
+      >
+    </li>
+    {{pass}}
+  </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+  <div class="col-md-4">
+    <a href="{{=URL('admin', 'manage_type_file',args=['new'])}}">
+      <button class="btn btn-primary">
+        <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+        &nbsp;Añadir Registro
+      </button>
+    </a>
+  </div>
+  <div class="col-md-7">
+    <!--<form class="form-inline my-2 my-lg-0">
+          <input class="form-control mr-lg-2" style="width:65%;" type="search" placeholder="Search" aria-label="Search">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>-->
+  </div>
+</div>
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <table class="table table-sm table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Extensiones</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {{ for typeFile in action['list']: }}
+          <tr>
+            <td>{{=typeFile['id']}}</td>
+            <td>{{=typeFile['name']}}</td>
+            <td>{{=typeFile['extension']}}</td>
+            <td>
+              <div class="btn-group">
+                <a
+                  href="{{=URL('admin', 'manage_type_file',args=['show', typeFile['id']])}}"
+                >
+                  <button class="btn btn-secondary btn-sm">
+                    <span
+                      class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                    ></span>
+                    &nbsp;Vista
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'manage_type_file',args=['edit', typeFile['id']])}}"
+                >
+                  <button class="btn btn-success btn-sm">
+                    <span
+                      class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"
+                    ></span>
+                    &nbsp;Editar
+                  </button></a
+                >
+                <a
+                  href="{{=URL('admin', 'manage_type_file',args=['delete', typeFile['id']])}}"
+                >
+                  <button class="btn btn-danger btn-sm">
+                    <span
+                      class="icon trash icon-trash glyphicon glyphicon-trash"
+                    ></span>
+                    &nbsp;Eliminar
+                  </button></a
+                >
+              </div>
+            </td>
+          </tr>
+          {{pass}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{else:}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-6 well">
+        {{if action['type'] == 'new':}}
+        <form
+          action="{{=URL('admin', 'manage_type_file', args=['new'])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="inputName"
+                value="{{if 'item' in action:}}{{=action['item']['inputName']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputExtension" class="col-sm-3 col-form-label"
+              >Extensiones</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputExtension"
+                name="inputExtension"
+                title="Ingresar valores separados por coma"
+                value="{{if 'item' in action:}}{{=action['item']['inputExtension']}}{{pass}}"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{elif action['type'] == 'show':}}
+        <div class="form-group row">
+          <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['name']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputExtension" class="col-sm-3 col-form-label"
+            >Extensiones</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['extension']}}"
+            />
+          </div>
+        </div>
+
+        <a href="{{=URL('admin', 'manage_type_file')}}">
+          <button class="btn btn-primary">
+            <span class="fa fa-arrow-circle-left"></span>
+            &nbsp;Regresar
+          </button>
+        </a>
+        {{elif action['type'] == 'delete':}}
+        <form
+          action="{{=URL('admin', 'manage_type_file', args=['delete', action['item'][0]['id']])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['name']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputExtension" class="col-sm-3 col-form-label"
+              >Extensiones</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                readonly
+                class="form-control-plaintext"
+                value="{{=action['item'][0]['extension']}}"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </form>
+        {{elif action['type'] == 'edit':}}
+        <form
+          action="{{=URL('admin', 'manage_type_file', args=['edit', action['item']['id']])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                name="inputName"
+                value="{{=action['item']['inputName']}}"
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputExtension" class="col-sm-3 col-form-label"
+              >Extensiones</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                name="inputExtension"
+                title="Ingresar valores separados por coma"
+                value="{{=action['item']['inputExtension']}}"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{pass}}
+        <br />
+        {{ if "message" in action: }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {{pass}}
+      </div>
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<style>
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
+  }
+  .table td,
+  .table th {
+    vertical-align: middle;
+  }
+</style>

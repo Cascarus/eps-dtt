@@ -1,0 +1,38 @@
+{{response.files.append(URL(r=request,c='static',f='css/fullcalendar.min.css'))}}
+{{response.files.append(URL(r=request,c='static',f='js/moment.min.js'))}}
+{{response.files.append(URL(r=request,c='static',f='js/fullcalendar.min.js'))}}
+
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <h1>{{=T('Calendario')}}</h1>
+    <a href="{{=URL('calendar_activity')}}" class="btn btn-primary" ><i class="icon-arrow-left"></i>Regresar</a>
+    <br><br><br>
+    <script type='text/javascript'>
+        jQuery(document).ready(function() {
+            var date = new Date();
+            var d = date.getDate();
+            var m = date.getMonth();
+            var y = date.getFullYear();
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,basicWeek,basicDay'
+                },
+                editable: false,
+                events: [
+                    {{for row in rows:}}
+                        {
+                            title: '{{=row.eps_activity.name}}',
+                            allDay: true,
+                            start: new Date("{{=row.eps_activity_calendar.date_assign.strftime('%B %d, %Y %H:%M:%S')}}"),
+                            end: new Date("{{=row.eps_activity_calendar.date_assign.strftime('%B %d, %Y %H:%M:%S')}}"),
+                            url: "{{=URL('activity_details',args=[row.eps_activity.id,row.eps_activity.modality, row.eps_activity_calendar.period_year])}}"
+                        },
+                    {{pass}}
+                ]
+            });
+        });
+    </script>
+    <div id='calendar'></div>
+</div>

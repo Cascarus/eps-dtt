@@ -1,0 +1,26 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>{{=T('Calendarización de Actividades')}}</h1>
+    </div>
+    <div class="col-12 mt-4">
+        {{=form}}
+    </div>
+</div>
+
+<script type='text/javascript'>
+    function checkDate (Ini, Fin, Par) {
+        var dI = Ini.split("-");
+        var dF = Fin.split("-");
+        var dP = Par.split("-");
+
+        var I = new Date(dI[0], dI[1] - 1, dI[2]);
+        var F = new Date(dF[0], dF[1] - 1, dF[2]);
+        var P = new Date(dP[0], dP[1] - 1, dP[2]);
+
+        if((P < I || P > F)) {
+            alert("La Fecha asignada para la actividad se encuentra fuera del rango permitido.");
+        }
+    }
+</script>

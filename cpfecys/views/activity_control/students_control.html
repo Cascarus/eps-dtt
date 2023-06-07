@@ -1,0 +1,472 @@
+{{extend 'dashboard.html'}}
+{{step_count=0}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h3>{{=name}}</h3>
+            <h4>{{=nameP}}</h4>
+        </div>
+        <div class="col-12 text-right mb-4">
+            <a class="btn btn-info mb-3" title="{{=T('General Report of Activities')}}"
+                href="{{=URL('activity_control', 'general_report_activities',vars=dict(project = request.vars['project'], period = year, type='class'))}}">
+                <i class="fa fa-file" aria-hidden="true"></i>
+                {{=T('Class Report')}}
+            </a>
+            <a class="btn btn-info mb-3" title="{{=T('General Report of Activities')}}"
+                href="{{=URL('activity_control', 'general_report_activities',vars=dict(project = request.vars['project'], period = year, type='lab'))}}">
+                <i class="fa fa-file-o" aria-hidden="true"></i>
+                {{=T('Laboratory Report')}}
+            </a>
+        </div>
+    <div class="col-12 col-md-3">
+      <!--CLASS WEIGHTING DIV-->
+      <div id="weighting_div">
+        <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button"
+          class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting">
+          <i class="fa fa-question-circle-o" aria-hidden="true"></i>
+        </a>
+
+        <div id="h_weighting_h" class="navbar-inner">
+          <div id="weighting_menu"></div>
+        </div>
+
+        <div id="weighting_inside" class="well">
+          {{exception_query = db(db.course_laboratory_exception.project == request.vars['project']).select().first()}}
+          {{if exception_query is None:}}
+          {{exception_s_var = False}}
+          {{exception_t_var = False}}
+          {{else:}}
+          {{exception_t_var = exception_query.t_edit_lab}}
+          {{exception_s_var = exception_query.s_edit_course}}
+          {{pass}}
+
+          {{request.vars['type']="course"}}
+          {{no_menu=True}}
+          {{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
+          {{if str(year) == str(cpfecys.current_year_period().id):}}
+          {{no_menu=False}}
+          {{pass}}
+          <!--Emarquez control periodos-->
+          {{if cpfecys.is_semestre(year)==False:}}
+          {{no_menu=False}}
+          {{pass}}
+          {{pass}}
+
+          {{#-------------------------------------------Course ended---------------------------------------------------------}}
+          {{course_ended_var = db((db.course_ended.project==request.vars['project']) & (db.course_ended.period==year) ).select().first() }}
+
+          {{if course_ended_var != None:}}
+          {{if course_ended_var.finish == True:}}
+          {{no_menu=True}}
+          {{pass}}
+          {{pass}}
+
+          {{total_var2=0}}
+          {{for course_act_var in db((db.course_activity_category.semester==year) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==False)).select():}}
+          {{total_var2 = float(total_var2) + float(course_act_var.grade)}}
+          {{pass}}
+          <center class="table-responsive">
+            {{if float(total_var2) == 100:}}
+            <table class="table table-striped table-bordered">
+              <tr>
+                <th>
+                  {{=T('Category')}}
+                </th>
+                <th>
+                  {{=T('Grade')}}
+                </th>
+                <th title="{{=T('Average Grades')}}">
+                  {{=T('AG')}}
+                </th>
+                <th title="{{=T('Teacher Permition')}}">
+                  {{=T('TP')}}
+                </th>
+              </tr>
+              {{for course_act_var in db((db.course_activity_category.semester==year) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==False)).select():}}
+              <tr>
+                <td>
+                  {{=course_act_var.category.category}}
+                </td>
+                <td>
+                  {{=course_act_var.grade}}
+                </td>
+                <td>
+                  {{if course_act_var.specific_grade == True:}}
+                  {{=T('No')}}
+                  {{else:}}
+                  {{=T('Yes')}}
+                  {{pass}}
+                </td>
+                <td>
+                  {{if course_act_var.teacher_permition == True:}}
+                  {{=T('Yes')}}
+                  {{else:}}
+                  {{=T('No')}}
+                  {{pass}}
+                </td>
+              </tr>
+              {{pass}}
+              <tr>
+                <td style="background-color:#eee;">
+                  {{=T("Total")}}
+                </td>
+                <td style="background-color:#eee;">
+                  <b>
+                    <font color="green">100.00</font>
+                  </b>
+                </td>
+                <td style="background-color:#eee;">
+                </td>
+                <td style="background-color:#eee;">
+                </td>
+              </tr>
+            </table>
+            {{else:}}
+            {{if no_menu == False:}}
+            <b>
+              <font color="red">{{=T('Weighting was not created or is incorrect')}}</font>
+            </b>
+            <br>
+            <a id="myButton" class="btn btn-warning"
+              href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = year, f_view='weighting_edit', type = request.vars['type']))}}">
+              <span class="icon-plus-sign"></span>
+              {{=T('Create Weighting')}}
+            </a>
+            {{else:}}
+            <b>
+              <font color="red">{{=T('Weighting was not created')}}</font>
+            </b>
+            {{pass}}
+            {{pass}}
+
+          </center>
+        </div>
+      </div>
+      <!--FINISH CLASS WEIGHTING DIV-->
+      <!--LAB WEIGHTING DIV-->
+      <div id="weighting_lab_div" style=" width:100%;">
+
+        <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button"
+          class="btn btn-warning" data-toggle="modal" data-target="#help_modal_weighting">
+          <span class="icon-black icon-question-sign"></span>
+        </a>
+
+
+        <a type="button" class="close" title="{{=T('View in full page the weighting')}}" aria-hidden="true"
+          href="{{=URL('activity_control', 'students_control_full',vars=dict( year = year, type='lab', project = request.vars['project'], f_view='weighting'))}}">
+          <span class="icon-black icon-fullscreen"></span>
+        </a>
+
+        {{request.vars['type']="lab"}}
+        {{no_menu=True}}
+        {{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or (auth.has_membership('Teacher') and request.vars['type'] == "course"  and assigned_to_project == True) or (auth.has_membership('Student') and request.vars['type'] == "lab"  and assigned_to_project == True) or (auth.has_membership('Student')  and request.vars['type'] == "course" and exception_s_var == True  and assigned_to_project == True) or (auth.has_membership('Teacher')  and request.vars['type'] == "lab" and exception_t_var == True  and assigned_to_project == True):}}
+        {{if str(year) == str(cpfecys.current_year_period().id):}}
+        {{no_menu=False}}
+        {{pass}}
+        <!--Emarquez control periodos-->
+        {{if cpfecys.is_semestre(year)==False:}}
+        {{no_menu=False}}
+        {{pass}}
+        {{pass}}
+        {{#=db._lastsql}}
+
+        <div id="h_weighting_lab_h" class="navbar-inner"
+          {{if (auth.has_membership('Student') and no_menu == False):}}
+          data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá gestionar la ponderación del laboratorio. El menú le mostrara las siguientes acciones:
+      <br><b>A.  Crear Nueva Ponderación:</b> Le permite crear una nueva ponderación del laboratorio.
+      <br><b>B.  Obtener Ponderación Anterior:</b> Le permite obtener una ponderación del laboratorio de un semestre anterior. 
+      <br><b>C.  Editar Ponderación:</b> Luego de haber creado la ponderación del laboratorio correctamente podrá editar la misma si desea hacer algún tipo de cambio.
+      <br><b>D.  Solicitar Cambio:</b> Si la fecha límite de ingreso se ha cumplido se le mostrara la opción solicitar cambio. Cualquier cambio que desee realizar deberá ser aprobado por el catedrático del curso o por un administrador del sistema.
+      " {{pass}}>
+          <div id="weighting_lab_menu">
+
+          </div>
+        </div>
+
+
+        <div id="weighting_lab_inside" class="well" style="overflow:auto;  background-color:white; "
+          {{if (auth.has_membership('Student') and no_menu == False):}}
+          data-step="{{step_count+=1}}{{=step_count}}"
+          data-intro="Luego de crear la ponderación del laboratorio correctamente se le mostrará la ponderación del mismo en esta sección. Las columnas a mostrar son <b>categoría</b>, <b>nota</b> y si las actividades dentro de esta categoría serán notas promediadas <b>(P.N)</b>."
+          {{elif (auth.has_membership('Teacher') or auth.has_membership('Academic')):}}
+          data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección se le mostrará la ponderación del laboratorio. Las columnas a mostrar son <b>categoría</b>, <b>nota</b> y si las actividades dentro de esta categoría serán notas promediadas <b>(P.N)</b>.
+          " {{pass}}>
+
+
+          {{#-------------------------------------------Course ended---------------------------------------------------------}}
+          {{course_ended_var = db((db.course_ended.project==request.vars['project']) & (db.course_ended.period==year) ).select().first() }}
+
+          {{if course_ended_var != None:}}
+          {{if course_ended_var.finish == True:}}
+          {{no_menu=True}}
+          {{pass}}
+          {{pass}}
+          {{total_var2=0}}
+          {{for course_act_var in db((db.course_activity_category.semester==year) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==True)).select():}}
+          {{total_var2 = float(total_var2) + float(course_act_var.grade)}}
+          {{pass}}
+          <center class="table-responsive">
+            {{if float(total_var2) == 100:}}
+            <table class="table table-striped table-bordered">
+              <tr>
+                <th>
+                  {{=T('Category')}}
+                </th>
+                <th>
+                  {{=T('Grade')}}
+                </th>
+                <th title="{{=T('Average Grades')}}">
+                  {{=T('AG')}}
+                </th>
+
+              </tr>
+              {{for course_act_var in db((db.course_activity_category.semester==year) & (db.course_activity_category.assignation==request.vars['project']) & (db.course_activity_category.laboratory==True)).select():}}
+              <tr>
+                <td>
+                  {{=course_act_var.category.category}}
+                </td>
+                <td>
+                  {{=course_act_var.grade}}
+                </td>
+                <td>
+                  {{if course_act_var.specific_grade == True:}}
+                  {{=T('No')}}
+                  {{else:}}
+                  {{=T('Yes')}}
+                  {{pass}}
+                </td>
+
+              </tr>
+              {{pass}}
+              <tr>
+                <td style="background-color:#eee;">
+                  {{=T("Total")}}
+                </td>
+                <td style="background-color:#eee;">
+                  <b>
+                    <font color="green">100.00</font>
+                  </b>
+                </td>
+                <td style="background-color:#eee;">
+                </td>
+              </tr>
+            </table>
+            {{else:}}
+            {{if no_menu == False:}}
+            <b>
+              <font color="red">{{=T('Weighting was not created or is incorrect')}}</font>
+            </b>
+
+            {{if auth.has_membership('Student'):}}
+            {{from datetime import datetime}}
+            {{enddate=None}}
+            {{#emarquez: PV: modificacion para adaptar la restriccion de fechas a periodos variables}}
+            {{if cpfecys.is_semestre(year)==True:}}
+            {{for date_var in db((db.student_control_period.period_name==nameP)).select():}}
+            {{var_exception = db((db.course_limit_exception.project == request.vars['project']) & (db.course_limit_exception.date_finish > datetime.now())).select().first()}}
+            {{if var_exception != None:}}
+            {{var_date_finish = var_exception.date_finish}}
+            {{else:}}
+            {{var_date_finish = date_var.date_finish}}
+            {{pass}}
+            {{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
+            {{enddate=var_date_finish}}
+            {{pass}}
+            {{pass}}
+            {{else:}}
+            {{for date_var in db((db.period_detail.period==cpfecys.get_period_from_periodyear(year))).select():}}
+            {{var_exception = db((db.course_limit_exception_period.project == request.vars['project']) & (db.course_limit_exception_period.period == cpfecys.get_period_from_periodyear(year) ) & (db.course_limit_exception_period.date_finish > datetime.now())).select().first()}}
+            {{if var_exception != None:}}
+            {{var_date_finish = var_exception.date_finish}}
+            {{else:}}
+            {{var_date_finish = date_var.date_finish}}
+            {{pass}}
+            {{if datetime.now() > date_var.date_start and datetime.now() < var_date_finish:}}
+            {{enddate=var_date_finish}}
+            {{pass}}
+            {{pass}}
+            {{pass}}
+
+
+            {{if enddate != None:}}
+            <br>
+            <font color="red">{{=T('Deadline for entry')}}: {{=enddate}}</font><br>
+            <br>
+            <a id="myButton" class="btn btn-warning"
+              href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = year, f_view='weighting_edit', type = request.vars['type']))}}">
+              <span class="icon-plus-sign"></span>
+              {{=T('Create Weighting')}}
+            </a>
+            {{pass}}
+            {{else:}}
+            <br>
+            <a id="myButton" class="btn btn-warning"
+              href="{{=URL('activity_control', 'students_control_full',vars=dict( project = request.vars['project'], year = year, f_view='weighting_edit', type = request.vars['type']))}}">
+              <span class="icon-plus-sign"></span>
+              {{=T('Create Weighting')}}
+            </a>
+            {{pass}}
+            {{else:}}
+            <b>
+              <font color="red">{{=T('Weighting was not created')}}</font>
+            </b>
+            {{pass}}
+            {{pass}}
+
+          </center>
+        </div>
+      </div>
+      <!--FINISH LAB WEIGHTING DIV-->
+    </div>
+    <div class="col-12 col-md-9">
+      <!--Menu of activity DIV Right-->
+      <a type="button" class="close" title="{{=T('Help')}}" aria-hidden="true" role="button"
+            class="btn btn-warning" data-toggle="modal" data-target="#help_modal_activity">
+            <span class="icon-black icon-question-sign"></span>
+          </a>
+          <!--Menu of activity DIV Right-->
+          <!--Menu of activity DIV left-->
+          <div id="h_activity_h" class="navbar-inner">
+            <div id="activity_menu"></div>
+          </div style="width:100%;">
+          <!--Menu of the activity DIV lett-->
+          <!--Cuadro donde sale la información-->
+          <div id="activity_insideMaster" class="well" style=" background-color:white;  ">
+            <ul id="myTabActivities" class="nav nav-tabs">
+              <li class="nav-item" id="classActivities"><a class="nav-link active" href="#" data-toggle="tab"
+                  {{if (auth.has_membership('Teacher')) or ((auth.has_membership('Student') and no_menu == False ) ):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                        Al seleccionar la pestaña <b>Actividades de Clase</b> se le mostrara la planificación de la clase en la cual podrá gestionar las notas de cada actividad.
+                        " {{elif (auth.has_membership('Academic')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                        Al seleccionar la pestaña <b>Actividades de Clase</b> se le mostrara la planificación de la clase en la cual podrá visualizar las notas obtenidas en cada una de las actividades.
+                        " {{pass}}>{{=T('Class Activities')}}</a></li>
+              <li class="nav-item" id="laboratoryActivities"><a class="nav-link" href="#" data-toggle="tab"
+                  {{if (auth.has_membership('Teacher')) or ((auth.has_membership('Student') and no_menu == False) ):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                        Al seleccionar la pestaña <b>Actividades de Laboratorio</b>, se le mostrara la planificación del laboratorio en la cual podrá gestionar las notas de cada actividad.
+                        " {{elif (auth.has_membership('Academic')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                        Al seleccionar la pestaña <b>Actividades de Laboratorio</b>, se le mostrara la planificación del laboratorio en la cual podrá visualizar las notas obtenidas en cada una de las actividades.
+                        " {{pass}}>{{=T('Laboratory Activities')}}</a></li>
+              <li class="nav-item" id="Activitywithoutmetric"><a class="nav-link" href="#" data-toggle="tab"
+                  {{if (auth.has_membership('Teacher')) or ((auth.has_membership('Student') and no_menu == False) ):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                        Al seleccionar la pestaña <b>Actividades sin métrica</b>, podrá gestionar todas aquellas actividades que no tengan una nota asociada.
+                        " {{elif (auth.has_membership('Academic')):}}
+                  data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                        Al seleccionar la pestaña <b>Actividades sin métrica</b>, podrá visualizar todas aquellas actividades que no tengan una nota asociada.
+                        " {{pass}}>{{=T('Activity without metric')}}</a></li>
+              {{if ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project==True):}}
+              <li class="nav-item" id="assignedactivities"><a class="nav-link" href="#" data-toggle="tab"
+                  {{if auth.has_membership('Teacher'):}} data-step="{{step_count+=1}}{{=step_count}}" data-intro="
+                          Al seleccionar la pestaña <b>Actividades Asignadas</b>, podrá gestionar todas aquellas actividades que le quiere asignar al tutor académico.
+                          " {{elif auth.has_membership('Student'):}} data-step="{{step_count+=1}}{{=step_count}}"
+                  data-intro="
+                          Al seleccionar la pestaña <b>Actividades Asignadas</b>, podrá visualizar todas aquellas actividades que el catedratico le haya solicitado realizar.
+                          " {{pass}}>{{=T('Assigned Activities')}}</a></li>
+              {{pass}}
+            </ul>
+            <div class="row">
+              <div class="col-12">
+                <div id="activity_inside" class="well">
+                  <div class="text-center">{{=T('Loading')}}...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--Cuadro donde sale la información-->
+      </div>
+      <!--FINISH CONTROL DIV-->
+    </div>
+  </div>
+  <!--Help modal weighting -->
+  <div class="modal fade" id="help_modal_weighting" tabindex="-1" role="dialog" aria-labelledby="help_modal_weightingLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="help_modal_weightingLabel">{{=T('Weighting help')}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{=T('In this area you can manage the weighting of the course / lab. The actions that can be performed are: Create weighting, Get weighting, Edit weighting and request a change of weighting (academic supervisor).')}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Finish help modal weighting-->
+
+  <!--Help modal activity -->
+  <div class="modal fade" id="help_modal_activity" tabindex="-1" role="dialog" aria-labelledby="help_modal_activityLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="help_modal_activityLabel">Modal title</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{=T('In this area you can manage the activities of the course / lab. The actions that can be performed are: Create activity, Edit activity and request a change of activity (academic supervisor).')}}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Finish help modal activity-->
+  <div id="modals">
+  </div>
+
+  <div id="modals_activity">
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $("#h_weighting_v").hide();
+    $("#h_weighting_lab_v").hide();
+    $("#h_control_v").hide();
+    $("#weighting_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="course", year = year, project = project))}}');
+    $("#weighting_lab_menu").load('{{=URL('activity_control','control_weighting.html',vars=dict(operation="menu_update", type="lab",  year = year, project = project))}}');
+
+    $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update", year = year, project = project, type="class"))}}');
+    $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",year = year, project = project, type="class"))}}');
+
+    //Labels of class and lab activities
+    $("#classActivities").click(function () {
+      jQuery('#activity_inside').empty();
+      jQuery('#activity_inside').append("<center>{{=T('Loading')}}...</center>");
+      $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update", year = year, project = project, type="class"))}}');
+      $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",year = year, project = project, type="class"))}}');
+    });
+
+    $("#laboratoryActivities").click(function () {
+      jQuery('#activity_inside').empty();
+      jQuery('#activity_inside').append("<center>{{=T('Loading')}}...</center>");
+      $("#activity_inside").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="div_update",year = year, project = project, type="lab"))}}');
+      $("#activity_menu").load('{{=URL('activity_control','control_activity.html',vars=dict(operation="menu_update",year = year, project = project, type="lab"))}}');
+    });
+
+    $("#Activitywithoutmetric").click(function () {
+      jQuery('#activity_inside').empty();
+      jQuery('#activity_inside').append("<center>{{=T('Loading')}}...</center>");
+      $("#activity_inside").load('{{=URL('activity_control','control_activity_without_metric.html',vars=dict(operation="div_update",year = year, project = project))}}');
+      $("#activity_menu").load('{{=URL('activity_control','control_activity_without_metric.html',vars=dict(operation="menu_update",year = year, project = project))}}');
+    });
+
+    $("#assignedactivities").click(function () {
+      jQuery('#activity_inside').empty();
+      jQuery('#activity_inside').append("<center>{{=T('Loading')}}...</center>");
+      $("#activity_inside").load('{{=URL('activity_control','control_assigned_activity.html',vars=dict(operation="div_update",year = year, project = project))}}');
+      $("#activity_menu").load('{{=URL('activity_control','control_assigned_activity.html',vars=dict(operation="menu_update",year = year, project = project))}}');
+    });
+  });
+</script>

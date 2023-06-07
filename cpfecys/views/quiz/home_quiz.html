@@ -1,0 +1,108 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+	<div class="col-12">
+		{{if permiso:}}
+			<div class="row-fluid">
+				{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var):}}
+					<div class="well">
+				{{else:}}
+					<div class="row">
+				{{pass}}
+					{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var):}}
+						<div class="col-12 text-center">
+							<h2>{{=T('Academic Control')}}</h2>
+						</div>
+						<div class="col-12 text-center">
+							<h3>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</h3>
+						</div>
+					{{else:}}
+						<div class="col-12 text-center">
+							<h2>Menu Evaluaciones</h2>
+						</div>
+						<div class="col-12">
+							<h3>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</h3>
+						</div>
+					{{pass}}
+				</div>
+				<div class="col-12 mb-4">
+					<nav class="navbar navbar-light bg-light">
+						<a class="navbar-brand" href="#">Gestion de Evaluaciones tipo cuestionario</a>
+					</nav>
+				</div>
+				<!--el curso es: {{=course}} el perido es: {{=period}}-->
+				<div class="well text-center" id="div_seleccionar_tipo_pregunta">
+					<div class="row">
+						<div class="col-4">
+							<a href="{{=URL('quiz', 'create_quiz', vars=dict(project = course, period=period))}}" class="btn btn-success"> 
+								<i class="fa fa-file-text-o" aria-hidden="true"></i> Crear
+							</a>
+						</div>
+						<div class="col-4">
+							<a href="{{=URL('quiz', 'consult_quiz', vars=dict(project = course, period=period))}}" class="btn btn-primary">
+								<i class="fa fa-search" aria-hidden="true"></i> Consultar
+							</a>
+						</div>
+						<div class="col-4">
+							<a href="{{=URL('quiz', 'reportes', vars=dict(project = course, period=period))}}" class="btn btn-warning">
+								<i class="fa fa-bar-chart" aria-hidden="true"></i> Reportes
+							</a>
+						</div>
+					</div>	
+				</div>
+			</div>
+		{{else:}}
+			<div class="navbar" data-step=1 data-intro="Div detalle del quiz">
+				<div class="navbar-inner">
+					<a style="cursor:pointer;">
+						<center>
+							<h4>ACCESO DENEGADO</h4>
+						</center>
+					</a>
+				</div>
+			</div>
+			<div class="well" id="div_metainfo_quiz">
+				<table style="width:100%;">
+					<tr>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+						<td style="width:10%;"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td colspan="2" style="text-align:center;">
+							<img src="{{=URL('static','images')}}/ACCESODENEGADO.png" width="100%">
+						</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td colspan="7"></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td colspan="6">
+							<label>Usted no tiene permisos para ingresar a este recurso, este intento de acceso quedo
+								registrado y sera reportado.</label>
+						</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</table>
+			</div>
+		{{pass}}
+		</div>
+	</div>
+</div>

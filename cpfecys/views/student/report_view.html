@@ -1,0 +1,338 @@
+{{extend 'dashboard.html'}}
+<div class="row-fluid">
+    <div class="well">
+        <a class="btn btn-success yesgraph" href="#" onclick="window.print();">
+            <i class="fa fa-print"></i>
+            Imprimir:
+            <small>{{=report.report_restriction['name']}}</small>
+        </a>
+    </div>
+</div>
+<div style="border:solid #ddd 1px;" class="noborder" >
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">
+                {{=report.report_restriction['name']}}
+            </h1>
+            <div class="p-3">
+                <strong>Estudiante: </strong>{{=report.assignation.assigned_user.username}} - {{=report.assignation.assigned_user.last_name}}, {{=report.assignation.assigned_user.first_name}}<br />
+                <strong>Proyecto: </strong> {{=report.assignation.project.name}}<br />
+                <strong>Jefe de proyecto:</strong>
+                    {{if teacher:}}
+                        {{=teacher.username}} - {{=teacher.first_name}} {{=teacher.last_name}}
+                    {{else:}}
+                        Sin asignar
+                    {{pass}}
+                    <br />
+                <strong>Área: </strong> {{=report.assignation.project.area_level.name}}<br />
+                {{period_variable = db(db.period_year.id == report.assignation.period).select().first()}}
+                <strong>Periodo: </strong> {{=T(period_variable.period.name)}} - {{=period_variable.yearp}}<br />
+            </div>
+        </div>
+    </div>
+    <hr />
+    {{if report.heading is not None:}}
+        <!-- Display Helper -->
+        {{inc_vars = dict(
+                        editable=False,
+                        edit_action='',
+                        delete_action='',
+                        content=MARKMIN(report.heading, markmin_settings)
+                    )
+        }}
+        {{include 'include/display-report-header.html'}}
+        <!-- //Display Helper -->
+    {{pass}}
+    <div class="container">
+        <div class="row-fluid breakpage">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-tasks"></span>
+                    Registro de actividades
+                </h1>
+                <span>
+                    <span><strong>Total de anomalías:</strong> {{=anomalies}} </span> |
+                    {{if report.assignation.project.area_level.name == 'DTT Tutor Académico' and (report.status.name == 'Draft' or report.status.name == 'Recheck'):}}
+                        <span><strong>Total de actividades registradas:</strong> {{=(len(activities_wm) + len(activities_m))}} </span>
+                    {{else:}}
+                        <span><strong>Total de actividades registradas:</strong> {{=len(logs)}} </span>
+                    {{pass}}
+                </span>
+            </div>
+        </div>
+        <div class="row">
+            {{if report.assignation.project.area_level.name == 'DTT Tutor Académico' and (report.status.name == 'Draft' or report.status.name == 'Recheck'):}}
+                {{for log in logs:}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    anomaly=(log.log_type['name'] == 'Anomaly'),
+                                    log_type=T(log.log_type['name']),
+                                    date=log.entry_date,
+                                    edit_action='',
+                                    delete_action='',
+                                    content=MARKMIN(log.description, markmin_settings)
+                                )
+                    }}
+                    {{include 'include/display-report-log.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+
+                <!--ACTIVITIES WITHOUT METRIC-->
+                {{for awm in activities_wm:}}
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    anomaly=False,
+                                    log_type=T('Activity'),
+                                    date=awm.date_start,
+                                    edit_action=None,
+                                    delete_action=None,
+                                    content=MARKMIN(f'Nombre: "{awm.name}" Descripción: "{awm.description}"', markmin_settings)
+                                )
+                    }}
+                    {{include 'include/display-report-log.html'}}
+                {{pass}}
+                <!--ACTIVITIES WITHOUT METRIC-->
+
+                <!--ACTIVITIES WITH METRIC-->
+                {{for awm in activities_m:}}
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    anomaly=False,
+                                    log_type=T('Activity'),
+                                    date=awm[0],
+                                    edit_action=None,
+                                    delete_action=None,
+                                    content=MARKMIN(awm[1], markmin_settings)
+                                )
+                    }}
+                    {{include 'include/display-report-log.html'}}
+                {{pass}}
+                <!--ACTIVITIES WITH METRIC-->
+            {{else:}}
+                {{for log in logs:}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    anomaly=(log.log_type['name'] == 'Anomaly'),
+                                    log_type=T(log.log_type['name']),
+                                    date=log.entry_date,
+                                    edit_action='',
+                                    delete_action='',
+                                    content=MARKMIN(log.description, markmin_settings)
+                                )
+                    }}
+                    {{include 'include/display-report-log.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{pass}}
+        </div>
+        <hr />
+        <div class="row-fluid breakpage">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-adjust"></span>
+                    <strong>Registro de actividades con métricas</strong>
+                </h1>
+                <span>
+                    {{if report.assignation.project.area_level.name == 'DTT Tutor Académico' and (report.status.name == 'Draft' or report.status.name == 'Recheck'):}}
+                        <strong>Total de registros con métricas:</strong> {{=len(activities_m)}}
+                    {{else:}}
+                        <span><strong>Total de registros con métricas:</strong> {{=len(metrics)}}</span>
+                    {{pass}}
+                </span>
+            </div>
+        </div>
+        <div class="row-fluid nofirstpagebreak">
+            {{if report.assignation.project.area_level.name == 'DTT Tutor Académico' and (report.status.name == 'Draft' or report.status.name == 'Recheck'):}}
+                {{for metric in activities_m:}}
+                    {{print('a', metric)}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    metric=metric,
+                                    edit_action=None,
+                                    delete_action=None
+                                )
+                    }}
+                    {{include 'include/display-report-metric.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{else:}}
+                {{for metric in metrics:}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    metric=metric,
+                                    edit_action='',
+                                    delete_action=''
+                                )
+                    }}
+                    {{include 'include/display-report-metric.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{pass}}
+            {{for final in final_r:}}
+                <!-- Display Helper -->
+                {{inc_vars = dict(
+                                editable=False,
+                                final=final,
+                                edit_action=f'final-edit-activity-{final.id}',
+                                delete_action=f'delete-final-{final.id}'
+                            )
+                }}
+                {{include 'include/display-final-report.html'}}
+                <!-- //Display Helper -->
+            {{pass}}
+        </div>
+        {{if report.hours is not None:}}
+            <div class="row-fluid">
+                <div style="padding:15px;">
+                    <h1>
+                        <span class="icon-time"></span>
+                        <strong>Horas completadas</strong>
+                    </h1>
+                </div>
+            </div>
+            <div class="row-fluid breakpage">
+                <!-- Accomplished Hours display Helper-->
+                {{inc_vars = dict(
+                                editable=False,
+                                id='display-report-hours',
+                                reports=assignation_reports,
+                                edit_action='',
+                                delete_action=''
+                            )
+                }}
+                {{include 'include/display-report-hours.html'}}
+                <!-- //Accomplished Hours display Helper-->
+            </div>
+        {{pass}}
+        <hr />
+        {{if not (report.desertion_started is None):}}
+            <div class="row-fluid breakpage">
+                <div style="padding:15px;">
+                    <h1>
+                        <span class="icon-user"></span>
+                        <strong>Registro de deserciones</strong>
+                    </h1>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <!-- Desertion Display Helper -->
+                {{inc_vars = dict(
+                                editable=False,
+                                id='display-desertion',
+                                reports=assignation_reports,
+                                desertion_started=report.desertion_started,
+                                desertion_gone=report.desertion_gone,
+                                desertion_continued=report.desertion_continued,
+                                edit_action='',
+                                delete_action=''
+                            )
+                }}
+                {{include 'include/display-report-desertion.html'}}
+                <!-- //Desertion Display Helper -->
+            </div>
+        {{pass}}
+        <div class="row-fluid breakpage">
+            <div style="padding:15px;">
+                <h1>
+                    <span class="icon-time"></span>
+                    Actividades futuras
+                </h1>
+            </div>
+        </div>
+        <div class="row-fluid">
+            {{if report.assignation.project.area_level.name == 'DTT Tutor Académico' and (report.status.name == 'Draft' or report.status.name == 'Recheck'):}}
+                {{for log in activities_f:}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    date=log.date_start,
+                                    edit_action=None,
+                                    delete_action=None,
+                                    content=MARKMIN(f'Nombre: "{log.name}" Descripción: "{log.description}"', markmin_settings)
+                                )
+                    }}
+                    {{include 'include/display-report-log-future.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{else:}}
+                {{for log in report.log_future.select():}}
+                    <!-- Display Helper -->
+                    {{inc_vars = dict(
+                                    editable=False,
+                                    date=log.entry_date,
+                                    edit_action='',
+                                    delete_action='',
+                                    content=MARKMIN(log.description, markmin_settings)
+                                )
+                    }}
+                    {{include 'include/display-report-log-future.html'}}
+                    <!-- //Display Helper -->
+                {{pass}}
+            {{pass}}
+        </div>
+    </div>
+    {{if not (report.footer is None):}}
+        <!-- Display Helper footer-->
+        {{inc_vars = dict(
+                        editable=False,
+                        edit_action='',
+                        delete_action='',
+                        content=MARKMIN(report.footer, markmin_settings)
+                    )
+        }}
+        {{include 'include/display-report-header.html'}}
+        <!-- //Display Helper -->
+    {{pass}}
+</div>
+
+<!-- Additional Scripts for MARKMIN -->
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts-10.3.3/code/highcharts.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts-10.3.3/code/modules/data.js"></script>
+<script type="text/javascript" src="{{=URL('static','js')}}/highcharts-10.3.3/code/modules/exporting.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup2')}}/markitup/jquery.markitup.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup2')}}/markitup/sets/default/set.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup2')}}/markitup/skins/markitup/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup2')}}/markitup/sets/default/style.css"/>
+
+<!-- Enable Markmin in textarea -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('textarea').css('width','500px').css('height','200px').markItUp(mySettings);
+        $('h1').each(function(){
+            if($(this).html() == 'Contenido'){
+            $(this).addClass('noprint');
+            }
+        });
+        var i = 0;
+        $('.well.span12 h2').each(function(){
+            if(
+                $(this).html() == 'PRACTICA' || $(this).html() == 'HOJA DE TRABAJO' 
+                || $(this).html() == 'TAREA' || $(this).html() == 'EXAMEN FINAL'
+                || $(this).html() == 'OTRA ACTIVIDAD' || $(this).html() == 'Reporte Final de Semestre'
+            ) {
+                if(i > 0) {
+                    $(this).parent().parent().addClass('breakpage');
+                    i++;
+                }
+            }
+        });
+        $('.span12 h1').each(function(){
+            if($(this).html() == 'Conclusiones'){
+                if(i > 0)
+                    $(this).parent().parent().parent().addClass('breakpage');
+                    console.log("adentro")
+                    i++;
+            }
+        });
+        $('h1').each(function(){
+            if($(this).html() == 'Introducción'){
+                    $(this).addClass('breakpage');
+            }
+        });
+    });
+</script>
+<!-- //Enable Markmin in textarea -->

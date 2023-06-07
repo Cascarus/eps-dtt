@@ -1,0 +1,45 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+  <div class="col-12 text-center">
+    <h1>Validación de Actividades Digitales</h1>
+  </div>
+  <div class="col-12 mt-4">
+    <div class="tabbable">
+      {{=form}}
+      {{if rows_activity:}}
+          <ul class="nav nav-tabs">
+            {{for item in rows_activity:}}
+                  {{if request.args:}}
+                      {{if str(request.args[2]) == str(item.id):}}
+                              <li class="nav-item" title="{{=str(item.description)}}">
+                                <a class="nav-link active" href="{{=URL(args=[request.vars.modality, request.vars.period, item.id])}}">
+                                    {{=str(item.name)}}
+                                </a>
+                              </li>
+                      {{else:}}
+                              <li class="nav-item" title="{{=str(item.description)}}">
+                                <a class="nav-link" href="{{=URL(args=[request.vars.modality, request.vars.period, item.id])}}">
+                                    {{=str(item.name)}}
+                                </a>
+                              </li>
+                      {{pass}}
+                  {{else:}}
+                      <li class="nav-item" title="{{=str(item.description)}}">
+                        <a class="nav-link" href="{{=URL(args=[request.vars.modality, request.vars.period, item.id])}}">
+                            {{=str(item.name)}}
+                        </a>
+                      </li>
+                  {{pass}}
+            {{pass}}
+          </ul>
+          <div class="tab-content">
+              <div class="tab-pane active" >
+                {{if form1:}}
+                    {{=form1}}
+                {{pass}}
+              </div>
+          </div>
+      {{pass}}   
+      </div>
+  </div>
+</div>

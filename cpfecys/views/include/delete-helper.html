@@ -1,0 +1,24 @@
+<!-- Start->Question Helper-->
+<div id="{{=inc_vars['id']}}" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="aria-{{=inc_vars['id']}}" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="aria-{{=inc_vars['id']}}">{{=inc_vars['title']}}</h3>
+                <button type="button" class="btn-secondary" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+           <div class="modal-body">
+               <p>{{=inc_vars['content']}}</p>
+           </div>
+           <div class="modal-footer">
+               <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+               <a class="btn {{=inc_vars['_class']}}"
+                  href="{{=inc_vars['url']}}">
+                   {{=inc_vars['action']}}
+               </a>
+           </div>
+        </div>
+    </div>
+</div>
+<!-- End->Question Helper-->

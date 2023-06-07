@@ -1,0 +1,29 @@
+{{extend 'dashboard.html'}}
+
+<div>
+	<a href="{{=URL('activity_control', 'general_report_activities', vars=dict(project = project.id, period = year.id, type = 'class', op='3'))}}" class="btn btn-primary"><i class="icon-arrow-left"></i> 
+		{{=T('Back')}}
+	</a>
+</div>
+
+<h2>
+	{{=T('Second Recovery Test')}}
+	<br>
+	<small>
+		{{=project.name}} - {{=T(year.period.name)}} {{=str(year.yearp)}}
+    </small>
+</h2>
+
+{{=grid}}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#course_second_recovery_test_carnet").find('option').remove().end();
+		var lista = document.getElementById("course_second_recovery_test_carnet");
+		lista.options.add(new Option("", ""));
+		
+		{{for studentsOnly in students:}}
+			lista.options.add(new Option({{=str(studentsOnly.carnet.carnet)}}, {{=studentsOnly.carnet}}));
+		{{pass}}
+	});
+</script>

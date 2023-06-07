@@ -1,0 +1,129 @@
+{{if request.vars['operation'] == "mails_list":}}
+	<table class="table table-bordered" >
+		{{
+			for a in range(len(mails) - 1, -1, -1):	
+                #SHOW JUST EMAILS SENDED TO ME
+				mine_var = False
+				var_query = db.notification_log4((db.notification_log4.register == mails[a].id) & (db.notification_log4.username == auth.user.username))
+	            if var_query != None:
+	                mine_var = True
+	            pass
+				if mine_var:
+		}}
+					<tr bgcolor="#F2F2F2">
+						<td  style="height:10px;" >
+							<table style="width:100%;" class="table table-bordered">
+								{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id)).select(db.read_mail.id).first() == None:}}
+									<tr>
+								{{else:}}
+									<tr bgcolor="#F2F2F2">
+								{{pass}}
+								<td style="width:40%;">
+									<span class="icon-envelope"></span> &nbsp;
+									<a style="cursor:pointer;" onclick="view_mail({{=mails[a].id}}, '{{=request.vars['project_id']}}');" role="button" href="#mailModal" data-toggle="modal" data-target="#mailModal">
+										{{=mails[a].subject}}
+									</a>
+								</td>
+								<td style="width:25%;">
+									{{
+										try:
+											user_var = db.auth_user(db.auth_user.username == mails[a].emisor)
+										except:
+											user_var = T("Not found")
+										pass
+
+										=f"{user_var.first_name} {user_var.last_name}"
+									}}
+								</td>
+								<td style="width:15%;">
+									{{
+										d_temp = mails[a].time_date
+										day = "%a"
+										month = "%b"
+										=f"{T(d_temp.strftime(day))} {d_temp.day} {T(d_temp.strftime(month))} {d_temp.year}"
+									}}
+								</td>
+								<td style="width:5%;">
+									{{
+										format2 = "%H:%M:%S"
+										=d_temp.strftime(format2)
+									}}
+								</td>
+								<td style="width:7%;">
+									<center>
+										{{if db((db.read_mail.id_auth_user == auth_user) & (db.read_mail.id_mail == mails[a].id)).select(db.read_mail.id).first() == None:}}
+											<span id="information_text" class="badge btn-success">{{=T('New')}}</span> 
+										{{else:}}
+											<span id="information_text" class="badge btn-info">{{=T('Read')}}</span> 
+										{{pass}}
+									</center>
+								</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				{{pass}}
+		{{pass}}
+	</table>
+	<script type="text/javascript">
+		function view_mail(var_id, var_project_id){ 
+	  		$("#mail_div")
+				.load("{{=URL('notification_student','inbox_mails_load.html')}}?operation=view_mail&mail_id=" + var_id + "&period_id={{=request.vars['period_id']}}&var_project_id=" + var_project_id)
+		}
+	</script>
+{{pass}}
+
+{{if request.vars['operation'] == "view_mail":}}
+	<table id="principal_table" style="width:100%;">
+		<tbody>
+			<td>
+				<div style=" height:400px; overflow:auto;">
+					<table class="table table-striped table-bordered">
+						<td style="width:25%;" >
+							<div style="height:140px; overflow:hidden">
+								{{user_auth = db((db.auth_membership.user_id == emisor.id) & (db.auth_membership.group_id == db.auth_group.id)
+											& ((db.auth_group.role == 'Teacher') | (db.auth_group.role == 'Ecys-Administrator')
+											| (db.auth_group.role == 'Super-Administrator'))).select(db.auth_membership.id).first()}}
+								{{if user_auth is not None:}}
+									<img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
+								{{else:}}
+									{{review = db((db.photo_review.user_id == emisor.id)).select().first()}}
+									{{if review is None:}}
+										<img id="img_img" alt="No photo" height="100%" width="100%">
+									{{else:}}
+										{{if not review.accepted:}}
+											<img id="img_img" alt="No photo" height="100%" width="100%">
+										{{else:}}
+											<img id="img_img" src="{{= URL('default/download', emisor.photo)}}" alt="No photo" height="100%" width="100%">
+										{{pass}}
+									{{pass}}
+								{{pass}}
+							</div>
+						</td>
+						<td style="width:75%;">
+							<h3>
+								<div style="height:60px; overflow:auto;">
+									{{=mail.subject}} 
+								</div>
+								<div style="height:40px; overflow:auto;">
+									<small>{{=f"{emisor.first_name} {emisor.last_name}"}} </small>
+								</div>
+							</h3>
+						</td>
+					</table>
+					<hr style="width:100%;"> 
+					<div id="message_detail" style="height:150px; overflow:auto;">
+						{{=XML(mail.sent_message)}}
+					</div>
+					<hr style="width:100%;"> 
+				</div>
+				<div align="right">
+					<a id="myButton" href="{{=URL('notification_student', 'send_mail', vars=dict(mail=emisor.email, name=f'{emisor.first_name} {emisor.last_name}', remessage=mail.sent_message, retime=mail.time_date, resub=mail.subject, semester_id=request.vars['period_id'], project=request.vars['var_project_id']))}}" role="button" class="btn btn-success"> 
+						{{=T('Reply')}}
+					</a>
+					<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">{{=T('Close')}}</button>
+				<div>
+			</td>
+		</tbody>
+	</table>
+{{pass}}

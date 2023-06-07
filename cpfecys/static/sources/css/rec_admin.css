@@ -1,0 +1,50 @@
+
+/*Para las tablas de reporte*/
+.tb_reporte > thead > tr {
+background-color: #92aeae;
+color: black;
+}
+
+.tb_reporte >tbody > tr:nth-child(even) td, tbody tr.even td {
+	background:#e3ecec;
+}
+
+
+/*Estilo para el menu*/
+.banner_menu{
+	background:#d9e6f2;
+}
+
+.btn_menu:hover {
+	background:#00cc99;
+}
+.btn_menu{
+	background:#ecf2f9;
+}
+.lbl_seleccionar{
+	color: #696969;
+}
+/*Boton para visualizar pdf*/
+.transition {
+	-webkit-transform: scale(1.3); 
+	-moz-transform: scale(1.3);
+	-o-transform: scale(1.3);
+	transform: scale(1.3);
+
+	/*width : 20px;
+	vertical-align: middle;
+	border-radius: 50%;
+	box-shadow: 0 0 0 2px #f00;
+	transition: box-shadow 0.3s;*/
+}
+
+.btn_rep:hover {
+	background:#00cc99;
+}
+
+.img_pdf {
+	-webkit-transition: all .3s ease-in-out;
+	-moz-transition: all .3s ease-in-out;
+	-o-transition: all .3s ease-in-out;
+	-ms-transition: all .3s ease-in-out;
+}

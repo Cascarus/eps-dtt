@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{block title}} {{end}}</title>
+  <link rel="stylesheet" href="{{=URL('static', 'build/css/styles.css')}}" type="text/css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="description" content="DESCRIPTION">
+  <meta name="keywords" content="KEYWORDS">
+  <link rel="icon" type="image/x-icon" href="{{=URL('static', 'build/images/favicon.ico')}}">
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="dttheader__logo">
+          <a class="navbar-brand" href="/">
+            <img src="/static/build/images/logo-ecys-white.png" alt="Dtt ECYS">
+          </a>
+        </div>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="dttNavbar">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="/about_us">About Us</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="/magazine/public_edicion_revista">Magazine ECYS</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="/events">Events</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+                Resources and Schedules
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/resources?r=10">Horario Clase</a>
+                <a class="dropdown-item" href="/resources?r=11">Horario Laboratorio</a>
+                <a class="dropdown-item" href="/resources?r=12">Horario DSI</a>
+                <a class="dropdown-item" href="/resources?r=13">Programa del Curso en PDF</a>
+                <a class="dropdown-item" href="/resources?r=15">Programa de laboratorio en PDF</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+                Resources
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/links">Links</a>
+                <a class="dropdown-item" href="/files">Files</a>
+                <a class="dropdown-item" href="/reclutamiento_registro_nuevo/solicitar">Registry</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link" href="/dashboard/login">Login</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </header>
+  <section class="dttcontent">
+    <div class="container">
+      {{include}}
+    </div>
+  </section>
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <p class="text-center">Universidad de San Carlos de Guatemala uses Simio <a
+              href="https://www.simio.com/">simulation software</a> under a grant from Simio LLC (<a href="https://www.simio.com/">www.simio.com</a>).</p>
+          <p class="text-center">Soporte y Asistencia <br />
+            <a href="mailto:soporte@dtt-ecys.org">soporte@dtt-ecys.org</a> <br />
+            Sistema de Seguimiento de la Escuela de Ciencias y Sistemas <br />
+            Facultad de Ingeniería- Universidad de San Carlos de Guatemala</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="{{=URL('static','build/js/home.min.js')}}"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-143827878-1');
+  </script>
+</body>
+
+</html>

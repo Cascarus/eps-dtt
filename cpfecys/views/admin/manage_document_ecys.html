@@ -1,0 +1,576 @@
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+  <h1>Entregables</h1>
+</div>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{=URL('admin', 'manage_document_ecys')}}">Entregables</a>
+    </li>
+    {{if action['type'] == 'new':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{=URL('admin', 'manage_document_ecys', args=['new'])}}"
+        >Nuevo</a
+      >
+    </li>
+    {{elif action['type'] == 'show':}}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_document_ecys', args=['show', action['item'][0]['id']])}}"
+        >Ver</a
+      >
+    </li>
+    {{elif action['type'] == 'edit': }}
+    <li class="breadcrumb-item active" aria-current="page">
+      <a
+        href="{{=URL('admin', 'manage_document_ecys', args=['edit', action['item']['id']])}}"
+        >Editar</a
+      >
+    </li>
+    {{pass}}
+  </ol>
+</nav>
+
+{{if action['type'] == 'list':}}
+<div class="row">
+  <div class="col-md-4">
+    <a href="{{=URL('admin', 'manage_document_ecys', args=['new'])}}">
+      <button class="btn btn-primary">
+        <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+        &nbsp;Añadir Registro
+      </button>
+    </a>
+  </div>
+</div>
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row-fluid">
+      <div style="overflow-x: auto" class="table-responsive-sm">
+        <table class="table table-sm table-striped table-hover">
+          <thead class="table-dark">
+            <tr>
+              <th class="text-center" colspan="7">General</th>
+              <th class="text-center" colspan="2">Archivo principal</th>
+              <th class="text-center" colspan="2">Archivo complementario</th>
+              <th class="text-center" colspan="1">Acciones</th>
+            </tr>
+            <tr>
+              <th class="text-center">Id</th>
+              <th class="text-center">Nombre</th>
+              <th class="text-center" style="width: 300px">Descripción</th>
+              <th class="text-center">Rol asociado</th>
+              <th class="text-center">¿Requiere firma?</th>
+              <th class="text-center">¿Requiere complemento?</th>
+              <th class="text-center">¿Es único?</th>
+              <th class="text-center">Tipo de archivo</th>
+              <th class="text-center">Tamaño máximo (MB)</th>
+              <th class="text-center">Tipo de archivo</th>
+              <th class="text-center">Tamaño máximo (MB)</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ for document in action['list']: }}
+            <tr>
+              <td class="text-center">{{=document['id']}}</td>
+              <td class="text-center">{{=document['name'].encode("utf-8")}}</td>
+              <td class="text-center">
+                {{=document['description'].encode("utf-8")}}
+              </td>
+              <td class="text-center">
+                {{=document['role_name'].encode("utf-8")}}
+              </td>
+              <td class="text-center">
+                {{='Si' if document['signature_required'] == 1 else 'No'}}
+              </td>
+              <td class="text-center">
+                {{='Si' if document['complement_required'] == 1 else 'No'}}
+              </td>
+              <td class="text-center">
+                {{='Si' if document['validation_required'] == 1 else 'No'}}
+              </td>
+              <td class="text-center">{{=document['extension']}}</td>
+              <td class="text-center">{{=document['max_size']}}</td>
+              <td class="text-center">
+                {{='-' if document['complement_extension'] is None else
+                document['complement_extension']}}
+              </td>
+              <td class="text-center">
+                {{='-' if document['complement_size'] == 0 else
+                document['complement_size']}}
+              </td>
+              <td>
+                <div class="btn-group">
+                  <a
+                    href="{{=URL('admin', 'manage_document_ecys', args=['show', document['id']])}}"
+                  >
+                    <button class="btn btn-secondary btn-sm">
+                      <span
+                        class="icon magnifier icon-zoom-in glyphicon glyphicon-arrow-zoom-in"
+                      ></span>
+                      &nbsp;Vista
+                    </button>
+                  </a>
+                  <a
+                    href="{{=URL('admin', 'manage_document_ecys',args=['edit', document['id']])}}"
+                  >
+                    <button class="btn btn-success btn-sm">
+                      <span
+                        class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"
+                      ></span>
+                      &nbsp;Editar
+                    </button></a
+                  >
+                  <a
+                    href="{{=URL('admin', 'manage_document_ecys',args=['delete', document['id']])}}"
+                  >
+                    <button class="btn btn-danger btn-sm">
+                      <span
+                        class="icon trash icon-trash glyphicon glyphicon-trash"
+                      ></span>
+                      &nbsp;Eliminar
+                    </button>
+                  </a>
+                  <button
+                    class="btn btn-primary dropdown-toggle btn-sm"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    Acciones
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    <a
+                      class="btn btn-sm dropdown-item"
+                      href="{{=URL('admin', 'signature_assignment_ecys',vars={'document' : document['id']})}}"
+                      role="button"
+                    >
+                      Asignación de Firmas
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{{else:}}
+<div class="mt-4">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-9 well">
+        {{ if "message" in action: }}
+        <div class="alert alert-danger alert-dismissible" role="alert">
+          <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+          <button
+            type="button"
+            class="close"
+            data-dismiss="alert"
+            aria-label="Close"
+          >
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        {{pass}} {{ if action['type'] == 'new': }}
+        <form
+          action="{{=URL('admin', 'manage_document_ecys', args=['new'])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="inputName"
+                value="{{if 'item' in action:}}{{=action['item']['inputName']}}{{pass}}"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDescription" class="col-sm-3 col-form-label"
+              >Descripción</label
+            >
+            <div class="col-sm-9">
+              <textarea
+                class="form-control"
+                id="inputDescription"
+                name="inputDescription"
+                rows="5"
+                required
+              >
+{{if 'item' in action:}}{{=action['item']['inputDescription']}}{{pass}}</textarea
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputRole" class="col-sm-3 col-form-label"
+              >Rol asociado</label
+            >
+            <div class="col-sm-9">{{=action['roles']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputFileTypes" class="col-sm-3 col-form-label"
+              >Tipo de Archivo</label
+            >
+            <div class="col-sm-9">{{=action['fileTypes']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSize" class="col-sm-3 col-form-label"
+              >Tamaño Máximo (MB)</label
+            >
+            <div class="col-sm-9">{{=action['sizePrincipal']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >¿Requiere firma?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">{{=action['checkSignature']}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputComplement" class="col-sm-3 col-form-label"
+              >¿Es único?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">
+                {{=action['checkValidation']}}
+                <sub
+                  >* Si se marca, indica que el documento sera unico para
+                  siempre, <br />
+                  caso contrario se validara su duplicidad por semestre.</sub
+                >
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputComplement" class="col-sm-3 col-form-label"
+              >¿Requiere complemento?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">
+                {{=action['checkComplement']}}
+                <sub
+                  >* Si se marca, indica que el documento contendra un respaldo
+                  obligatorio <br />
+                  para su firma o revisión.</sub
+                >
+              </div>
+            </div>
+          </div>
+          <div id="complementShow" style="{{=action['show']}}">
+            <div class="form-group row">
+              <label for="inputFileTypes" class="col-sm-3 col-form-label"
+                >Tipo de Archivo</label
+              >
+              <div class="col-sm-9">{{=action['fileTypesComplement']}}</div>
+            </div>
+            <div class="form-group row">
+              <label for="inputComplementSize" class="col-sm-3 col-form-label"
+                >Tamaño Máximo (MB)</label
+              >
+              <div class="col-sm-9">{{=action['sizeComplement']}}</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{elif action['type'] == 'show':}}
+        <hr color="black" />
+        <div class="text-center">
+          <label class="col-sm-3 col-form-label">General</label>
+        </div>
+        <hr color="black" />
+        <div class="form-group row">
+          <label for="inputName" class="col-sm-3 col-form-label">Nombre</label>
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['name'].encode('utf-8')}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputDescription" class="col-sm-3 col-form-label"
+            >Descripción</label
+          >
+          <div class="col-sm-9">
+            <textarea readonly class="form-control-plaintext" rows="5">
+{{=action['item'][0]['description'].encode('utf-8')}}</textarea
+            >
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputName" class="col-sm-3 col-form-label"
+            >Rol asociado</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['role_name'].encode('utf-8')}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSignature" class="col-sm-3 col-form-label"
+            >¿Requiere Firma?</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{='Si' if action['item'][0]['signature_required'] == 1 else 'No'}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSignature" class="col-sm-3 col-form-label"
+            >¿Requiere Complemento?</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{='Si' if action['item'][0]['complement_required'] == 1 else 'No'}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSignature" class="col-sm-3 col-form-label"
+            >¿Es único?</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{='Si' if action['item'][0]['validation_required'] == 1 else 'No'}}"
+            />
+          </div>
+        </div>
+        <hr color="black" />
+        <div class="text-center">
+          <label class="col-sm-3 col-form-label">Archivo principal</label>
+        </div>
+        <hr color="black" />
+        <div class="form-group row">
+          <label for="inputTypeFile" class="col-sm-3 col-form-label"
+            >Tipo de archivo</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['extension']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSize" class="col-sm-3 col-form-label"
+            >Tamaño máximo (MB)</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{=action['item'][0]['max_size']}}"
+            />
+          </div>
+        </div>
+        <hr color="black" />
+        <div class="text-center">
+          <label class="col-sm-3 col-form-label">Archivo complementario</label>
+        </div>
+        <hr color="black" />
+        <div class="form-group row">
+          <label for="inputTypeFile" class="col-sm-3 col-form-label"
+            >Tipo de archivo</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{='-' if action['item'][0]['complement_extension'] is None else action['item'][0]['complement_extension']}}"
+            />
+          </div>
+        </div>
+        <div class="form-group row">
+          <label for="inputSize" class="col-sm-3 col-form-label"
+            >Tamaño máximo (MB)</label
+          >
+          <div class="col-sm-9">
+            <input
+              type="text"
+              readonly
+              class="form-control-plaintext"
+              value="{{='-' if action['item'][0]['complement_size'] == 0 else action['item'][0]['complement_size']}}"
+            />
+          </div>
+        </div>
+        <a href="{{=URL('admin', 'manage_document_ecys')}}">
+          <button class="btn btn-primary">
+            <span class="fa fa-arrow-circle-left"></span>
+            &nbsp;Regresar
+          </button>
+        </a>
+        {{ elif action['type'] == 'edit': }}
+        <form
+          action="{{=URL('admin', 'manage_document_ecys', args=['edit', action['item']['id']])}}"
+          method="POST"
+        >
+          <div class="form-group row">
+            <label for="inputName" class="col-sm-3 col-form-label"
+              >Nombre</label
+            >
+            <div class="col-sm-9">
+              <input
+                type="text"
+                class="form-control"
+                id="inputName"
+                name="inputName"
+                value="{{if 'item' in action:}}{{=action['item']['inputName']}}{{pass}}"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputDescription" class="col-sm-3 col-form-label"
+              >Descripción</label
+            >
+            <div class="col-sm-9">
+              <textarea
+                class="form-control"
+                id="inputDescription"
+                name="inputDescription"
+                rows="5"
+                required
+              >
+{{if 'item' in action:}}{{=action['item']['inputDescription']}}{{pass}}</textarea
+              >
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputRole" class="col-sm-3 col-form-label"
+              >Rol asociado</label
+            >
+            <div class="col-sm-9">{{=action['roles']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputFileTypes" class="col-sm-3 col-form-label"
+              >Tipo de Archivo</label
+            >
+            <div class="col-sm-9">{{=action['fileTypes']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSize" class="col-sm-3 col-form-label"
+              >Tamaño Máximo (MB)</label
+            >
+            <div class="col-sm-9">{{=action['sizePrincipal']}}</div>
+          </div>
+          <div class="form-group row">
+            <label for="inputSignature" class="col-sm-3 col-form-label"
+              >¿Requiere firma?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">{{=action['checkSignature']}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputComplement" class="col-sm-3 col-form-label"
+              >¿Es único?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">
+                {{=action['checkValidation']}}
+                <sub
+                  >* Si se marca, indica que el documento sera unico para
+                  siempre, <br />
+                  caso contrario se validara su duplicidad por semestre.</sub
+                >
+              </div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label for="inputComplement" class="col-sm-3 col-form-label"
+              >¿Requiere complemento?</label
+            >
+            <div class="col-sm-9">
+              <div class="form-check">
+                {{=action['checkComplement']}}
+                <sub
+                  >* Si se marca, indica que el documento contendra un respaldo
+                  obligatorio <br />
+                  para su firma o revisión.</sub
+                >
+              </div>
+            </div>
+          </div>
+          <div id="complementShow" style="{{=action['show']}}">
+            <div class="form-group row">
+              <label for="inputFileTypes" class="col-sm-3 col-form-label"
+                >Tipo de Archivo</label
+              >
+              <div class="col-sm-9">{{=action['fileTypesComplement']}}</div>
+            </div>
+            <div class="form-group row">
+              <label for="inputComplementSize" class="col-sm-3 col-form-label"
+                >Tamaño Máximo (MB)</label
+              >
+              <div class="col-sm-9">{{=action['sizeComplement']}}</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+        {{pass}}
+      </div>
+    </div>
+  </div>
+</div>
+{{pass}}
+
+<script>
+  let checkbox = document.getElementById("inputComplement");
+
+  checkbox.addEventListener("change", (event) => {
+    document.getElementById("complementShow").style.display = event
+      .currentTarget.checked
+      ? ""
+      : "none";
+  });
+</script>
+
+<style>
+  .btn-group,
+  .btn-group-vertical {
+    display: inline-block;
+  }
+  .table td,
+  .table th {
+    vertical-align: middle;
+  }
+</style>

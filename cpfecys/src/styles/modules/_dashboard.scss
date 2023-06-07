@@ -1,0 +1,13 @@
+.heading{
+    @include media-breakpoint-down(xs){
+        a{
+            white-space: normal;
+        }
+    }
+}
+#auth_user_photo{
+    margin-bottom: 7px;
+}
+td.w2p_fl, td.w2p_fw{
+    padding-bottom: 10px;
+}

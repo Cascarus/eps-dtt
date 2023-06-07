@@ -1,0 +1,117 @@
+<section class="dttcontent__white">
+    <div id="first" class="container">
+        <div class="row">
+            <div class="col-12 col-md-4 text-center dttcontent__container">
+                <a href="/profile">
+                    <div class="dttcontent__icon">
+                        <i class="fa fa-cog" aria-hidden="true"></i>
+                    </div>
+                    <p>Perfil del Estudiante</p>
+                </a>
+                
+            </div>
+            <div class="col-12 col-md-4 text-center dttcontent__container">
+                <a href="/escuela">
+                    <div class="dttcontent__icon">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </div>
+                    <p>Escuela de Mecanica Industrial</p>
+                </a>
+            </div>
+            <div class="col-12 col-md-4 text-center dttcontent__container">
+                <a href="/about_us">
+                    <div class="dttcontent__icon">
+                        <i class="fa fa-globe" aria-hidden="true"></i>
+                    </div>
+                    <p>Nosotros</p>
+                </a>	
+            </div>
+        </div>
+    </div>
+</section>
+<section class="dttcontent__white">
+    <div class="container dttcontent__news">
+        <div class="row">
+            <div class="col-12">
+                <div id="dttCarousel" class="carousel slide carousel-fade" data-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="/cpfecys/static/build/images/emi/fiusac03.jpg" alt="">
+                            <div class="container">
+                                <div class="carousel-caption">
+                                    <div class="ja-ss-desc">
+                                        <h3>Control de Practica Final - Escuela de Ingeniería Mecánica Industrial</h3>
+                                        <p>Facultad de Ingeniería - USAC</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{contadorF=0}}
+                        {{for notification in range(len(front_notification)-1, -1, -1):}}
+                            {{contadorF+=1}}
+                                {{if front_notification[notification].visible:}}
+                                    {{if front_notification[notification].promoted:}}
+                                        <div class="carousel-item">
+                                            {{if front_notification[notification].image_file is None or front_notification[notification].image_file == '': }}
+                                            <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
+                                                xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+                                                aria-label="Placeholder: Second slide">
+                                                <rect width="100%" height="100%" style="fill: #174873; fill-opacity:0"></rect>
+                                            </svg>
+                                            {{else:}}
+                                            <img src="{{= URL('default/download', front_notification[notification].image_file)}}" alt="Notification" title="Notification" class=" w-100">
+                                            {{pass}}
+                                            <div class="container">
+                                                <div class="carousel-caption">
+                                                    <div class="dttContent__news--item">
+                                                        <h3>{{=front_notification[notification].name}}</h3>
+                                                        <p class="lead">{{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
+                                                        </p>
+                                                        <a class="btn btn-large btn-primary"
+                                                            href="{{=URL('default', 'notification', vars=dict(notification = front_notification[notification].id))}}">Ver</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{else:}}
+                                        <div class="carousel-item">
+                                            {{if front_notification[notification].image_file is None or front_notification[notification].image_file == '': }}
+                                            <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="500"
+                                                xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+                                                aria-label="Placeholder: Second slide">
+                                                <rect width="100%" height="100%" style="fill: #174873; fill-opacity:0"></rect>
+                                            </svg>
+                                            {{else:}}
+                                            <img src="{{= URL('default/download', front_notification[notification].image_file)}}" alt="Sample image" title="Sample image" class=" w-100">
+                                            {{pass}}
+                                            <div class="container">
+                                                <div class="carousel-caption">
+                                                    <div class="dttContent__news">
+                                                        <h3>{{=front_notification[notification].name}}</h3>
+                                                        <p class="lead">
+                                                            {{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
+                                                        </p>
+                                                        <a class="btn btn-large btn-primary"
+                                                            href="{{=URL('default', 'notification', vars=dict(notification = front_notification[notification].id))}}">Ver</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{pass}}
+                                {{pass}}
+                        {{pass}}
+                    </div>
+                    <a class="carousel-control-prev" href="#dttCarousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#dttCarousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
