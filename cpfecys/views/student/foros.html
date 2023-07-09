@@ -7,7 +7,7 @@
             <h2>
                 Foros semanales
                 <br>
-                <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+                <small>{{=str(periodo.id)}} {{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
             </h2>
         </div>
     </div>
@@ -16,7 +16,7 @@
 <div class="col-12 col-md-6 mb-3">
     
         <form class="form-inline">
-            <select name="period" id="period" class="form-control">
+            <select name="period" id="period-foros" class="form-control">
                 <!--emarquez: id periodo-->
                 {{var_sel = ''}}
                 {{for period in periods:}}
@@ -31,8 +31,6 @@
                 {{pass}}
             </select>
             <input class="btn btn-outline-primary" type="submit" value="{{=T('Go')}}">
-            <!--emarquez: control de periodo , -->
-            <!-- <input id="chkTipoCursoA" type="checkbox" checked data-toggle="toggle" data-on="Semestres" data-off="Periodos" data-size="mini" class="d-none"> -->
         </form>
 </div>
 

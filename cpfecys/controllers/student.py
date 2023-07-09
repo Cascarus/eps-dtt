@@ -3245,9 +3245,7 @@ def foros():
 
     #cascarus
     periodo = cpfecys.current_year_period()
-    if request.vars['period']:
-        periodo_parametro = request.vars['period']
-        periodo = db(db.period_year.id == periodo_parametro).select().first()
+    
 
     periods_temp = db.executesql("""
         SELECT py.id, py.yearp, p.name
