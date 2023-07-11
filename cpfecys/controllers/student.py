@@ -3240,8 +3240,38 @@ def conferencias():
 @auth.requires_login()
 @auth.requires_membership('Student')
 def foros():
-    hola = "hola desde foros"
-    return dict(message = hola)
+    hola = auth.user.id
+    rows = db(db.foro.id_estudiante == auth.user.id).select()
+
+    #cascarus
+    periodo = cpfecys.current_year_period()
+    
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN user_project uspj ON uspj.period = py.id
+        INNER JOIN period p on p.id = py.period
+        WHERE uspj.ASSIGNED_USER = {0};
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    return dict(
+        message = hola,
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+    )
 
 @auth.requires_login()
 @auth.requires_membership('Student')

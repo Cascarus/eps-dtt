@@ -3090,6 +3090,18 @@ db.define_table('iso_vw_incidentes',
     Field('id_tutor','integer'),
     Field('project_id','integer'))
 
+# --------------------------- tablas cascarus --------------------------------#
+db.define_table('foro',
+    Field('id_proyecto', 'reference project'),
+    Field('id_estudiante', 'reference auth_user' ),
+    Field('id_dsi', 'reference auth_user'),
+    Field('nombre_foro', 'string'),
+    Field('reporte', 'string'),
+    Field('nota', 'decimal(5,2)'),
+    Field('estado', 'string'),
+    Field('fecha_creacion', 'datetime'),
+    Field('fecha_calificacion', 'datetime'),
+    Field('observaciones', 'string'))
 
 # ------------------------END---------------------------------------------------
 # after defining tables, uncomment below to enable auditing
