@@ -1078,3 +1078,81 @@ def delete_schedule_assignation():
     db(db.dsi_assignation_schedule.id == request.args[0]).update(isEnabled=0)
     session.flash = 'Asignación de horario eliminado.'
     redirect(URL('dsi_dsi', 'schedule_assignation'))
+
+
+#cascarus -- FOROS-VIEW
+@auth.requires_login()
+@auth.requires_membership('DSI')
+def foro_view():
+    periodo = cpfecys.current_year_period()
+    if request.vars['period']:
+        periodo_parametro = request.vars['period']
+        periodo = db(db.period_year.id == periodo_parametro).select().first()
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN period p on p.id = py.period
+        ORDER BY py.id DESC;
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.foro.estado == 'pendiente').select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select().first()
+
+    return dict(
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+    )
+
+
+#cascarus -- CONVERENCIA-VIEW
+@auth.requires_login()
+@auth.requires_membership('DSI')
+def conferencia_view():
+    periodo = cpfecys.current_year_period()
+    if request.vars['period']:
+        periodo_parametro = request.vars['period']
+        periodo = db(db.period_year.id == periodo_parametro).select().first()
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN period p on p.id = py.period
+        ORDER BY py.id DESC;
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.conferencia.estado == 'pendiente').select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select().first()
+
+    return dict(
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+    )
