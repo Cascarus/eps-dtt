@@ -3103,6 +3103,20 @@ db.define_table('foro',
     Field('fecha_calificacion', 'datetime'),
     Field('observaciones', 'string'))
 
+db.define_table('conferencia',
+    Field('id_proyecto', 'reference project'),
+    Field('id_estudiante', 'reference auth_user' ),
+    Field('id_dsi', 'reference auth_user'),
+    Field('nombre_video', 'string'),
+    Field('reporte', 'string'),
+    Field('video', 'string'),
+    Field('nota', 'decimal(5,2)'),
+    Field('estado', 'string'),
+    Field('fecha_creacion', 'datetime'),
+    Field('fecha_calificacion', 'datetime'),
+    Field('observaciones', 'string'),
+    Field('descripcion', 'string'))
+
 # ------------------------END---------------------------------------------------
 # after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
