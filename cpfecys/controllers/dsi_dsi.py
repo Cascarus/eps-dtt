@@ -1079,7 +1079,6 @@ def delete_schedule_assignation():
     session.flash = 'Asignación de horario eliminado.'
     redirect(URL('dsi_dsi', 'schedule_assignation'))
 
-
 #cascarus -- FOROS-VIEW
 @auth.requires_login()
 @auth.requires_membership('DSI')

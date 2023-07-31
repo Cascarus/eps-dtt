@@ -1,0 +1,126 @@
+{{extend 'layout.html'}}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            {{if data.first() is not None:}}
+                <h1>
+                    {{=data.first().item_restriction.name}} -
+                    <small>
+                        {{=semester.yearp}}, {{=T(db.period(id = semester.period).name)}}
+                    </small>
+                </h1>
+            {{pass}}
+        </div>
+        <div class="col-12">
+            <form class="form-inline" action="{{=URL('default','resources')}}" method='get'>
+                <input id="parameter" name="r" type="hidden" value="{{=request.vars['r']}}" />
+                <div class="row col-12">
+                    <div class="form-group col-12 mb-md-2">
+                        <div class="row col-12">
+                            <select class="mr-2 form-control col-8 col-md-4" id="period" name="period">
+                            </select>
+                            <input class="btn btn-primary col-3 col-md-1" type="submit" value="{{=T('Go')}}">
+                        </div>
+                    </div>
+                    <div class="form-group col-12">
+                        <input id="chkTipoCurso" name="chkTipoCurso" type="checkbox" checked data-toggle="toggle"
+                        data-on="<i class='fa fa-share'></i> Semestres" data-off="<i class='fa fa-reply'></i> Periodos"
+                        data-size="mini">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-12">
+            <div class="table-responsive mt-2">
+                <table id="dttresources" class="table table-striped talbe-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{=T('Course Name')}}</th>
+                            <th>{{=T('Teacher')}}</th>
+                            <th>{{=T('Final Practice Student')}}</th>
+                            <th>{{=T('Details')}}</th>
+                        </tr>
+                    </thead>
+                    {{counter = 0}}
+                    <tbody>
+                        {{for element in data: }}
+                            {{counter += 1}}
+                            <tr>
+                                <td>{{=counter}}</td>
+                                <td>{{=element.project.name}}</td>
+                                <td>
+                                    <ul>
+                                        {{teachers = teachers_on_project(element.project.id)}}
+                                        {{for teacher in teachers:}}
+                                            <li>
+                                                {{=teacher.auth_user.last_name}}, {{=teacher.auth_user.first_name}}
+                                            </li>
+                                        {{pass}}
+                                    </ul>
+                                </td>
+                                <td>
+                                    <ul>
+                                        {{final_practice_students = aux_in_courses(element.project.id)}}
+                                        {{for aux in final_practice_students:}}
+                                            <li>
+                                                {{=aux.auth_user.last_name}}, {{=aux.auth_user.first_name}}
+                                            </li>
+                                        {{pass}}
+                                    </ul>
+                                </td>
+                                <td>
+                                    {{if not element.item_restriction.is_unique:}}
+                                        {{for aux in final_practice_students:}}
+                                            <!--emarquez: se filtra también por período-->
+                                            {{for element2 in db((db.item.item_restriction == element.item_restriction)&
+                                                (db.item.assignation == aux.user_project.id)&(db.item.created == semester.id)).select():}}
+                                                {{if element2.item_restriction.item_type.name == 'File':}}
+                                                    <a href="{{=URL('default', 'download', args=element2.uploaded_file)}}" class="btn btn-primary">
+                                                        {{=T('Download')}}
+                                                    </a>
+                                                {{elif element2.item_restriction.item_type.name == 'Schedule':}}
+                                                    {{=aux.auth_user.last_name}}, {{=aux.auth_user.first_name}}:
+                                                    {{schedule = db(db.item_schedule.item == element2.id).select()}}
+                                                    <ul>
+                                                        {{for s in schedule:}}
+                                                            <li>
+                                                                {{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}
+                                                            </li>
+                                                        {{pass}}
+                                                    </ul>
+                                                {{pass}}
+                                            {{pass}}
+                                        {{pass}}
+                                    {{else:}}
+                                        {{if element.item_restriction.item_type.name == "File":}}
+                                            <a href="{{=URL('default', 'download', args=element2.item.uploaded_file)}}" class="btn btn-primary">
+                                                {{=T('Download')}}
+                                            </a>
+                                        {{elif element.item_restriction.item_type.name == 'Schedule': }}
+                                            <strong>
+                                                {{=element.auth_user.last_name}}, {{=element.auth_user.first_name}}:
+                                            </strong>
+                                            {{schedule = db(db.item_schedule.item == element.item.id).select()}}
+                                            <ul>
+                                                {{for s in schedule:}}
+                                                    <li>
+                                                        {{=T(s.day_of_week.name)}}: {{=s.start_time}} - {{=s.end_time}}, {{=s.physical_location}}
+                                                    </li>
+                                                {{pass}}
+                                            </ul>
+                                        {{pass}}
+                                    {{pass}}
+                                </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var periodo = "{{=request.vars['period']}}"
+    var tipo_periodo = "{{=request.vars['chkTipoCurso']}}"
+</script>

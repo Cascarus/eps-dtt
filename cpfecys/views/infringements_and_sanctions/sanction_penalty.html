@@ -1,0 +1,89 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <center>
+        <h2>Administrar penalizaciones</h2>
+    </center>
+    <div class="row">
+        <div class="col">
+            {{if len(no_procesados) > 0:}}
+                <form 
+                    action="{{=URL('infringements_and_sanctions','sanction_penalty', vista + '/' + id_sancion)}}"
+                    method="POST">
+                    <div class="form-group">
+                        <label for="curso">Curso</label>
+                        <input type="text" name="curso" id="curso" class="form-control" value="{{=sancion['curso']}}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha">Fecha</label>
+                        <input class="form-control" type="text" name="fecha" id="fecha" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="razon">Razon</label>
+                        <input type="text" name="razon" id="razon" class="form-control" value="{{=sancion['tipo']}} en {{=sancion['actividad']}}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="causa">Causa</label>
+                        <input type="text" name="causa" id="causa" class="form-control" value="{{=sancion['causa']}}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="estudiantes">Estudiantes</label>
+                        <p>Puede utilizar Ctrl + clic para seleccionar varios estudiantes</p>
+                        <select name="estudiantes" id="estudiantes" class="form-control" required multiple>
+                            {{for item in no_procesados:}}
+                                <option value="{{=item['id']}}">
+                                    {{=item['carnet']}} - {{=item['nombre']}}
+                                </option>
+                            {{pass}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="penalizacion">Penalización</label>
+                        <select name="penalizacion" id="penalizacion" class="form-control" required>
+                            {{for tipo in tipos_penalidad:}}
+                                <option value="{{=tipo['id']}}">
+                                    {{=tipo['name']}}
+                                </option>
+                            {{pass}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-success">Realizar sanción</button>
+                    </div>
+                </form>
+            {{else:}}
+                <center>
+                    <h4>Se han aplicado sanciones a todos los estudiantes</h4>
+                </center>
+            {{pass}}
+            <br>
+            {{if len(procesados) > 0:}}
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Carnet</th>
+                            <th>Nombre</th>
+                            <th>Sanción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for item in procesados:}}
+                            <tr>
+                                <td>{{=item['carnet']}}</td>
+                                <td>{{=item['nombre']}}</td>
+                                <td>{{=item['sancion']}}</td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            {{else:}}
+                <center>
+                    <h4>No se han aplicado sanciones</h4>
+                </center>
+            {{pass}}
+        </div>
+    </div>
+</div>
+<script>
+    const date_ = new Date("{{=sancion['fecha']}}");
+    $('#fecha').val(date_.toLocaleDateString('es-GT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+</script>

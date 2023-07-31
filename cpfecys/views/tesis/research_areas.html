@@ -1,0 +1,30 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>Areas de investigación de tesis</h1>
+    </div>
+    <div class="mt-4 col-12">
+        <div class="tabbable">
+            <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#data{{=1}}" data-toggle="tab">
+                            Administración
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#data{{=2}}" data-toggle="tab">
+                            Vista
+                        </a>
+                    </li>
+             </ul>
+            <div class="mt-4 tab-content">
+                <div  class="tab-pane active" id="data{{=1}}">
+                        {{=grid}}
+                </div>
+                <div class="tab-pane" id="data{{=2}}">
+                    {{=LOAD('tesis', 'make_html', ajax=True)}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

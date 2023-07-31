@@ -1,0 +1,43 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <center>
+                <h1>Incidentes de {{=incidentes[0].project.name}}</h1>
+            </center>
+        </div>
+        <div class="col-12">
+            <strong>
+                Registro académico: {{=tutor.username}}
+                <br />
+                Nombre: {{=tutor.first_name}} {{=tutor.last_name}}
+            </strong>
+            <div class="web2py_grid mt-4">
+                <div class="web2py_table">
+                    <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                        <table>
+                            <thead>
+                                <th><a href="#">Tipo de incidente</a></th>
+                                <th><a href="#">Descripción</a></th>
+                                <th><a href="#">Fecha</a></th>
+                                <th><a href="#">Fecha de creación</a></th>
+                                <th><a href="#">Contacto</a></th>
+                            </thead>
+                            <tbody>
+                                {{for incidente in incidentes:}}
+                                    <tr>
+                                        <td>{{=incidente.iso_tipo_incidente.descripcion}}</td>
+                                        <td>{{=incidente.iso_incidente.descripcion}}</td>
+                                        <td>{{=incidente.iso_incidente.fecha_reporte}}</td>
+                                        <td>{{=incidente.iso_incidente.fecha_creacion}}</td>
+                                        <td>{{=incidente.iso_incidente.email}}</td>
+                                    </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

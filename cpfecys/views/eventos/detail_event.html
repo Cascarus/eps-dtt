@@ -1,0 +1,51 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4 col-12">
+    <center>
+        <h1>
+            Evento: {{=name}}
+            <br>
+            <small>Horarios</small>
+        </h1>
+    </center>
+    <a class="button btn btn-default" href="{{=URL('eventos', 'events_list', vars=dict(assignation=id_assig))}}">
+        <span class="buttontext button" title="Atras">Atras</span>
+    </a>
+    <a class="button btn btn-default" href="{{=URL('create_schedule', args=(id_event, id_assig))}}">
+        <span class="icon plus icon-plus glyphicon glyphicon-plus"></span>
+        <span class="buttontext button" title="Añadir Horario">Añadir Horario</span>
+    </a>
+    <div class="web2py_grid">
+        <div class="web2py_table">
+            <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Ubicación</th>
+                            <th>Fecha de inicio</th>
+                            <th>Fecha de fin</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for sc in schedule:}}
+                            <tr>
+                                <td>{{=sc.id}}</td>
+                                <td>{{=sc.physical_location}}</td>
+                                <td>{{=sc.start_date}}</td>
+                                <td>{{=sc.end_date}}</td>
+                                <td class="row_buttons" nowrap="nowrpa">
+                                    <a href="{{=URL('edit_schedule', args=(sc.id,id_event,id_assig))}}" class="button btn btn-default">
+                                        <span class="icon pen icon-pencil glyphicon glyphicon-arrow-pencil"></span>
+                                        <span class="buttontext button" title="Editar">Editar</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

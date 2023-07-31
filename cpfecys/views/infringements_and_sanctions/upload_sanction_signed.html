@@ -1,0 +1,65 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <center>
+        <h2>Sanción escrita firmada</h2>
+    </center>
+    <div class="row">
+        <div class="col-12">
+            <form enctype="multipart/form-data" method="post">
+                <div class="form-group">
+                    <label for="fecha">Fecha</label>
+                    <input type="text" name="fecha" id="fecha" class="form-control" value="{{=sancion['fecha']}}"
+                        disabled>
+                </div>
+                <div class="form-group">
+                    <label for="estudiante">Estudiante</label>
+                    <input type="text" name="estudiante" id="estudiante" class="form-control"
+                        value="{{=sancion['carnet']}} {{=sancion['estudiante']}}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="curso">Curso</label>
+                    <input type="text" name="curso" id="curso" class="form-control" value="{{=sancion['curso']}}"
+                        disabled>
+                </div>
+                <div class="form-group">
+                    <label for="causa">Causa</label>
+                    <input type="text" name="causa" id="causa" class="form-control" value="{{=sancion['causa']}}"
+                        disabled>
+                </div>
+                <div class="form-group">
+                    <label for="razon">Razón</label>
+                    <input type="text" name="razon" id="razon" class="form-control" value="{{=sancion['razon']}}"
+                        disabled>
+                </div>
+                <div class="form-group">
+                    <label for="penalizacion">Penalización</label>
+                    <input type="text" name="penalizacion" id="penalizacion" class="form-control"
+                        value="{{=sancion['penalizacion']}}" disabled>
+                </div>
+                {{if puede_subir:}}
+                    <div class="form-group">
+                        <label for="doc_firmado">Documento firmado</label>
+                        <input type="file" name="doc_firmado" id="doc_firmado" class="form-control" accept="application/pdf"
+                            required>
+                        {{if not "Super-Administrator" in session.auth.user_groups.values():}}
+                            <small>*Una vez subido el documento no se puede volver a subir</small>
+                        {{pass}}
+                    </div>
+                    <input type="hidden" name="_formname" value="upload_doc_signed">
+                    <input type="text" name="id_penalizacion" value="{{=sancion['id_penalizacion']}}" class="hidden">
+                    <input type="text" name="estudiante" value="{{=estudiante}}" class="hidden">
+                    <input type="text" name="sancion" value="{{=id_sancion}}" class="hidden">
+                    <button type="submit" class="btn btn-block btn-success">Subir documento firmado</button>
+                {{pass}}
+                {{if sancion['documento'] is not None:}}
+                    <a href="{{=URL('infringements_and_sanctions', 'download_sanction_signed', str(sancion['documento']))}}"
+                        class="btn btn-block btn-info">Ver documento firmado</a>
+                {{else:}}
+                    <center>
+                        <h3>No se ha subido ningún documento</h3>
+                    </center>
+                {{pass}}
+            </form>
+        </div>
+    </div>
+</div>

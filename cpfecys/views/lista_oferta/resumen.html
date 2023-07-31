@@ -1,0 +1,96 @@
+{{extend 'dashboard.html'}}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<style>
+    p {
+        white-space: pre-line;
+    }    
+</style>
+<div class = "dttContainer">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+          <h1 class="bi bi-journal-text"style="color: white">Resumen Oferta</h1>
+        </div>
+    </nav>
+    <br><br>
+    <div class = "row">
+        <div class="col">
+            <div class="card bg-light" style="max-width: 100rem;">
+                <div class="card-header text-white bg-dark"><h5>Descripción  <i class="bi bi-layout-text-sidebar-reverse"></i></h5></div>
+                <div class="card-body">
+                    {{inc_vars = dict(
+                            editable=False,
+                            edit_action='',
+                            delete_action='',
+                            content=MARKMIN(description_content, markmin_settings)
+                        )
+                    }}
+                    {{include 'include/content_view_bt.html'}}
+                </div>
+                <div class="card-header text-white bg-dark"><h5>Requerimientos <i class="bi bi-card-checklist"></i></h5></div>
+                <div class="card-body">
+                    {{inc_vars = dict(
+                            editable=False,
+                            edit_action='',
+                            delete_action='',
+                            content=MARKMIN(requerimientos, markmin_settings)
+                        )
+                    }}
+                    {{include 'include/content_view_bt.html'}}
+                </div>
+                <div class="card-header text-white bg-dark"><h5>Salario   <i class="bi bi-cash"></i></h5></div>
+                <div class="card-body">
+                    <h5>{{=ofe[0]['salario_aproximado']}}</h5>
+                </div>
+                <div class="card-header text-white bg-dark"><h5>Contacto   <i class="bi bi-cash"></i></h5></div>
+                <div class="card-body">
+                    <h5 class="card-header card-title">{{=ofe[0]['nombre_empresa']}}</h5>
+                    <h6 class="card-text bi bi-telephone-fill">Numero:  {{=ofe[0]['telefono']}}</h6>
+                    <h6 class="card-text bi bi-envelope">Correo:  {{=ofe[0]['correo']}}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+    <script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+    <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
+    <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+    <script src="//cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"></script>
+    
+    <!-- Enable Markmin in textarea -->
+    <script>
+        jQuery(document).ready(function() {
+            jQuery('textarea').css('width','500px').css('height','200px').markItUp(mySettings);
+            jQuery('h1').each(function(){
+                if($(this).html() == 'Contenido'){
+                $(this).addClass('noprint');
+                }
+            });
+            var i = 0;
+            jQuery('.well.span12 h2').each(function(){
+                if($(this).html() == 'PRACTICA' || $(this).html() == 'HOJA DE TRABAJO' || $(this).html() == 'TAREA' || $(this).html() == 'EXAMEN FINAL' || $(this).html() == 'OTRA ACTIVIDAD' || $(this).html() == 'Reporte Final de Semestre'){
+                if(i> 0)
+                $(this).parent().parent().addClass('breakpage');
+                i++;
+                }
+            });
+            jQuery('.span12 h1').each(function(){
+                if($(this).html() == 'Conclusiones'){
+                if(i> 0)
+                $(this).parent().parent().parent().addClass('breakpage');
+                i++;
+                }
+            });
+            jQuery('h1').each(function(){
+                if($(this).html() == 'Introducción'){
+                    $(this).addClass('breakpage');
+                }
+            });
+        });
+    </script>
+    <!-- //Enable Markmin in textarea -->
+{{end page_js}}
+

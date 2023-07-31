@@ -1,0 +1,159 @@
+{{extend 'layout.html'}}
+<style>
+    /* Estilos CSS para las animaciones */
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Aplicar animaciones a los elementos */
+    .fadeIn {
+        animation-name: fadeIn;
+    }
+
+    .slideIn {
+        animation-name: slideIn;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12 animated fadeIn">
+            <br>
+            <div class="text-center">
+                <img src="/static/build/images/ecys/logo-ecys-fiusac-min.png" alt="Dtt ECYS" class="img-fluid">
+            </div>
+            <table style="width: 100%;" class="animated slideIn">
+                <tr>                      
+                <td style="width: 50%; vertical-align: top; text-align: justify; padding-right: 10px;" >
+                        <h1 style="color: orange;">Visión</h1>
+                        <hr style="border-color: gray;">
+                        <p> El estudiante de la Facultad de Ingeniería de la Universidad de San Carlos de Guatemala será reconocido como un profesional superior, en base al conocimiento incorporado en el currículo de estudios para capacitar a los estudiantes de manera integral, dándoles las herramientas adecuadas para su desarrollo profesional.</p>
+                </td>
+               
+                <td style="width: 50%; vertical-align: top; text-align: justify; padding-right: 10px;">
+                    <h1 style="color: orange;">Misión</h1>
+                    <hr style="border-color: gray;">
+                    <p>Desarrollar en el alumno las competencias que garantizan el éxito en la construcción del conocimiento a través de los diferentes estilos de aprendizaje y fomentar la investigación permanente para permitir una mejor calidad de vida a la comunidad. Teniendo en cuenta las opciones del mercado actual en el país (logística, administración, tecnología de la información, finanzas, contabilidad, comercio, etc.), y también el mercado internacional, hacen una gran demanda global y competitividad en la actualidad.</p>
+                </td>
+                </tr>
+            </table>
+            <h1 style="color: orange;">Objetivos generales</h1>
+            <hr style="border-color: gray;">
+            <ol class="animated slideIn">
+                <li>Proporcionar capacitación adecuada para que el profesional pueda ayudar al desarrollo de Guatemala, a través de la aplicación de experiencia funcional en las áreas de informática y sistemas. </li>
+                <li>Construya una cultura de cambio y adaptación que permita al graduado autoeducarse de manera permanente. Ha sido capaz de identificar la necesidad de cambio tanto personal como profesionalmente dentro de la organización en la que participa, para analizar y diseñar soluciones e implementarlas con éxito.</li>
+                <li>Proporcione a los estudiantes el conocimiento y las habilidades necesarias para interactuar de manera efectiva con todos los miembros de la organización, fomentando el uso de tecnología, sistemas de aplicación y herramientas que promuevan procesos de mejora interna.</li>
+                <li>Actualice el plan de estudios que incluye los últimos desarrollos en cada una de las diferentes tecnologías relacionadas con los campos de acción de la informática y la tecnología de la información, así como la aplicación de las técnicas de ingeniería de sistemas.</li>
+            </ol>
+            <br> 
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 animated fadeIn">
+                            <br>
+                        <div style="width: 100%; display: flex; justify-content: center;">
+                                  <table class="table-responsive-md animated slideIn" style="width: 100%;">
+                                    <tr>
+                                      <td colspan="4" class="text-center">
+                                        <h1 style="color: orange;">Conocimientos</h1>
+                                        <hr style="border-color: gray;">    
+                                    </td>
+                                   </tr>
+                                   <tr>
+                                    <td class="text-center" style="color: orange; font-size: 24px; width: 30%;text-align: justify;" >Generales</td>
+                                    <td class="text-center bigTableHeader" style="width: 70%; text-align: justify;"><b>Donde se consideran las ciencias académicas generales, las relaciones interpersonales y el idioma inglés.</b></td>
+                                  </tr>
+                                  <tr>
+                                    <td class="text-center" style="color: orange; font-size: 24px; width: 30%; text-align: justify;">Específicos</td>
+                                    <td class="text-center bigTableHeader" style="width: 70%; text-align: justify;"><b>Ciencia relacionada con su especialidad, que abarca la informática, la metodología de sistemas y el desarrollo de sistemas de información.</b></td>
+                                  </tr>
+                                  </table>
+                         </div>
+                         </div>
+                    </div>
+            </div>
+            <hr style="border-color: gray;">
+            <h1 style="color: orange;">Habilidades</h1>
+            <ol class="animated slideIn">
+            <hr style="border-color: gray;">
+                <li>Resolución de problemas: visión holística de los problemas considerando todos los elementos involucrados, utilizando un enfoque sistemático </li>
+                <li>Generalización: capacidad de generalizar soluciones y aprender de su experiencia.</li>
+                <li>Relaciones interpersonales: para persuadir a los negocios, el trabajo en equipo, presentar un proyecto con claridad y precisión, y trabajar bajo presión.</li>
+                <li>Gestión de recursos: Logro de resultados, consenso de acciones en torno a los planes para llevar a cabo un proceso racional de toma de decisiones.</li>
+                <li>Abstracción: capacidad de modelar e interpretar variables abstractas.</li>
+                <li>Autoaprendizaje: saber qué buscar, cómo buscar, dónde buscar, cómo buscar y cuándo surge la necesidad de un nuevo aprendizaje.</li>
+                <li>Análisis y síntesis: herramientas útiles de gestión de habilidades para las necesidades que tiene y sintetizar los factores más importantes para su consideración.</li>
+            </ol>
+            <h1 style="color: orange;">Aptitudes</h1>
+            <ol class="animated slideIn">
+                <hr style="border-color: gray;">
+                <li>Ordenado y metódico.</li>
+                <li>Capacidad para trabajar bajo objetivos claramente definidos.</li>
+                <li>Responsable</li>
+                <li>Investigador</li>
+                <li>Amigable con el medio ambiente.</li>
+                <li>Auto adaptable al entorno en el que opera.</li>
+                <li>Efectivo y eficiente.</li>
+                <li>Abierto para comprender otros puntos de vista.</li>
+                <li>Distinguir hechos, opiniones, creencias y valores.</li>
+                <li>Autoestima.</li>
+                <li>Prepárese para aprender los principios básicos de las múltiples disciplinas con las que podría relaci>
+            </ol>
+
+            <div class="container">
+                    <div class="row">
+                        <div class="col-12 animated fadeIn">
+                            <br>
+                        <div style="width: 100%; display: flex; justify-content: center;">
+                                  <table class="table-responsive-md animated slideIn" style="width: 100%;">
+                                    <tr>
+                                      <td colspan="4" class="text-center">
+                                        <h1 style="color: orange;">Estadísticas</h1>
+                                    </td>
+                                   </tr>
+                                    <tr>
+                                     <td class="text-center bigTableHeader"><b>Más</td>
+                                     <td class="text-center bigTableHeader"><b>En el año</td>
+                                     <td class="text-center bigTableHeader"><b>Anualmente</td>
+                                     <td class="text-center bigTableHeader"><b>Aproximadamente</td>
+                                     <td class="text-center bigTableHeader"><b>En un año</td>
+                                    </tr>
+                                    <tr>
+                                     <td class="text-center" style="color: orange; font-size: 62px;">+7000</td>
+                                     <td class="text-center" style="color: orange; font-size: 62px;">1970</td>
+                                     <td class="text-center" style="color: orange; font-size: 62px;">+600</td>
+                                     <td class="text-center" style="color: orange; font-size: 62px;">+375</td>
+                                     <td class="text-center" style="color: orange; font-size: 62px;">+35</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center bigTableHeader"><b>Estudiantes matriculados</td>
+                                        <td class="text-center bigTableHeader"><b>Inició la carrera</td>
+                                        <td class="text-center bigTableHeader"><b>Estudiantes ingresan a la carrera</td>
+                                        <td class="text-center bigTableHeader"><b>Estudiantes ingresan a cursos profesionales</td>
+                                        <td class="text-center bigTableHeader"><b>Estudiantes se gradúan</td>
+                                       </tr>
+                                  </table>
+                         </div>
+                         </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

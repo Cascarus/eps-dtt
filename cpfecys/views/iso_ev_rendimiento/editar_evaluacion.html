@@ -1,0 +1,232 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h3>
+            Editando: {{=evaluacion.nombre}}
+        </h3>
+        <h4>
+            Inicio: {{=evaluacion.fecha_inicio}} Fin: {{=evaluacion.fecha_fin}}
+        </h4>
+    </div>
+    <div class="col-12 mt-4">
+        <div id="div_punteo">
+            <h4>Punteo:</h4>
+        </div>
+        <div>
+            <h5>Vista Previa</h5>
+            <div id="preguntas">
+            </div>
+        </div>
+        <br />
+        <div id="menup" class="flotante">
+            <button class="btn btn-success btn_circle" data-toggle="modal" data-target="#dPregunta">
+                <span class="fa fa-plus" aria-hidden="true" />
+            </button>
+            <br />
+            <button class="btn btn-primary btn_circle" onclick="validarPreguntas()">
+                <span class="fa fa-paper-plane" aria-hidden="true" />
+            </button>
+        </div>
+        <div class="modal fade" role="dialog" id="dPregunta">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar pregunta</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row" id="tipoPregunta">
+                                <label for="tipoP">Tipo de Pregunta: </label>
+                                <select id="tipoP" name="tipoP" class="form-control">
+                                    <option value="-1" selected>
+                                        No se encontraron tipos
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label for="txtPregunta">Ingrese la pregunta: </label>
+                                <textarea id="txtPregunta" class="form-control"></textarea>
+                            </div>
+                            <div class="form-row" id="divPunteo">
+                                <label for="txtPunteo">Ingrese el punteo: </label>
+                                <input type="number" id="txtPunteo" name="txtPunteo" class="form-control" min="0" />
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="guardarPregunta()">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="modPregunta">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar pregunta</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row">
+                                <label for="modtxtPregunta">Ingrese la pregunta: </label>
+                                <textarea id="modtxtPregunta" class="form-control"></textarea>
+                            </div>
+                            <div class="form-row" id="divPunteo">
+                                <label for="modtxtPunteo">Ingrese el punteo: </label>
+                                <input type="number" id="modtxtPunteo" name="txtPunteo" class="form-control" min="0" />
+                            </div>
+                            <input type="hidden" val="0" id="modactIdPreg" />
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="actualizarPregunta()">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="dRespuesta">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Agregar Respuesta</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row">
+                                <label for="txtResp">Descripción: </label>
+                                <input type="text" id="txtResp" class="form-control" />
+                            </div>
+                            <div class="form-row">
+                                <label for="ptoResp">Ingrese el punteo: </label>
+                                <input type="number" id="ptoResp" name="ptoResp" class="form-control" min="0" />
+                            </div>
+                            <input type="hidden" id="idPregR" name="idPregR" value="0" />
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="guardarRespuesta()">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="editRespuesta">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar Respuesta</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-row">
+                                <label for="mtxtResp">Descripción: </label>
+                                <input type="text" id="mtxtResp" class="form-control" />
+                            </div>
+                            <div class="form-row">
+                                <label for="mptoResp">Ingrese el punteo: </label>
+                                <input type="number" id="mptoResp" name="mptoResp" class="form-control" min="0" />
+                            </div>
+                            <input type="hidden" id="midPregR" name="midPregR" value="0" />
+                            <input type="hidden" id="midResp" name="midResp" value="0">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="modRespuesta()">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="delResp">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Eliminar Respuesta</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Desea eliminar la respuesta?</p>
+                        <form>
+                            <input type="hidden" id="didResp" name="didResp" value="0" />
+                            <input type="hidden" id="didPreg" name="didPreg" value="0">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="confDelRespuesta()">Eliminar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="delPreg">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Eliminar Pregunta</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Desea elimar la pregunta?</p>
+                        <form>
+                            <input type="hidden" id="del_id_preg" name="del_id_preg" value="0">
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" onclick="confDelPreg()">Eliminar</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" role="dialog" id="error_punteo">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header alert-danger">
+                        <h5 class="modal-title" style="color: red;">Error</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="txt_error">
+                            <p>dummy</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="/static/css/iso_estilos.css">
+<script>
+    let id_ev = {{=id_ev}}
+    $(document).ready(function () {
+        getTipoPregunta();
+        getPreguntas();
+        $("#tipoP").on("change", selecTipo);
+    })
+    let activar_ev = "{{=URL('iso_ev_rendimiento', 'activar_evaluacion')}}/{{=id_ev}}";
+</script>
+<script type="text/javascript" src="/static/js/iso_evaluacion.js"></script>

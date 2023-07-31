@@ -1,0 +1,41 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12">
+        <div class="navbar-inner pt-2 pb-2 text-center">
+            <h4>Seccion de Preguntas Frecuentes</h4>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="well" style="background-color:#FAFAFA;">
+            <div class="row">
+                <div class="col-12">
+                    <label class="lbl_seleccionar"><b>Seleccionar categoría</b></label>
+                    <div class="form-group">
+                        {{=categoria_html}}
+
+                    </div>
+                    <button class="btn btn-primary form-group" type="button" id="btn_cargar"><i
+                            class="icon-chevron-right icon-white"></i> CARGAR</button>
+                </div>
+            </div>
+            {{=preguntas_html}}
+        </div>
+    </div>
+</div>
+
+
+{{block page_js}}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btn_cargar").click(function () {
+            var parametros = "{{=URL('pf_admin', 'ver_preguntas')}}?categoria_id=" + encodeURIComponent($('#select_categoria option:selected').val());
+            window.location.href = parametros;
+        });
+    });
+
+    $('#myTab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    })
+</script>
+{{end page_js}}

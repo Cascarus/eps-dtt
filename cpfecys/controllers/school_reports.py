@@ -293,7 +293,7 @@ def general_period():
             redirect(URL('default', 'home'))
 
         group_projects = db((db.project.area_level == area.id) & (db.user_project.period <= period.id) 
-                        & ((db.user_project.period + db.user_project.periods) > period.id)).select(
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)).select(
                             db.project.name,
                             db.project.id,
                             join=[db.project.on(db.user_project.project == db.project.id)],
@@ -499,7 +499,7 @@ def general_period_export():
 
         #CHECK PARAMETERS
         group_projects = db((db.project.area_level == area.id) & (db.user_project.period <= period.id) 
-                        & ((db.user_project.period + db.user_project.periods) > period.id)).select(
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)).select(
                             db.project.name,
                             db.project.id,
                             join=[db.project.on(db.user_project.project == db.project.id)],
@@ -736,7 +736,7 @@ def historic_course():
                 redirect(URL('default', 'home'))
             
             group_projects = db((db.project.area_level == area.id) & (db.user_project.period <= period.id) 
-                            & ((db.user_project.period + db.user_project.periods) > period.id)).select(
+                            & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)).select(
                                 db.project.name,
                                 db.project.id,
                                 join=[db.project.on(db.user_project.project == db.project.id)],
@@ -782,7 +782,7 @@ def historic_course():
         for course in name_courses:
             sections = db((db.project.name.like(f'%{course}%')) & (db.user_project.project == db.project.id)
                         & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                        & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.id, orderby=db.project.name, distinct=True)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.id, orderby=db.project.name, distinct=True)
             
             infoe_level_temp = [sections.first().id, course, 0, 0, 0, len(sections)]
             for project in sections:
@@ -908,7 +908,7 @@ def historic_course():
         for course in name_courses:
             sections = db((db.project.name.like(f'%{course}%')) & (db.user_project.project == db.project.id)
                         & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                        & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.name, db.project.id, orderby=db.project.name, distinct=True)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.name, db.project.id, orderby=db.project.name, distinct=True)
             for project in sections:
                 infoe_level_temp = [project.name, 0, 0, 0]
 
@@ -1052,7 +1052,7 @@ def historic_course_export():
         #CHECK PARAMETERS
         if request.vars['level'] == '1' or request.vars['level'] is None:
             group_projects = db((db.project.area_level == area.id) & (db.user_project.period <= period.id) 
-                            & ((db.user_project.period + db.user_project.periods) > period.id)).select(
+                            & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)).select(
                                 db.project.name,
                                 db.project.id,
                                 join=[db.project.on(db.user_project.project == db.project.id)],
@@ -1121,7 +1121,7 @@ def historic_course_export():
         for course in name_courses:
             sections = db((db.project.name.like(f'%{course}%')) & (db.user_project.project == db.project.id)
                         & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                        & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.name, db.project.id, orderby=db.project.name, distinct=True)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.name, db.project.id, orderby=db.project.name, distinct=True)
             
             infoe_level_temp = [course, 0, 0, 0, len(sections)]
             for project in sections:
@@ -1252,7 +1252,7 @@ def historic_course_export():
         for course in name_courses:
             sections = db((db.project.name.like(f'%{course}%')) & (db.user_project.project == db.project.id)
                         & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                        & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.name, db.project.id, orderby=db.project.name, distinct=True)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.name, db.project.id, orderby=db.project.name, distinct=True)
             for project in sections:
                 infoe_level_temp = [project.name, 0, 0, 0]
 
@@ -1397,7 +1397,7 @@ def percentage_change_grades():
                 redirect(URL('default', 'home'))
 
             group_projects = db((db.project.area_level == area.id) & (db.user_project.period <= period.id) 
-                            & ((db.user_project.period + db.user_project.periods) > period.id)).select(
+                            & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)).select(
                                 db.project.name,
                                 db.project.id,
                                 join=[db.project.on(db.user_project.project == db.project.id)],
@@ -1439,7 +1439,7 @@ def percentage_change_grades():
         #FOR COURSE
         for course in name_courses:
             sections = db((db.project.name.like(f'%{course}%')) & (db.user_project.period <= period.id)
-                        & ((db.user_project.period + db.user_project.periods) > 18)).select(
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > 18)).select(
                             db.project.id,
                             db.project.name,
                             join=[db.user_project.on(db.user_project.project == db.project.id)],
@@ -1466,7 +1466,7 @@ def percentage_change_grades():
         
         sections = db((db.project.name.like(f'%{name_c}%')) & (db.user_project.project == db.project.id)
                     & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                    & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.name, orderby=db.project.name, distinct=True)
+                    & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.name, orderby=db.project.name, distinct=True)
         
         total_changes = db((db.grades_log.yearp == period.yearp) & (db.grades_log.period == T(period.period.name))
                         & (db.grades_log.project.belongs([section.name for section in sections])) & ((db.grades_log.operation_log == 'update')
@@ -1520,7 +1520,7 @@ def percentage_change_grades_export():
         #CHECK PARAMETERS
         if request.vars['level'] == '1' or request.vars['level'] is None:
             group_projects = db((db.project.area_level == area.id) & (db.user_project.period <= period.id) 
-                            & ((db.user_project.period + db.user_project.periods) > period.id)).select(
+                            & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)).select(
                                 db.project.name,
                                 db.project.id,
                                 join=[db.project.on(db.user_project.project == db.project.id)],
@@ -1591,7 +1591,7 @@ def percentage_change_grades_export():
         for course in name_courses:
             sections = db((db.project.name.like(f'%{course}%')) & (db.user_project.project == db.project.id)
                         & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                        & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.id, db.project.name, orderby=db.project.name, distinct=True)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.id, db.project.name, orderby=db.project.name, distinct=True)
             
             info_level_temp = [course, 0, len(sections)]
             if total_changes > 0:
@@ -1629,7 +1629,7 @@ def percentage_change_grades_export():
  
         sections = db((db.project.name.like(f'%{name_c}%')) & (db.user_project.project == db.project.id)
                     & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                    & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.project.name, orderby=db.project.name, distinct=True)
+                    & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.project.name, orderby=db.project.name, distinct=True)
         
         total_changes = db((db.grades_log.yearp == period.yearp) & (db.grades_log.period == T(period.period.name))
                         & (db.grades_log.project.belongs([section.name for section in sections])) & ((db.grades_log.operation_log == 'update')
@@ -1658,7 +1658,7 @@ def get_assignations(project, period, role):
             & (db.auth_membership.group_id == db.auth_group.id) & (db.auth_group.role == role)
             & (project == False or (db.user_project.project == project)) & (db.project.area_level == db.area_level.id)
             & (db.user_project.project == db.project.id) & (db.user_project.period == db.period_year.id)
-            & ((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id)))
+            & ((db.user_project.period <= period.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)))
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))

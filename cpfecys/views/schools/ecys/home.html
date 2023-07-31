@@ -46,20 +46,20 @@
                                 </div>
                             </div>
                         </div>
-                        {{contadorF=0}}
-                        {{for notification in range(len(front_notification)-1, -1, -1):}}
-                            {{contadorF+=1}}
+                        {{contador_f = 0}}
+                        {{for notification in range(len(front_notification) - 1, -1, -1):}}
+                            {{contador_f += 1}}
                                 {{if front_notification[notification].visible:}}
                                     {{if front_notification[notification].promoted:}}
                                         <div class="carousel-item">
                                             {{if front_notification[notification].image_file is None or front_notification[notification].image_file == '': }}
-                                            <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
-                                                xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
-                                                aria-label="Placeholder: Second slide">
-                                                <rect width="100%" height="100%" style="fill: #fc7204; fill-opacity:0"></rect>
-                                            </svg>
+                                                <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="400"
+                                                    xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+                                                    aria-label="Placeholder: Second slide">
+                                                    <rect width="100%" height="100%" style="fill: #fc7204; fill-opacity:0"></rect>
+                                                </svg>
                                             {{else:}}
-                                            <img src="{{= URL('default/download', front_notification[notification].image_file)}}" alt="Notification" title="Notification" class=" w-100">
+                                                <img src="{{= URL('default/download', front_notification[notification].image_file)}}" alt="Notification" title="Notification" class=" w-100">
                                             {{pass}}
                                             <div class="container">
                                                 <div class="carousel-caption">
@@ -76,13 +76,13 @@
                                     {{else:}}
                                         <div class="carousel-item">
                                             {{if front_notification[notification].image_file is None or front_notification[notification].image_file == '': }}
-                                            <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="500"
-                                                xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
-                                                aria-label="Placeholder: Second slide">
-                                                <rect width="100%" height="100%" style="fill: #fc7204; fill-opacity:0"></rect>
-                                            </svg>
+                                                <svg class="bd-placeholder-img bd-placeholder-img-lg d-block w-100" width="800" height="500"
+                                                    xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" focusable="false" role="img"
+                                                    aria-label="Placeholder: Second slide">
+                                                    <rect width="100%" height="100%" style="fill: #fc7204; fill-opacity:0"></rect>
+                                                </svg>
                                             {{else:}}
-                                            <img src="{{= URL('default/download', front_notification[notification].image_file)}}" alt="Sample image" title="Sample image" class=" w-100">
+                                                <img src="{{=URL('default/download', front_notification[notification].image_file)}}" alt="Sample image" title="Sample image" class="w-100">
                                             {{pass}}
                                             <div class="container">
                                                 <div class="carousel-caption">

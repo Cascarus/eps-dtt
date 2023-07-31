@@ -1,0 +1,121 @@
+{{extend 'dashboard.html'}}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<style>
+  a {
+    color: black;
+  }
+</style>
+<div class="dttContainer">
+    <h1>Mis Aplicaciones</h1>
+    <input type="text" id="myInput" class="form-control" onkeyup="myFunction()" placeholder="Bucar por fecha o estado" title="Type in a name">
+    <table id="myTable" class="table table-striped table-bordered table-sm">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Empresa</th>
+                <th scope="col">Puesto</th>
+                <th scope="col">Fecha Aplicación</th>
+                <th scope="col">Estado</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{for item in seg:}}
+                <tr>
+                    <td> 
+                        <a style="cursor:pointer;" class="link-primary"
+                        href="{{=URL('lista_oferta', 'resumen', vars=dict( num = item['id_oferta_laboral']*109324+134544 ))}}">
+                            {{=item['nombre_empresa']}}
+                        </a>
+                    </td>
+                    <td value="1">{{=item['puesto']}}</td>
+                    <td>{{=item['fecha']}}</td>
+                    {{if int(item['id_estado_aplicacion']) == 6:}}
+                        <td><span class="badge badge-success">Solicitud recibida</span></td>
+                    {{else:}}
+                        <td><span class="badge badge-primary">{{=item['estado_aplicacion']}}</span></td>
+                    {{pass}}
+                    <td>
+                        <button name="btnDelete" id="{{=item['id_oferta_laboral']}}" value="{{=item['id_estudiante_cv']}}"
+                        onclick="deleteOf(this)" class="btn btn-danger bi bi-trash">
+                        </button>
+                    </td>
+                </tr>
+            {{pass}}
+        </tbody>
+    </table>
+</div>
+<script>
+    function myFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2];
+            td2 = tr[i].getElementsByTagName("td")[3];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                txtValue2 = td2.textContent || td2.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    function deleteOf(obj) {
+        let id_oferta = obj.id;
+        let id_cv = obj.value
+        swal.fire({
+            title: "Estas seguro de eliminar tu solicitud?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: 'Save',
+        })
+        .then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                const data = {
+                    id_oferta: id_oferta,
+                    id_cv: id_cv
+                }
+                $.ajax({
+                    type: 'post',
+                    url: '/lista_oferta/eliminar_solicitud',
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                            title: 'Tu CV ha sido eliminado exitosamente',
+                            text: res.msg,
+                            icon: 'success'
+                            }).then(() => window.location = '/lista_oferta/seguimiento_sol');
+                        } else {
+                            Swal.fire({
+                            title: 'Error!',
+                            text: res.msg,
+                            icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            } else if (result.isDenied) {
+                Swal.fire('Changes are not saved', '', 'info')
+            }
+        })
+    }
+</script>
+<script src="//cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

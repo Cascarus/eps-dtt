@@ -1,0 +1,248 @@
+{{extend 'dashboard.html'}}
+
+
+<div class="container mt-3">
+    <div class="row">
+        <div class="card col-sm-12 col-md-8 border border-secondary">
+            <div class="row card-header bg-dark text-white font-weight-bold ">
+                <div class="col-sm-12 col-md-6">
+                    <h5>CV Estudiante</h5>
+                </div>
+            </div>
+
+            <div class="card-body ">
+                <div class="row mt-3">
+                    <div class="col-sm-12 col-md-4"
+                        style="display: flex; align-items: center; justify-content: center;">
+                        <img id="img_cv" src="/static/build/images/autoridades/humn.png" alt="No photo">
+                    </div>
+                    <div class="col-sm-12 col-md-8"
+                        style="text-align: center; display: flex; justify-content: center; align-items: center;">
+                        <h2 class="mt-2">{{=datos_user['first_name']}} {{=datos_user['last_name']}}</h2>
+                    </div>
+
+                </div>
+
+                <div class="row mt-5" style="overflow: auto;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-dark text-center text-white font-weight-bold ">
+                                Resumen del perfil
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <div class="col-sm-12 col-xl-4 mt-2">
+                                        <label for="edad" class="col-sm-12  col-form-label">Edad:</label>
+                                        <input type="text" readonly class=" col-sm-12 form-control mt-1" id="edad"
+                                            value="{{=datos_cv['edad']}}">
+                                    </div>
+                                    <div class="col-sm-12 col-xl-4 mt-2">
+                                        <label for="creditos" class="col-sm-12 col-form-label">Creditos
+                                            Aprobados:</label>
+                                        <input type="text" readonly class="col-sm-12 form-control mt-1" id="creditos"
+                                            value="{{=creditos_aprobados}}">
+                                    </div>
+                                    <div class="col-sm-12 col-xl-4 mt-2">
+                                        <label for="creditos" class="col-sm-12 col-form-label">Certificacion de
+                                            Cursos:</label>
+                                        <button class="col-sm-12 btn btn-primary btn mt-1 text-justify"
+                                            onclick="verCertificado('{{=datos_cv['cursos_aprobados']}}')">Ver
+                                            certificado</button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div class="row mt-3" style="overflow: auto;">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header bg-dark text-center text-white font-weight-bold">
+                                Areas de Especialidad
+                            </div>
+                            <div class="card-body">
+                                <div class="row ml-2" style="font-size: 18px;">
+                                    {{for area in areas_est:}}
+                                    <span class="badge badge-primary mr-1 mt-1">{{=area['area_especialidad']}}</span>
+                                    {{pass}}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row mt-3">
+                    <div class="card col-12 ">
+                        <div class="card-header bg-dark text-center text-white font-weight-bold">
+                            Experiencia Laboral
+                        </div>
+                        <div class="card-body">
+                            {{for exp in experiencia_lab:}}
+                            <div class="card w-95 m-0 p-0">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12  col-xl-8">
+                                            <h5 class="card-title">{{=exp['puesto']}}</h5>
+                                            <h6 class="card-subtitle mb-2 text-muted">{{=exp['empresa']}}</h6>
+                                            <span
+                                                class="card-subtitle mb-2 text-muted d-block d-xl-none ">{{=exp['fecha_inicio']}}
+                                                - {{=exp['fecha_fin']}}</span>
+                                            <p>{{=exp['descripcion']}}</p>
+                                        </div>
+                                        <div class="col-xl-4 d-none d-xl-block ">
+                                            <label for="">{{=exp['fecha_inicio']}} - {{=exp['fecha_fin']}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{pass}}
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-3" style="overflow: auto;">
+                    <div class="card col-12">
+                        <div class="card-header bg-dark text-center text-white font-weight-bold">
+                            Cursos y Certificaciones
+                        </div>
+                        <div class="card-body">
+                            {{for cert in certificaciones:}}
+                            <div class="card w-95">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-12 col-xl-8">
+                                            <h5 class="card-title">{{=cert['nombre_certificacion']}}</h5>
+                                            <span class="card-subtitle mb-2 text-muted d-block d-xl-none ">
+                                                {{=cert['fecha_expedicion']}}
+                                            </span>
+                                            {{if(cert['tipo']==1):}}
+                                            {{archivo = cert['enlace']}}
+                                            <button class="btn btn-primary btn-sm" onclick='verCertificado("{{=archivo}}")'>
+                                                Ver Credencial
+                                            </button>
+                                            {{else:}}
+                                            <a class="btn btn-primary btn-sm" href="{{=cert['enlace']}}"
+                                                class="card-link" target="_blank">Ver Credencial</a>
+                                            {{pass}}
+                                        </div>
+                                        <div class="col-12 col-xl-4 d-none d-xl-block">
+                                            <label for="">{{=cert['fecha_expedicion']}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{pass}}
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="row mt-3" style="overflow: auto;">
+                    <div class="card col-12">
+                        <div class="card-header bg-dark text-center text-white font-weight-bold">
+                            Habilidades Tecnicas
+                        </div>
+                        <div class="card-body">
+                            <div class="row ml-2" style="font-size: 18px;">
+                                {{for hab in habilidades_usuario:}}
+                                <span class="badge badge-primary mr-1 mt-1">{{=hab['habilidad']}}</span>
+                                {{pass}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-4  ">
+            <div class="row mt-3" style="overflow: auto;">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-center text-white font-weight-bold">
+                            Informacion de Contacto
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <label for="correo" class="col-sm-12 col-md-4  col-form-label">Correo:</label>
+                                <input type="text" readonly class="col-sm-12  col-md-8 form-control-plaintext "
+                                    id="correo" value="{{=datos_cv['correo']}}">
+                            </div>
+                            <div class="form-group row">
+                                <label for="telefono" class="col-sm-12 col-md-4 col-form-label">Telefono:</label>
+                                <input type="text" readonly class="col-sm-12 col-md-8 form-control-plaintext"
+                                    id="telefono" value="{{=datos_cv['telefono']}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3" style="overflow: auto;">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-dark text-center text-white font-weight-bold">
+                            Visibilidad
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group row">
+                                <input type="text" readonly class="col-sm-12  col-md-8 form-control-plaintext "
+                                    id="visibilidad" value="{{=visibility}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+
+    </div>
+
+    <style>
+        #img_cv {
+            height: 150px;
+            width: 150px;
+            border-radius: 50%;
+        }
+    </style>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+
+        function verCertificado(certificado) {
+            var fd = new FormData();
+            fd.append("documento_cv", certificado);
+
+            $.ajax({
+
+                url: `${location.protocol}//${location.hostname}:${location.port}/bolsa_trabajo/obtener_cv`,
+                type: "POST",
+                data: fd,
+                success: function (resp) {
+                    downloadPDF(resp)
+                },
+                cache: false,
+                contentType: false,
+                processData: false,
+                
+            });
+        }
+
+        function downloadPDF(pdf) {
+            const linkSource = `data:application/pdf;base64,${pdf}`;
+            const downloadLink = document.createElement("a");
+            const fileName = "Certificado.pdf";
+            downloadLink.href = linkSource;
+            downloadLink.download = fileName;
+            downloadLink.click();
+        }
+
+    </script>

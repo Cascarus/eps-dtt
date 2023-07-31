@@ -1,0 +1,177 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class='row p-0 m-0'>
+        <div class='d-flex w-100 justify-content-center py-3 px-0'>
+            <h2>
+                Exportar reportes
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                    <span class="fa fa-question-circle"></span>
+                  </button>
+            </h2>
+        </div>
+    </div>
+
+    <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+        <div class="col-12 ">
+            <table class="table table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>{{=T('#')}}</th>
+                        <th>{{=T('Reportes')}}</th>
+                        <th>{{=T('Exportar')}}</th>
+                    </tr>
+                </thead>
+                <tbody id="tb-salarios">
+                    <tr>
+                        <td>{{=T('1')}}</td>
+                        <td class="h5">{{=T('Empresas NO Aceptadas')}}</td>
+                        <td>
+                            <a class= "btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Empresas_NO_Aceptadas.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{=T('2')}}</td>
+                        <td class="h5">{{=T('Empresas Registradas')}}</td>
+                        <td>
+                            <a class= "btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Empresas_Registradas.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{=T('3')}}</td>
+                        <td class="h5">{{=T('Ofertas Laborales Registradas')}}</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Ofertas_Laborales_Registradas.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>                
+                    <tr>
+                        <td>{{=T('4')}}</td>
+                        <td class="h5">{{=T('Cantidad de Ofertas Aceptadas por Empresa')}}</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Ofertas_Laborales_Aceptadas.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{=T('5')}}</td>
+                        <td class="h5">{{=T('Promedio de Rangos Salariales por Especialidad')}}</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Promedio_Salarial_Especialidad.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>{{=T('6')}}</td>
+                        <td class="h5">{{=T('Visitas por Ofertas de Trabajo')}}</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Visitas_Por_Oferta.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>                
+                    <tr>
+                        <td>{{=T('7')}}</td>
+                        <td class="h5">{{=T('Oferta de trabajo con Cantidad de Aplicantes')}}</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Oferta_y_Cantidad_Aplicantes.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>                
+                    <tr>
+                        <td>{{=T('8')}}</td>
+                        <td class="h5">{{=T('Solicitudes Recibidas por Empresa ')}}</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Solicitudes_RECIBIDAS_Empresa.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>       
+                    <tr>
+                        <td>{{=T('9')}}</td>
+                        <td class="h5">Solicitudes Revisadas por Empresa</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Solicitudes_REVISADAS_Empresa.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>       
+                    <tr>
+                        <td>{{=T('10')}}</td>
+                        <td class="h5">Estudiantes Contactados por Empresa</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Solicitantes_CONTACTADOS_Empresa.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr>                       
+                    <tr>
+                        <td>{{=T('11')}}</td>
+                        <td class="h5">Estudiantes Contratados por empresa</td>
+                        <td>
+                            <a class=" btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/Reporte_Solicitantes_CONTRATADOS_Empresa.csv" target="_blank">
+                                <i class="fa fa-download "> </i> Exportar CSV
+                            </a>
+                        </td>
+                    </tr> 
+                </tbody>
+            </table>
+        </div>
+    </div>
+     <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="myModalLabel">{{=T('modulo de repostes de bolsa Trabajos')}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <p>
+                {{=T('Modulo de reporteria para el modulo de bolsa de trabajo.')}}
+            </p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{{=T('Close')}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $.ajax({
+        type: 'GET',
+        url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/reportes_docs`,
+        async: false,
+        success: function (res) {
+            res = JSON.parse(res);
+            if (res.success) {
+                Swal.fire({
+                    title: 'Reportes!',
+                    text: `${res.msg} ${res.error}`,
+                    icon: 'success'
+                })
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: res.msg,
+                    icon: 'error'
+                });
+            }
+        },
+        error: function (xhr, status, errorThrown) {
+        }
+    });
+</script>

@@ -1,16 +1,14 @@
 {{extend 'dashboard.html'}}
 <div class="mt-4">
   <div class="row">
-    <div class="col-12">
-      <h3>ABC de Entregables</h3>
+    <div class="col-12 text-center">
+      <h3>ABC de entregables</h3>
     </div>
     <div class="col-12 mt-3">
       <a onclick="window.history.back()" class="btn btn-primary"
         ><i class="icon-arrow-left"></i>{{=T('Back')}}</a
       >
       <!-- Inicio - Prácticas Finales(DS) - Fernando Reyes -->
-      {{print('ERROR')}}
-      {{print(action)}}
       {{if 'item_id' in action:}}
       <a
         href="{{=URL('admin', 'signature_assignment',vars={'document' : action['item_id'], 'reference' : 'item'})}}"

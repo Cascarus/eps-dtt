@@ -1,0 +1,63 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <div class="row">
+        <div class="col">
+            <center>
+                <h2>Implicados</h2>
+            </center>
+            <br>
+            <center>
+                <h3>Agregar implicados</h3>
+            </center>
+            <form action="{{=URL('infringements_and_sanctions', 'sanction_manage_involve',id_sancion + '/add')}}" method="post">
+                <div class="form-group">
+                    <label for="involucrados">Estudiantes</label>
+                    <select name="involucrados" id="involucrados" class="form-control" multiple required>
+                        {{for est in no_involucrados:}}
+                            <option value="{{=est['id']}}">
+                                {{=est['carnet']}} - {{=est['nombre']}}
+                            </option>
+                        {{pass}}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-block btn-success">Agregar</button>
+            </form>
+            <br><br>
+            <center>
+                <h3>Implicados actuales</h3>
+            </center>
+            <table class="table table-striped">
+                <colgroup>
+                    <col style="width: 20%;">
+                    <col style="width: 60%;">
+                    <col style="width: 20%;">
+                </colgroup>
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Carnet</th>
+                        <th>Nombre</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for est in involucrados:}}
+                        <tr>
+                            <td>{{=est['carnet']}}</td>
+                            <td>{{=est['nombre']}}</td>
+                            <td>
+                                <center>
+                                    <form
+                                        action="{{=URL('infringements_and_sanctions', 'sanction_manage_involve',id_sancion + '/delete')}}"
+                                        method="post">
+                                        <input type="hidden" name="caso" id="caso" value="{{=est['id']}}">
+                                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                    </form>
+                                </center>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

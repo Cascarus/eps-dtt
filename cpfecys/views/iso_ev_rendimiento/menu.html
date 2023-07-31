@@ -1,0 +1,36 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Evaluación de rendimiento</h1>
+        </div>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="card mb-4">
+                        <div class="card-header"></div>
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                Crear evaluación de rendimiento
+                            </h4>
+                            <a class="w-100 btn btn-lg btn-primary" type="button"
+                                href="{{=URL('iso_ev_rendimiento', 'crear_encuesta')}}">Ir</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card mb-4">
+                        <div class="card-header"></div>
+                        <div class="card-body">
+                            <h4>
+                                Listar evaluaciones de rendimiento
+                            </h4>
+                            <a class="w-100 btn btn-lg btn-primary" type="button"
+                                href="{{=URL('iso_ev_rendimiento', 'listar_evaluaciones')}}">Ir</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

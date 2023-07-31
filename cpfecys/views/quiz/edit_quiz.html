@@ -1,4 +1,6 @@
 {{extend 'dashboard.html'}}
+
+{{block page_js}}
 <script type="text/javascript" src="{{=URL('static','js/quiz-js/editQuiz.js')}}"></script>
 <script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
 <script type="text/javascript">
@@ -30,6 +32,7 @@
         }
     });
 </script>
+{{end page_js}}
 
 <div class="mt-4">
 	<div class="col-12">

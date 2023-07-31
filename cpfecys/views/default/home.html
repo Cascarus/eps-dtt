@@ -1,10 +1,9 @@
 {{extend 'dashboard.html'}}
-
 <div class="row">
     <div class="col-12 text-center mt-5">
         <div class="image_outer_container">
             <div class="image_inner_container">
-                {{if session.auth.user.photo != None:}}
+                {{if session.auth.user.photo is not None:}}
                     <img id="img_img" src="{{=URL('default/download', session.auth.user.photo)}}" alt="User">
                 {{else:}}
                     <img id="img_img" src="/static/build/images/autoridades/humn.png" alt="No photo">
@@ -13,7 +12,7 @@
         </div>
     </div>
     <div class="col-12 text-center">
-        <h1>{{=session.auth.user.first_name}} {{=session.auth.user.last_name}}</h1>
+        <h1>{{=session.auth.user.first_name if session.auth.user.first_name is not None else ''}} {{=session.auth.user.last_name if session.auth.user.last_name is not None else ''}}</h1>
     </div>
     <div class="col-12 col-md-6 text-center m-auto">
         {{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
@@ -28,7 +27,7 @@
                     </div>
                 </div>
             {{else:}}
-                {{if review.accepted == False:}}
+                {{if not review.accepted:}}
                     <div class="alert alert-danger" role="alert">
                         <div class="dtt__title--photo">
                         <strong>{{=T('Photo Rejected')}}</strong> 

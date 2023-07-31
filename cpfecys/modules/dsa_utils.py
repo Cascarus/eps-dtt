@@ -297,9 +297,7 @@ def get_quantity_of_download(month, year, user):
             month, year, user)
 
 def get_id_from_student(username):
-    return ("SELECT"
-            " * FROM dsa_user"
-            " WHERE username = '{}';").format(username)
+    return (f"SELECT * FROM dsa_user WHERE username = '{username}';")
 
 def get_documents_per_month(month, year, user):
     return ("SELECT"
@@ -368,17 +366,17 @@ def create_student(student, service):
         if student['email'] == "": query += "NULL);"
         else: query += "'" + student['email'] + "');"
     else:
-        query += " ('" + student['name'].encode("utf8") + "', "
+        query += " ('" + student['name']+ "', "
 
-        query += "'" + student['last_name'].encode("utf8") + "', "
+        query += "'" + student['last_name']+ "', "
 
         if student['cui'] == "": query += "NULL, '"
-        else: query += "'" + student['cui'].encode("utf8") + "', '"
+        else: query += "'" + student['cui'] + "', '"
 
-        query += student['username'].encode("utf8") + "', "
+        query += student['username'] + "', "
 
         if student['email'] == "": query += "NULL);"
-        else: query += "'" + student['email'].encode("utf8") + "');"
+        else: query += "'" + student['email'] + "');"
 
     return query
 

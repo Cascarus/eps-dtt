@@ -1,0 +1,16 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div>
+        <div class="col-12 text-center">
+            <h3>Archivos</h3>
+        </div>
+        <div class="col-12">
+            <ul class="list-group">
+                {{for file in files:}}
+                <li class="list-group-item list-group-item-action"><a href="{{=URL('default/download', file.file_data)}}" target="blank"> {{=file.name}} </a></li>
+                {{pass}}
+            </ul>
+        </div>
+    </div>
+</div>
+

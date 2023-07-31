@@ -1,25 +1,14 @@
 {{extend 'dashboard.html'}}
 <div class="col-12 text-center mt-4">
   <h2>
-    {{=T('Final Practice Administration')}}
-    <a
-      href="#myModal"
-      role="button"
-      class="btn btn-primary"
-      data-toggle="modal"
-    >
+    Administración de práctica final
+    <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal">
       <span class="fa fa-question-circle"></span>
     </a>
   </h2>
+  <small>{{=T(currentyear_period.period.name)}} - {{=currentyear_period.yearp}}</small>
 </div>
-<div
-  class="modal fade"
-  id="myModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="myModalLabel"
-  aria-hidden="true"
->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -56,132 +45,79 @@
 </div>
 
 <!--emarquez: modificacion logica de pestañas-->
+{{checked_var = ''}}
+{{if type == 1:}}
+  {{checked_var = 'checked'}}
+{{pass}}
+{{if 'type' in request.vars and request.vars['type'] == '1':}}
+  {{checked_var = 'checked'}}
+{{pass}}
 Seleccione tipo de periodo <br />
-<input
-  id="chkTipoCurso"
-  type="checkbox"
-  checked
-  data-toggle="toggle"
-  data-on="Semestres"
-  data-off="Periodos"
-  data-size="mini"
-/>
+<input id="chkTipoCurso" type="checkbox" {{=checked_var}} data-toggle="toggle" data-on="Semestres" data-off="Periodos" data-size="mini"/>
 <!--emarquez: fin -->
 
 <div class="tabbable">
   <!-- Only required for left/right tabs -->
   <!--emarquez id de tab-->
   <ul class="nav nav-tabs" id="listaTab">
-    <li class="nav-item">
-      <a class="nav-link active" href="#setuptab" data-toggle="tab">
-        {{=T('Other Periods')}}
-      </a>
-    </li>
     {{for item in periods_before:}}
-    <!--emarquez: cambio de parametro para enviar el correcto-->
-    <li class="nav-item">
-      <a
-        class="nav-linkl text-center"
-        href="{{=URL(vars=dict(year_period=item.period_year.id,type=type))}}"
-      >
-        <span class="text-center">
-          {{=str(item.period_year.yearp)}}
-          <br />
-          {{=str(T(item.period.name))}}
-        </span>
-        {{pass}}
-      </a>
-    </li>
+      <!--emarquez: cambio de parametro para enviar el correcto-->
+      <li class="nav-item">
+        <a class="nav-link text-center" href="{{=URL(vars=dict(year_period=item.period_year.id,type=type))}}">
+          <span class="text-center">
+            {{=item.period_year.yearp}}
+            <br />
+            {{=T(item.period.name)}}
+          </span>
+        </a>
+      </li>
     {{pass}}
-
-    <!--emarquez: eliminacion de current period
-      <li class="active"><a href="#data{{=currentyear_period.id}}"
-    data-toggle="tab">
-              {{=str(currentyear_period.yearp) + ' - ' + str(current_period_name.name)
-    }}
-    -->
     <li id="upload1" class="nav-item">
-      <a
-        class="nav-link"
-        href="{{=URL('assignation_upload', vars=dict(type=type,year_period=currentyear_period.id))}}"
-      >
-        {{=T('CSV Assignation')}}
+      <a class="nav-link text-center" href="{{=URL('assignation_upload', vars=dict(type=type,year_period=currentyear_period.id))}}">
+        Asignación de tutores 
+        <br/>
+        por CSV
       </a>
     </li>
     <li id="upload2" class="nav-item">
-      <a
-        class="nav-link"
-        href="{{=URL('teacher_assignation_upload', vars=dict(type=type,year_period=currentyear_period.id))}}"
-      >
-        {{=T('Teacher CSV Assignation')}}
+      <a class="nav-link text-center" href="{{=URL('teacher_assignation_upload', vars=dict(type=type,year_period=currentyear_period.id))}}">
+        Asignación de catedrático
+        <br/>
+        por CSV
       </a>
     </li>
   </ul>
   <div class="tab-content">
-    <div class="tab-pane" id="setuptab">
-      <form>
-        <select name="year_period" class="form-control">
-          {{for item in other_periods:}}
-          <option value="{{item.id}}">
-            {{=str(item.id) + ' - ' + str(T('item.name'))}}
-          </option>
-          {{pass}}
-        </select>
-        <input type="submit" class="btn btn-primary" value="{{=T('go')}}" />
-      </form>
-    </div>
     <div class="tab-pane active" id="data{{=currentyear_period.id}}">
       {{=grid}}
     </div>
   </div>
 </div>
-<hr />
-{{if request.is_local:}} {{=response.toolbar()}} {{pass}}
 
+{{block page_js}}
 <!--emarquez: javascript-->
 <script type="text/javascript">
-
   $(document).ready(function(){
-
-  if("{{=request.vars['type']}}"!="None")
-  var tipo = {{=request.vars['type']}}
-
-   if(tipo==2)
-    $('#chkTipoCurso').removeProp('checked');
-   else
-    $('#chkTipoCurso').prop('checked')
-
-
+    if("{{=request.vars['type']}}" != "None") var tipo = {{=request.vars['type']}}
+      
+    if (tipo == 2) $('#chkTipoCurso').removeProp('checked');
+    else $('#chkTipoCurso').prop('checked')
+    
     $('#chkTipoCurso').change(function() {
-      if($(this).prop('checked'))
-        document.location.href = "{{=URL('final_practice')}}"  //semestres
-      else document.location.href = "{{=URL(vars=dict(year_period=0,type=2))}}" // periodos variables
+      if($(this).prop('checked')) document.location.href = "{{=URL('final_practice')}}"  //semestres
+      else document.location.href = "{{=URL(vars=dict(year_period=0, type=2))}}" // periodos variables
     });
 
+    //Colocar como activo el panel que contenga "period_year=nperiodo"
+    $('#listaTab li').each(function(indice, elemento) {
+      var link = $(this).find("a").prop("href");
+      if (link.indexOf("year_period={{=currentyear_period.id}}") >= 0)
+      $(this).addClass("active");
+    });
 
-  //Colocar como activo el panel que contenga "period_year=nperiodo"
-
-  //$('#listaTab li').each(function(i, e)
-  //{
-  //  $(this).removeClass("active");
-  //}
-
-
-  $('#listaTab li').each(function(indice, elemento) {
-
-    var link= $(this).find("a").prop("href");
-    //if (str.indexOf("Yes") >= 0)
-    // year_period=3
-    if (link.indexOf("year_period={{=currentyear_period.id}}")>=0)
-    $(this).addClass("active");
-  //	else $(this).removeClass("active");
-
-    //console.log('El elemento con el índice '+link);
-  });
-
-  //como lleva el parametro tambien lo activa, con lo siguiente se desactiva
-  $("#upload1").removeClass("active");
-  $("#upload2").removeClass("active");
-
+    //como lleva el parametro tambien lo activa, con lo siguiente se desactiva
+    $("#upload1").removeClass("active");
+    $("#upload2").removeClass("active");
   });
 </script>
+{{end page_js/}}

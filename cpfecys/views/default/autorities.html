@@ -1,0 +1,176 @@
+{{extend 'layout.html'}}
+<style>
+    /* Estilos CSS para las animaciones */
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Aplicar animaciones a los elementos */
+    .fadeIn {
+        animation-name: fadeIn;
+    }
+
+    .slideIn {
+        animation-name: slideIn;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 style="color: orange; font-size: 48px">Autoridades </h1>
+            <hr style="border-color:gray;"> 
+            <div class="card mb-3">
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Decana</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Inga. Aurelia Anabela Cordova Estrada</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Vocal I</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Ing. Jose Francisco Gomez Rivera</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Vocal II</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Ing. Mario Renato Escobedo Martinez</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Vocal III</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Ing. Jose Milton de Leon Bran</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Vocal IV</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Br. Luis Diego Aguilar Ralon</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Vocal V</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Br. Christian Daniel Estrada Santizo</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Secretario Junta Directiva</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">Ing. Hugo Humberto Rivera Perez</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-gutters mb-3">
+                    <div class="col-md-2 d-flex justify-content-center">
+                        <div class="image_outer_container">
+                            <div class="image_inner_container">
+                                <img src="/static/build/images/autoridades/humn.png" alt="Decano">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8 text-left">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-weight: bold; font-size: 20px" >Director de Escuela Ciencias y Sistemas</h5>
+                            <p class="card-text" style="color: rgb(122, 86, 18);font-size: 18px">MSc. Ing. Carlos Gustavo Alonzo</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Obtener todas las imágenes con la clase "image_inner_container"
+    var images = document.querySelectorAll('.image_inner_container');
+
+    // Agregar las clases de animación a las imágenes
+    images.forEach(function(image) {
+        image.classList.add('animated', 'fadeIn', 'slideIn');
+    });
+</script>

@@ -1,0 +1,28 @@
+{{extend 'layout.html'}}
+<div class="container d-flex justify-content-center">
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            {{if mensaje != '':}}
+                <div class="alert alert-danger" role="alert">
+                    {{=mensaje}}
+                </div>
+            {{pass}}
+            <table style="background-color:#e3ecec">
+                <tr>
+                    <td>
+                        <h3>
+                            <img src="{{=ruta_iconos}}/id_2.png">
+                            1. Validación de registro universitario
+                        </h3>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label style="color: #696969;"><b>(Carnet)</b></label>
+                        {{=form}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

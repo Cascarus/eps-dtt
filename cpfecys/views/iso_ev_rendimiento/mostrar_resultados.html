@@ -1,0 +1,53 @@
+{{extend 'dashboard.html'}}
+{{if len(resultados):}}
+    {{if "Teacher" in session.auth.user_groups.values():}}
+        <h1>Resultado de las Evaluaciones de Rendimiento</h1>
+    {{else: }}
+        <h1>Resultado de la Evaluación de Rendimiento: {{=encuesta[0].nombre}}</h1>
+        <a class='btn btn-large btn-primary'
+            href='/iso_ev_rendimiento/descargar_resultado?iso_encuesta_id={{=iso_encuesta_id}}&amp;list_type=csv'>
+            Descargar Resultados
+        </a>
+    {{pass}}
+    <div class="web2py_grid">
+        <div class="web2py_table">
+            <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                <table>
+                    <thead>
+                        <th><a href="#">#</a></th>
+                        <th><a href="#">Proyecto</a></th>
+                        {{if "Teacher" in session.auth.user_groups.values():}}
+                            <th>
+                                <a href="#">Evaluación</a>
+                            </th>
+                        {{pass}}
+                        <th><a href="#">Carnet</a></th>
+                        <th><a href="#">Nombre</a></th>
+                        <th><a href="#">Punteo</a></th>
+                        <th><a href="#">Gráfica</a></th>
+                    </thead>
+                    <tbody>
+                        {{for curso in resultados:}}
+                            <tr>
+                                <td>{{=curso[0]}}</td>
+                                <td>{{=curso[1]}}</td>
+                                {{if "Teacher" in session.auth.user_groups.values():}}
+                                    <td>{{=curso[8]}}</td>
+                                {{pass}}
+                                <td>{{=curso[2]}}</td>
+                                <td>{{=curso[3]}} {{=curso[4]}}</td>
+                                <td>{{if curso[5]:}}{{=curso[5]}} {{else:}}No calificado{{pass}}</td>
+                                    <td>
+                                        <a
+                                            href="{{=URL('iso_ev_rendimiento','resultado_evaluacion')}}?idevrcurso={{=curso[6]}}">Ver</a>
+                                    </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{{else:}}
+    <h1>No hay resultados</h1>
+{{pass}}

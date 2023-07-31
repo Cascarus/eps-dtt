@@ -1,0 +1,93 @@
+{{extend 'dashboard.html'}}
+{{step_count = 0}}
+{{row_count = 1}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div  class="well">
+                <center>
+                    {{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator')):}}
+                        <h2>
+                            Resultados evaluación de desempeño 360 grados
+                            <br>
+                            <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+                        </h2>
+                    {{pass}}
+                </center>
+                <table class="table-responsive">
+                    <tr>
+                        <td>
+                            <div data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
+                                <form class="form-inline" action="{{=URL('evaluation','search')}}" method='get'>
+                                    <select name="period" class="form-control">
+                                        {{for period in periods:}}
+                                            {{if str(period.id) == str(periodo.id):}}
+                                                {{var_sel="selected='selected'"}}
+                                            {{else:}}
+                                                {{var_sel=''}}
+                                            {{pass}}
+                                            <option value="{{=period.id}}" {{=var_sel}}>
+                                                {{=T(period.period.name)}}-{{=period.yearp}}
+                                            </option>
+                                        {{pass}}
+                                    </select>
+                                    <select name="group" class="form-control">
+                                        {{for group in groups:}}
+                                            {{if str(group.id) == str(grupo.id):}}
+                                                {{var_sel_g="selected='selected'"}}
+                                            {{else:}}
+                                                {{var_sel_g=''}}
+                                            {{pass}}
+                                            <option value="{{=group.id}}" {{=var_sel_g}}>
+                                                {{if group.role == 'Student':}}
+                                                    {{=T('Rol Student')}}
+                                                {{else:}}
+                                                    {{=T(group.role)}}
+                                                {{pass}}
+                                            </option>
+                                        {{pass}}
+                                    </select>
+                                    <input class="btn btn-primary" type="submit" value="{{=T('Go')}}">
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                <div class=table-responsive align="left">
+                    <table>
+                        <tr>
+                            <td>
+                                <table class="table table-bordered table-striped table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th scope="row">#</th>
+                                            <th>Username</th>
+                                            <th>Nombre</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{for row in rows:}}
+                                            <tr>
+                                                <th scope="row">{{=row_count}}</th>
+                                                <td>{{=row.auth_user.username}}</td>
+                                                <td>{{=row.auth_user.first_name}} {{=row.auth_user.last_name}}</td>
+                                                <td>
+                                                    <center>
+                                                        <a class="btn btn-small btn-info" href="{{=URL('evaluation', 'results', vars=dict(user=row.auth_user.id,period=row.evaluation_result.period, group=row.auth_group.id))}}"  class="btn btn-primary" ><i class="icon-list-alt"></i> {{=T('Go')}}</a>
+                                                    </center>
+                                                </td>
+                                            </tr>
+                                            {{row_count += 1}}
+                                        {{pass}}	
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

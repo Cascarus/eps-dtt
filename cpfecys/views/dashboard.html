@@ -1,84 +1,22 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>CPFECYS | DTT</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <meta name="description"
-            content="Escuela de Ciencias y Sistemas, Desarrollo de Transferencia Tecnológica, Universidad de San Carlos de Guatemala">
-        <meta name="keywords" content="DTT, ECYS, FIUSAC, SISTEMAS, Computación, Ingeniería">
-        <link rel="icon" type="image/x-icon" href="/static/build/images/favicon.ico">
-        <link rel="stylesheet" href="/static/build/css/admin-{{=school}}.css">
-        <meta http-equipv="Content-Type" content="text/html; charset=iso-8859-1">
-        {{include 'web2py_ajax.html'}}
-        <script type="text/javascript">
-            var _URLPERIOD_VARIABLE =  "{{=URL('admin', 'get_periodos_variables') }}";
-            var _URLPERIOD_SEMESTRE = "{{=URL('admin', 'get_periodos_semestre')}}";
-            var _URLNOTIFICATION_NUMBER = "{{=URL('notification','get_notification_number') }}";
-            var _URL_PERIODS = "{{=URL('admin', 'get_periodos') }}";
-            var PERIODOS_VARIABLES;
-            var PERIODOS_SEMESTRE;
-            var tipo_periodo = "{{=request.vars['tipo_periodo']}}";
-            var periodo = "{{=request.vars['period']}}";
-            var userName = "array={{=auth.user.username}}";
-        </script>
-        <script src="{{=URL('static','build/js/jquery.js')}}"></script>
-        <script src="{{=URL('static','build/js/bootstrap.bundle.min.js')}}"></script>
-        <script src="{{=URL('static','build/js/web2py.js')}}"></script>
-        <script src="{{=URL('static','build/js/web2py-bootstrap4.js')}}"></script>
-        <script src="{{=URL('static','build/js/admin-min.js')}}"></script>
-        <script src="{{=URL('static', 'js/excelise.js')}}"></script>
-        <script src="{{=URL('static','js/bootstrap-toggle.min.js')}}"></script>
-        
-        <script  type="text/javascript">
-            {{if 'Student' in session.auth.user_groups.values() or 'Academic' in session.auth.user_groups.values() or 'Teacher' in session.auth.user_groups.values():}}
-                if(window.page != 'update_data'){
-                    refreshData();
-                }        
-            {{pass}}
-    
-            console.log(typeof window.page, window.page)
-            if(window.page != 'update_data' && window.page != undefined) {
-                console.log("a")
-                //emarquez
-                $.ajax({
-                    url:_URLPERIOD_SEMESTRE,
-                    async: false,
-                    success: function(result){
-        
-                        console.log('periodos dashboard', _URLPERIOD_SEMESTRE, result)
-                        //if(result){ 
-                            PERIODOS_SEMESTRE = result;// }
-                        $.ajax({
-                            url:_URLPERIOD_VARIABLE,
-                            success: function(result){
-                                //if(result){ 
-                                    PERIODOS_VARIABLES = result; //}
-                            }
-                        });
-                    },
-                    error: function(result) {
-                        console.log('error', result)
-                    }
-                });
-            }
-        </script>
-        
-        {{if school == 'ecys':}}    
-            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
-            <script>
-                window.dataLayer = window.dataLayer || [];
-                function gtag() { dataLayer.push(arguments); }
-                gtag('js', new Date());
-    
-                gtag('config', 'UA-143827878-1');
-            </script>    
-        {{pass}}
-    </head>
-    <body class="fixed-nav sticky-footer bg-dark" id="page-top">
-     <!-- Navigation-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CPFECYS | DTT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description"
+        content="Escuela de Ciencias y Sistemas, Desarrollo de Transferencia Tecnológica, Universidad de San Carlos de Guatemala">
+    <meta name="keywords" content="DTT, ECYS, FIUSAC, SISTEMAS, Computación, Ingeniería">
+    <link rel="icon" type="image/x-icon" href="/static/build/images/{{=school}}/favicon.ico">
+    <link rel="stylesheet" href="/static/build/css/admin-{{=school}}.css">
+    <meta http-equipv="Content-Type" content="text/html; charset=iso-8859-1">
+    {{include 'web2py_ajax.html'}}
+</head>
+
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+    <!-- Navigation-->
     <nav class="navbar navbar-expand-lg bg-dark navbar-dark fixed-top dtt-navbar" id="mainNav">
         <a class="navbar-brand" href="/home">
             <img src="/static/build/images/{{=school}}/logo-dtt.png" alt="{{=school}}" height="60"/>
@@ -209,6 +147,21 @@
 
                     </ul>
                 </li>
+                <li class="nav-item" title="Bolsa de Trabajo">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsebolsatrabajo"
+                        data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-briefcase"></i>
+                        <span class="nav-link-text">Bolsa de Trabajo</span>
+                    </a>
+                    <ul class="sidenav-third-level collapse" id="collapsebolsatrabajo">
+                        <li><a href="/cpfecys/bolsa_trabajo/suscripciones">Suscripción Empresas</a></li>
+                        <li><a href="/cpfecys/bolsa_trabajo/editor">Editor</a></li>
+                        <li><a href="/cpfecys/bolsa_trabajo/reportes">Reportes</a></li>
+                        <li><a href="/cpfecys/bolsa_trabajo/exportar_reportes">Descargar Reportes</a></li>
+                        <li><a href="/cpfecys/bolsa_trabajo/trabajos">Ofertas Laborales</a></li>
+                        <li><a href="/cpfecys/bolsa_trabajo/ver_cvs_admin">Ver CVs</a></li>
+                    </ul> 
+                </li>
                 <li class="nav-item" title="Control Academico">
                     <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
                         href="#collapsecontrolacademic" data-parent="#exampleAccordion" aria-expanded="false">
@@ -258,7 +211,7 @@
                             <li><a href="/management_reports/student_management">Gestión de Estudiantes</a></li> 
                             <li><a href="/management_reports/student_assignment_management">Asignación de Estudiantes</a></li> 
                             <li><a href="/management_reports/grades_management">Gestión de Notas</a></li> 
-                            <li><a href="/management_reports/activities_withmetric_management">Actividades con Metrica</a></li> 
+                            <li><a href="/management_reports/activities_with_metric_management">Actividades con Metrica</a></li> 
                             <li><a href="/management_reports/change_request_activities_with_metric_management">Solicitud de Cambio <br/>Actividades con Metrica</a></li> 
                             <li><a href="/management_reports/change_request_grades_management">Solicitud de Cambio de Notas</a></li> 
                             <li><a href="/management_reports/performance_students">Desempeño de los Estudiantes</a></li> 
@@ -420,6 +373,43 @@
                         <li><a href="/cpfecys/admin/mail_notifications">Enviar Mail</a></li>
                     </ul>
                 </li>
+                <li class="nav-item" title="Sanciones y reportes">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseSancionesAdmin"
+                    data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-sticky-note"></i>
+                        <span class="nav-link-text">Sanciones y faltas</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse" id="collapseSancionesAdmin">
+                        <li><a href="/infringements_and_sanctions/report_infringement_admin">Realizar sancion de falta <br> de proceso a practicantes</a></li>
+                        <li><a href="/infringements_and_sanctions/manage_honor_code">Administrar codigo de honor</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseCopias"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            
+                            <span class="nav-link-text">Copias y plagios</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseCopias">
+                            <li><a href="/infringements_and_sanctions/create_sanction_type">Administrar tipos <br> de casos de sanciones</a></li>
+                            <li><a href="/infringements_and_sanctions/create_sanction_action_type">Administrar penalizaciones <br> por sanciones</a></li>
+                            <li><a href="/infringements_and_sanctions/sanction_list/admin">Ver sanciones por copias <br> y sanciones</a></li>
+                            <li><a href="/infringements_and_sanctions/admin_sanction">Editar sanciones por copias <br> y sanciones</a></li>
+                        </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseFaltas"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Faltas a practicantes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseFaltas">
+                            <li><a href="/infringements_and_sanctions/create_infringement_type">Administrar tipo de faltas <br> practicantes de control</a></li>
+                            <li><a href="/infringements_and_sanctions/create_infringement_admin_type">Administrar tipo de faltas <br> practicantes de proceso</a></li>
+                            <li><a href="/infringements_and_sanctions/infringement_list/admin">Ver faltas de practicantes</a></li>
+                            <li><a href="/infringements_and_sanctions/admin_infringement">Editar faltas de practicantes <br> de control</a></li>
+                        </ul>
+                    </ul>
+                </li>
+                
                 {{pass}}
                 {{if "Tesis-Administrator" in session.auth.user_groups.values(): }}
                 <li class="nav-item" title="Tesis">
@@ -557,6 +547,15 @@
                             <li><a href="/evaluation/graph">Resumen del Semestre</a></li>
                             <li><a href="/evaluation/search">Historico por Curso</a></li>
                         </ul>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#ecysSanctions"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Sanciones y faltas</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="ecysSanctions">
+                            <li><a href="/infringements_and_sanctions/sanction_list/admin">Ver sanciones por copias</a></li>
+                        </ul>
                         <!-- Inicio - Prácticas Finales(Digital Signature) - Fernando Reyes -->
                         <li>
                             <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsedeliverablepracticafinal"
@@ -593,6 +592,20 @@
                     <ul class="sidenav-second-level collapse " id="collapseStudent">
                         <li><a href="/student/index">Practica Final</a></li>
                         <li><a href="/student/periods">Escuela de Vacaciones</a></li>
+                        {{if session.student_courses_history is not None and session.student_courses_history > 0:}}
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#sanctionsStudent"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Sanciones por copia y plagio</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="sanctionsStudent">
+                            <li><a href="/infringements_and_sanctions/sanction_list/teacher">Lista de reportes realizados</a></li>
+                            {{if session.student_courses_in_charge is not None and session.student_courses_in_charge > 0:}}
+                            <li><a href="/infringements_and_sanctions/report_sanction">Reportar copia o plagio</a></li>
+                            {{pass}}
+                        </ul>
+                        {{pass}}
                         <!-- Inicio - Prácticas Finales(DS) - Fernando Reyes -->
                         <li><a href="/student/stationery">Recepción de Papelería</a></li>
                         <!-- Fin - Prácticas Finales(DS) - Fernando Reyes -->
@@ -612,6 +625,7 @@
                         <li><a href="/student/foros">Foro Semanal</a></li>
                         <li><a href="/student/conferencias">Conferencias</a></li>
                     </ul>
+                    
                 </li>
                 {{pass}}
                 {{ if "Academic" in session.auth.user_groups.values() or "Student" in session.auth.user_groups.values() or "Teacher" in session.auth.user_groups.values():}}
@@ -650,6 +664,17 @@
                     <ul class="sidenav-second-level collapse " id="collapseteacherrequest">
                         <li><a href="/teacher/todo_reports">Reportes Pendientes <br/> de Calificación</a></li>
                         <li><a href="/activity_control/courses_list_request">Control de solicitudes <br/> de cursos</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" title="Copias y plagios">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse"
+                    href="#teacherSanctions" data-parent="#exampleAccordion" aria-expanded="false">
+                    <i class="fa fa-fw fa fa-sticky-note"></i>
+                    <span class="nav-link-text">Copias y plagios</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="teacherSanctions">
+                        <li><a href="/infringements_and_sanctions/sanction_list/teacher">Lista de reportes realizados</a></li>
+                        <li><a href="/infringements_and_sanctions/report_sanction">Reportar copia o plagio</a></li>
                     </ul>
                 </li>
                 {{pass}}
@@ -720,18 +745,79 @@
                         <li><a href="/dsi_dsi/holidays_admin">Asuetos</a></li>
                         <li><a href="/dsi_dsi/foro_view">Foros</a></li>
                         <li><a href="/dsi_dsi/conferencia_view">Conferencias</a></li>
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseInfringementDSI"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Faltas a practicantes</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseInfringementDSI">
+                            <li><a href="/infringements_and_sanctions/report_infringement">Reportar falta</a></li>
+                            <li><a href="/infringements_and_sanctions/infringement_list/dsi">Ver faltas</a></li>
+                        </ul>
                     </ul>
                 </li>
                 {{pass}}
+
+
+                {{ if "Student" in session.auth.user_groups.values() or "Academic" in session.auth.user_groups.values():}}
+                <li class="nav-item" title="Perfil Estudiante">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseBolsa" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-briefcase"></i>
+                        <span class="nav-link-text">Bolsa de Trabajo</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseBolsa">
+                        <li><a href="/curriculum/mi_cv">Mi CV</a></li>
+                        <li><a href="/curriculum/previa">Formulario CV</a></li>
+                        <li><a href="/lista_oferta/lista_ofertas">Ofertas Laborales</a></li>
+                        <li><a href="/lista_oferta/seguimiento_sol">Mis Aplicaciones</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+
+                {{ if "Empresa" in session.auth.user_groups.values():}}
+                <li class="nav-item" title="Perfil Estudiante">
+                    <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseBolsa" data-parent="#exampleAccordion" aria-expanded="false">
+                        <i class="fa fa-fw fa fa-briefcase"></i>
+                        <span class="nav-link-text">Bolsa de Trabajo</span>
+                    </a>
+                    <ul class="sidenav-second-level collapse " id="collapseBolsa">
+                        <li><a href="/oferta_laboral/oferta_laboral">Registrar Oferta Laboral</a></li>
+                        <li><a href="/oferta_laboral/seguimiento_ofertas">Administrar Ofertas</a></li>
+                    </ul>
+                </li>
+                {{pass}}
+
+
                 <li class="nav-item" title="Perfil Estudiante">
                     <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapsePerfil" data-parent="#exampleAccordion" aria-expanded="false">
                         <i class="fa fa-fw fa fa-user"></i>
                         <span class="nav-link-text">Perfil</span>
                     </a>
                     <ul class="sidenav-second-level collapse " id="collapsePerfil">
-                        <li><a href="/myprofile/profile">Mis Datos</a></li>
+                        {{ if "Empresa" in session.auth.user_groups.values(): }}
+                        <li><a href="/oferta_laboral/editar_empresa">Mis Datos</a></li>
                         <li><a href="/user/change_password">Contraseña</a></li> 
+                        {{ else: }}
+                        <li><a href="/myprofile/profile">Mis Datos</a></li>
+                        <li><a href="/user/change_password">Contraseña</a></li>
+                        {{ if "Academic" in session.auth.user_groups.values(): }}
+                        <li>
+                            <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseSancionesAcademic"
+                            data-parent="#exampleAccordion" aria-expanded="false">
+                            <span class="nav-link-text">Sanciones y faltas</span>
+                            </a>
+                        </li>
+                        <ul class="sidenav-third-level collapse" id="collapseSancionesAcademic">
+                            <li><a href="/infringements_and_sanctions/sanction_list">Ver sanciones por copias</a></li>
+                            {{if "Student" in session.auth.user_groups.values(): }}
+                            <li><a href="/infringements_and_sanctions/infringement_list/student">Ver faltas de practicantes</a></li>
+                            {{pass}}
+                        </ul>
+                        {{pass}}
+                        {{pass}}
                     </ul>
+                    
                 </li>
                 <li class="nav-item" title="Archivos">
                     <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseArchivos" data-parent="#exampleAccordion" aria-expanded="false">
@@ -747,7 +833,7 @@
                     </ul>
                 </li>
                 <li class="nav-item" title="Logout">
-                    <a class="nav-link" href="/user/logout?_next=/user/login">
+                    <a class="nav-link" href="/user/logout?_next=/">
                         <i class="fa fa-power-off"></i>
                         <span class="nav-link-text">Salir</span>
                         
@@ -762,18 +848,23 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
-                {{ if "Student" in session.auth.user_groups.values() or "Academic" in session.auth.user_groups.values() or "Teacher" in session.auth.user_groups.values():}}
-                <li class="nav-item rnt-hide-md-down">
-                    <a class="nav-link dttInbox"  href="/notification_student/inbox">Bandeja de Entrada</a>
-                </li>
+                {{if "Student" in session.auth.user_groups.values() or "Academic" in session.auth.user_groups.values() or "Teacher" in session.auth.user_groups.values():}}
+                    <li class="nav-item rnt-hide-md-down">
+                        <a class="nav-link dttInbox"  href="/notification_student/inbox">Bandeja de Entrada</a>
+                    </li>
                 {{pass}}
                 <li class="nav-item rnt-hide-md-down">
                     <a class="nav-link" href="/home">
-                        {{=session.auth.user.first_name}} {{=session.auth.user.last_name}}
+                        {{if "Empresa" in session.auth.user_groups.values():}}
+                            {{=session.auth.user.first_name}}
+                        {{pass}}
+                        {{if not "Empresa" in session.auth.user_groups.values():}}
+                            {{=session.auth.user.first_name}} {{=session.auth.user.last_name}}
+                        {{pass}}
                     </a>
                 </li>
                 <li class="nav-item rnt-hide-md-down">
-                    <a class="nav-link" href="/user/logout?_next=/user/login">
+                    <a class="nav-link" href="/user/logout?_next=/">
                         <i class="fa fa-power-off"></i>
                         Salir
                     </a>
@@ -809,18 +900,61 @@
         <!-- Bootstrap core JavaScript-->
     </div>
     
+    <script type="text/javascript">
+        var _URLPERIOD_VARIABLE =  "{{=URL('admin', 'get_periodos_variables') }}";
+        var _URLPERIOD_SEMESTRE = "{{=URL('admin', 'get_periodos_semestre') }}";
+        var _URLNOTIFICATION_NUMBER = "{{=URL('notification', 'get_notification_number') }}";
+        var _URL_PERIODS = "{{=URL('admin', 'get_periodos')}}";
+        var PERIODOS_VARIABLES;
+        var PERIODOS_SEMESTRE;
+        var tipo_periodo = "{{=request.vars['tipo_periodo']}}";
+        var periodo = "{{=request.vars['period']}}";
+        var userName = "array={{=auth.user.username}}";
+    </script>
+    <script src="{{=URL('static','build/js/jquery.js')}}"></script>
+    <script src="{{=URL('static','build/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{=URL('static','build/js/web2py.js')}}"></script>
+    <script src="{{=URL('static','build/js/web2py-bootstrap4.js')}}"></script>
+    <script src="{{=URL('static','build/js/admin-min.js')}}"></script>
+    <script src="{{=URL('static', 'js/excelise.js')}}"></script>
+    <script src="{{=URL('static','js/bootstrap-toggle.min.js')}}"></script>
+    {{block page_js}}{{end page_js}}
+    <script type="text/javascript">
+        {{ if "Student" in session.auth.user_groups.values() or "Academic" in session.auth.user_groups.values() or "Teacher" in session.auth.user_groups.values():}}
+        if(window.page != 'update_data'){
+            refreshData();
+        }        
+        {{pass}}
 
+        //emarquez
+        $.ajax({
+            url:_URLPERIOD_SEMESTRE,
+            async: false,
+            success: function(result){
+                if(result){
+                    PERIODOS_SEMESTRE = result;
+                }
+                $.ajax({
+                    url:_URLPERIOD_VARIABLE,
+                    success: function(result){
+                        if(result){
+                            PERIODOS_VARIABLES = result;
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    
+    {{if school == 'ecys':}}    
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-<!-- Include SmartWizard CSS -->
-<link href="{{=URL('static', 'sources/css/smart_wizard.min.css')}}" rel="stylesheet" type="text/css" />
-<!-- Optional SmartWizard theme -->
-<link href="{{=URL('static', 'sources/css/smart_wizard_theme_arrows.min.css')}}" rel="stylesheet" type="text/css" />
-<!-- Include SmartWizard JavaScript source -->
-<script src="{{=URL('static', 'sources/js/jquery.smartWizard.min.js')}}"></script>
-
-<!-- Include jQuery Validator plugin -->
-<script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
-<script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
-<script type="text/javascript" src="{{=URL('static','sources/js/accion.js')}}"></script>
-    </body>
+        gtag('config', 'UA-143827878-1');
+    </script>    
+    {{pass}}
+</body>
 </html>

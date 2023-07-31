@@ -1,0 +1,25 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <div class="row">
+        <div class="col">
+            <br>
+            <center>
+                <h3>
+                    Actualizar el código de honor
+                </h3>
+            </center>
+            <form action="{{URL=('infringements_and_sanctions','create_honor_code')}}" method="post">
+                <div class="form-group">
+                    <label for="codigo">Código</label>
+                    <textarea name="codigo" id="codigo" rows="20" class="form-control">
+                        {{if previo is not None:}}
+                            {{=previo['code']}}
+                        {{pass}}
+                    </textarea>
+                    <small>*Todo código se empieza con la versión anterior</small>
+                </div>
+                <button type="submit" class="btn btn-block btn-success">Subir nuevo código de honor</button>
+            </form>
+        </div>
+    </div>
+</div>

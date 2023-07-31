@@ -1,0 +1,53 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>Reportes pendientes de calificación</h1>
+    </div>
+    <div class="mt-4 col-12">
+        <div class="well table-responsive">
+            <table class="table table-striped table-bordered" style="width:100%;">
+                <thead class="thead-dark">
+                    <tr>            
+                        <th>Carnet</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Proyecto</th>
+                        <th>Reporte</th>
+                        <th>Fecha de entrega</th>
+                        <th>Veces que ha sido calificado</th>
+                        <th>Última calificación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for report in db(db.report.id.belongs(my_pending_reports)).select(
+                                        db.report.assignation,
+                                        db.report.report_restriction,
+                                        db.report.created,
+                                        db.report.times_graded,
+                                        db.report.score_date,
+                                        db.report.id
+                                    ):
+                    }}                 
+                        <tr>            
+                            <td>{{=report.assignation.assigned_user.username}}</td>
+                            <td>{{=report.assignation.assigned_user.first_name}}</td>
+                            <td>{{=report.assignation.assigned_user.last_name}}</td>
+                            <td>{{=report.assignation.project.name}}</td>
+                            <td>{{=report.report_restriction.name}}</td>
+                            <td>{{=report.created}}</td>
+                            <td>{{=report.times_graded or 0}}</td>
+                            <td>{{=report.score_date or T('Never')}}</td>            
+                            <td>
+                                <a class="btn btn-primary" href="{{=URL('teacher', 'report/view', vars=dict(report=report.id))}}"> 
+                                    <span class="fa fa-eye"></span>
+                                    Ver reporte 
+                                </a>
+                            </td>
+                        </tr>        
+                    {{pass}}                        
+                </tbody>  
+            </table>    
+        </div>
+    </div>
+</div>

@@ -1,0 +1,186 @@
+{{extend 'dashboard.html'}}
+
+<div class='row p-0 m-0'>
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Actualizar empresa</h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/cpfecys/bolsa_trabajo/suscripciones">Suscripciones</a></li>
+        <li class="breadcrumb-item"><a
+                href="/cpfecys/bolsa_trabajo/view?id={{=new_dict['empresa']['id_empresa']}}">{{=new_dict["empresa"]["nombre_empresa"]}}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Editar empresa</li>
+    </ol>
+</nav>
+
+<form id="formEmpresa" class="m-0 p-0" action='/cpfecys/bolsa_trabajo/edit' method="POST">
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="nameInput" class="form-label">Nombre de la empresa</label>
+            <input type="text" class="form-control" id="nameInput" required
+                value="{{=new_dict['empresa']['nombre_empresa']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="emailInput" class="form-label">Correo</label>
+            <input type="email" class="form-control" id="emailInput" required
+                value="{{=new_dict['empresa']['correo']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="personInput" class="form-label">Persona Encargada</label>
+            <input type="text" class="form-control" id="personInput" required
+                value="{{=new_dict['empresa']['persona_encargada']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="phoneInput" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="phoneInput" required
+                value="{{=new_dict['empresa']['telefono']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="addressInput" class="form-label">Dirección</label>
+            <input type="text" class="form-control" id="addressInput" required
+                value="{{=new_dict['empresa']['direccion']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="webInput" class="form-label">Página web</label>
+            <input type="text" class="form-control" id="webInput" required
+                value="{{=new_dict['empresa']['pagina_web']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="descInput" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descInput" rows="3"
+                required>{{=new_dict['empresa']['descripcion']}}</textarea>
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="passInput" class="form-label">Password</label>
+            <input type="password" class="form-control" id="passInput" autocomplete="off" required
+                value="{{=new_dict['empresa']['password']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="estadoSelect" class="form-label">Estado</label>
+            <select class="form-control" id="estadoSelect">
+                {{for estado in new_dict['estados_registro']:}}
+                    {{if estado['id_estado_registro'] == new_dict['empresa']['id_estado_registro']:}}
+                        <option value="{{=estado['id_estado_registro']}}" selected>{{=estado["estado_registro"]}}</option>
+                    {{else:}}
+                        <option value="{{=estado['id_estado_registro']}}">{{=estado["estado_registro"]}}</option>
+                    {{pass}}
+                {{pass}}
+            </select>
+        </div>
+    </div>
+    <div class='row m-0 p-0 mb-3'>
+        <div class='col-12 d-flex justify-content-end'>
+            <button type="button" class="btn btn-primary w-auto mr-3" onclick="submitt()">Actualizar</button>
+            <button type="button" class="btn btn-danger w-auto" onclick="cancelUpdate()">Cancelar</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function quitarAcentos(cadena) {
+        const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'ñ': 'n', 'Ñ': 'N' };
+        cadena = cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+        return cadena = cadena.replace(/[^\w\s ?,:.!%()-_"@/]/gi, '');
+    }
+
+    async function modal() {
+        return text;
+    }
+
+    async function submitt() {
+        var form = $('#formEmpresa')[0]
+        const data = {
+            nombre_empresa: quitarAcentos(form[0].value),
+            correo: form[1].value,
+            persona_encargada: quitarAcentos(form[2].value),
+            telefono: form[3].value,
+            direccion: quitarAcentos(form[4].value),
+            pagina_web: form[5].value,
+            descripcion: quitarAcentos(form[6].value),
+            password: form[7].value,
+            estado: form[8].value,
+            motivo: ""
+        }
+        enviarForm(data);
+    }
+
+    async function enviarForm(data) {
+        console.log(data.estado)
+        if (Number(data.estado) > 2) {
+            var textoMotivo = ""
+            await Swal.fire({
+                input: 'textarea',
+                inputLabel: 'Motivo',
+                inputPlaceholder: 'Escribir motivo...',
+                inputAttributes: {
+                    'aria-label': 'Escribir motivo'
+                },
+                showCancelButton: true,
+                preConfirm: (textoo) => {
+                    textoMotivo = textoo
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    data.motivo = quitarAcentos(textoMotivo);
+                    enviarAjax(data);
+                }
+            });
+        } else {
+            enviarAjax(data);
+        }
+    }
+
+    function enviarAjax(data) {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        data.id_empresa = urlParams.get('id')
+        $.ajax({
+            type: 'post',
+            url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/actualizar_empresa`,
+            data: `array=${JSON.stringify(data)}`,
+            success: function (res) {
+                res = JSON.parse(res);
+                if (res.success) {
+                    Swal.fire({
+                        title: 'Actualizado!',
+                        text: res.msg,
+                        icon: 'success'
+                    }).then(() => window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/suscripciones`);
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: res.msg,
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function (xhr, status, errorThrown) {
+                console.log(xhr, status, errorThrown);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Hubo un problema, intente más tarde',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function cancelUpdate() {
+        window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/suscripciones`
+    }
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

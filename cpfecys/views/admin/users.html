@@ -1,11 +1,13 @@
 {{extend 'dashboard.html'}}
-<div class="text-center">
-    <h1>{{=T('User Administration')}}</h1>
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <center>
+                <h1>Administración de usuarios</h1>
+            </center>
+        </div>
+        <div class="col-12 mt-2">
+            {{=grid}}
+        </div>
+    </div>
 </div>
-
-{{=grid}}
-
-{{if request.is_local:}}
-{{=response.toolbar()}}
-{{pass}}
-

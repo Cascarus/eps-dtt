@@ -1,0 +1,37 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12">
+            <center>
+            <h1>
+                Gestión de evaluaciones
+            </h1>
+        </center>
+            <a onclick="window.history.back()" class="btn btn-primary">
+                <i class="icon-arrow-left"></i>
+                {{=T('Back')}}
+            </a>
+        </div>
+        <div class="col-12 mt-2">
+            <input id="chk_tipo_curso" name="chk_tipo_curso" type="checkbox" checked data-toggle="toggle" data-on="<i class='fa fa-share'></i> Semestres" data-off="<i class 'fa fa-reply'></i> Periodos" data-size="mini">
+        </div>
+    </div>
+    <div class="col-12 mt-3">
+        {{=grid}}
+    </div>
+</div>
+
+{block page_js}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#evaluation_date_start__row").append("<tr><td class=\"w2p_fw\"><div class=\"alert\"  ><div align=\"left\">{{=T('The date must be within the current semester')}}.</div></div></td>");
+		$("#evaluation_date_finish__row").append("<tr><td class=\"w2p_fw\"><div class=\"alert\"  ><div align=\"left\">{{=T('The date must be within the current semester')}}.</div></div></td>");
+        $("#chk_tipo_curso").change(function() {
+            if($(this).prop('checked'))
+                window.location.href = "evaluation"
+            else
+                window.location.href = "evaluation_period"
+        })
+    })
+</script>
+{{end page_js}}

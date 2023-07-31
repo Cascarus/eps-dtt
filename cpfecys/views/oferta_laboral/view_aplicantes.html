@@ -1,0 +1,130 @@
+{{extend 'dashboard.html'}}
+
+
+<div class='row p-0 m-0' style="overflow: auto;">
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Aplicantes a Oferta Laboral</h1>
+    </div>
+</div>
+
+<div class="row p-3 m-2">
+    <a class="btn btn-primary " href="/cpfecys/oferta_laboral/seguimiento_ofertas">
+        <i class="fa fa-chevron-left mr-2"></i>Volver
+    </a>
+</div>
+
+<div class='row p-3 m-1'>
+    <table class="table table-hover">
+        <thead style="background-color: #EAEAEA;">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Nombre del Aplicante</th>
+                <th scope="col">Edad</th>
+                <th scope="col">Creditos Aprobados</th>
+                <th scope="col">Estado de Aplicacion</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td scope="row"></td>
+                <td>
+                    <form action="/cpfecys/oferta_laboral/view_aplicantes" method="GET">
+                        <input type="hidden" name="id_oferta" value="{{=new_dict['id_oferta']}}" />
+                        <input type="text" id="nombre" name="nombre" class="form-control" />
+                    </form>
+                </td>
+                <td>
+                    <form action='/cpfecys/oferta_laboral/view_aplicantes' method="GET">
+                        <input type="hidden" name="id_oferta" value="{{=new_dict['id_oferta']}}" />
+                        <input type="number" id="edad" name='edad' class="form-control" />
+                    </form>
+                </td>
+                <td>
+                    <form action='/cpfecys/oferta_laboral/view_aplicantes' method="GET">
+                        <input type="hidden" name="id_oferta" value="{{=new_dict['id_oferta']}}" />
+                        <input type="number" id="creditos" name='creditos' class="form-control" />
+                    </form>
+                </td>
+                <td></td>
+            </tr>
+            {{for aplicante in new_dict['aplicantes']:}}
+            <tr>
+                <td scope="row">{{=aplicante["id_estudiante_cv"]}}</td>
+                <td scope="row">{{=aplicante["nombre"]}}</td>
+                <td>{{=aplicante["edad"]}}</td>
+                <td>{{=aplicante["creditos_aprobados"]}}</td>
+                <td>
+                    <center>
+                        {{id_estado=aplicante["id_estado_aplicacion"]}}
+                        {{if id_estado < 5:}} <span class='badge badge-primary ' style="font-weight: bold;">
+                            {{=aplicante['estado_aplicacion']}}</span>
+                            {{elif id_estado == 5:}}
+                            <span class='badge badge-success '
+                                style="font-weight: bold;">{{=aplicante['estado_aplicacion']}}</span>
+                            {{else:}}
+                            <span class='badge badge-danger '
+                                style="font-weight: bold;">{{=aplicante['estado_aplicacion']}}</span>
+                            {{pass}}
+
+                    </center>
+                </td>
+                <td class="text-center">
+                    {{if aplicante["id_estado_aplicacion"] > 5:}}
+                    <a class="btn btn-primary btn-sm disabled"
+                        href="/cpfecys/oferta_laboral/datos_aplicante?id_usuario={{=aplicante['id_estudiante_cv']}}&id_oferta={{=new_dict['id_oferta']}}">
+                        <i class="fa fa-fw fa fa-eye"></i>
+                    </a>
+                    {{else:}}
+                    <a class="btn btn-primary btn-sm"
+                        href="/cpfecys/oferta_laboral/datos_aplicante?id_usuario={{=aplicante['id_estudiante_cv']}}&id_oferta={{=new_dict['id_oferta']}}">
+                        <i class="fa fa-fw fa fa-eye"></i>
+                    </a>
+                    {{pass}}
+
+                </td>
+            </tr>
+            {{pass}}
+        </tbody>
+        <tfoot style="background-color: #EAEAEA;">
+            <tr>
+                <th scope="col" colspan="5" class="text-right">
+                    {{=new_dict["inicio_aplicantes"]}} - {{=new_dict["fin_aplicantes"]}} de
+                    {{=new_dict["cantidad_aplicantes"]}}
+                </th>
+
+                <th scope="col" class="d-flex justify-content-around">
+                    <a
+                        href='?page=1&id_oferta={{=new_dict["id_oferta"]}}&nombre={{=new_dict["nombre"]}}&edad={{=new_dict["edad"]}}&creditos={{=new_dict["creditos"]}}'>
+                        <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                    </a>
+                    {{if new_dict["prev_page"] != 0:}}
+                    <a
+                        href='?page={{=new_dict["prev_page"]}}&id_oferta={{=new_dict["id_oferta"]}}&nombre={{=new_dict["nombre"]}}&edad={{=new_dict["edad"]}}&creditos={{=new_dict["creditos"]}}'>
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    </a>
+                    {{else:}}
+                    <a
+                        href='?page=1&id_oferta={{=new_dict["id_oferta"]}}&nombre={{=new_dict["nombre"]}}&edad={{=new_dict["edad"]}}&creditos={{=new_dict["creditos"]}}'>
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    </a>
+                    {{pass}}
+                    {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} <a
+                        href='?page={{=new_dict["next_page"]}}&id_oferta={{=new_dict["id_oferta"]}}&nombre={{=new_dict["nombre"]}}&edad={{=new_dict["edad"]}}&creditos={{=new_dict["creditos"]}}'>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                        {{else:}}
+                        <a
+                            href='?page={{=new_dict["cantidad_paginas"]}}&id_oferta={{=new_dict["id_oferta"]}}&nombre={{=new_dict["nombre"]}}&edad={{=new_dict["edad"]}}&creditos={{=new_dict["creditos"]}}'>
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                        {{pass}}
+                        <a
+                            href='?page={{=new_dict["cantidad_paginas"]}}&id_oferta={{=new_dict["id_oferta"]}}&nombre={{=new_dict["nombre"]}}&edad={{=new_dict["edad"]}}&creditos={{=new_dict["creditos"]}}'>
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

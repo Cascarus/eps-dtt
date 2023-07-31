@@ -1,0 +1,32 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <center>
+        <h2>{{=falta['tipo']}}</h2>
+        <h4>{{=falta['curso']}}</h4>
+    </center>
+    <div class="row">
+        <div class="col">
+            <form>
+                <div class="form-group">
+                    <label for="fecha">Fecha</label>
+                    <input type="text" name="fecha" id="fecha" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea name="descripcion" id="descripcion" rows="5" class="form-control" readonly>{{=falta['descripcion']}}</textarea>
+                </div>
+                {{if vista == 'dsi': }}
+                    <div class="form-group">
+                        <label for="estudiante">Estudiante</label>
+                        <input type="text" name="estudiante" id="estudiante" class="form-control" value="{{=falta['carnet']}} - {{=falta['estudiante']}}" readonly>
+                    </div>
+                {{pass}}
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const falta = JSON.parse(`{{=XML(response.json(falta))}}`);
+    const date_ = new Date(falta.fecha);
+    $('#fecha').val(date_.toLocaleDateString('es-GT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+</script>

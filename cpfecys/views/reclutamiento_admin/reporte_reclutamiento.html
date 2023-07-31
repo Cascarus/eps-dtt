@@ -1,0 +1,393 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Gestión de reclutamiento</h2>
+        </div>
+        <div class="col-12">
+            <center>{{=opciones}}</center>
+        </div>
+    </div>
+    <div class="row well">
+        <div class="col-12 text-center">
+            <h3>Reporte de reclutamiento: {{=label_proceso}}</h3>
+        </div>
+        <div class="col-12">
+            <form class="form-inline">
+                <div class="col-12">
+                    <label class="lbl_seleccionar"><b>Seleccionar proceso</b></label>
+                    <br>
+                    <div class="input-prepend">
+                        {{=procesos_html}}
+                        <button class="btn btn-primary" type="button" id="btn_cargar"><i
+                                class="icon-refresh icon-white"></i>Cargar</button>
+                        <button class="btn btn-success" type="button" id="btn_guardar"
+                            onclick='javascript:guardar_estado_proceso_btn();'><i class="icon-hdd icon-white"></i>
+                            Guardar estado</button>
+                        <a onclick="exportExcel();" class="btn btn-warning" id="btn_export"><i
+                                class="icon-download icon-white"></i>
+                            Excel (CSV)
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+        <div class="col-12">
+            <form class="form-inline">
+                <div class="col-9">
+                    <a class="show_class text-primary" style="cursor:pointer; display:none;"
+                        onclick="visible_detail();">
+                        Ver detalle de aprobación
+                    </a>
+                    <a class="hide_class text-primary" style="cursor:pointer;" onclick="hide_detail();">
+                        Ocultar detalle
+                    </a>
+                </div>
+                <div class="col-3 text-right">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-search" aria-hidden="true"></i></span>
+                        </div>
+                        <input id="searchInput" placeholder="Buscar..." type="text" class="input-medium form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-12">
+            <div class="table-responsive">
+                <table id="tb_reclutamiento"
+                    class="table table-bordered table-hover table-striped table-condensed tb_reporte">
+                    <thead>
+                        <tr>
+                            <td width="5%" align="left" rowspan="2"><b>Carnet</b></td>
+                            <!--<td width="5%" align="left" rowspan="2"><b>Cui</b></td>-->
+                            <td width="15%" align="left" rowspan="2"><b>Nombre</b></td>
+                            <td width="10%" align="left" rowspan="2"><b>Area de interés</b></td>
+                            <td width="10%" align="left" rowspan="2"><b>Proyecto solicitado</b></td>
+                            <td width="20%" align="center" colspan="4" class="hide_class"><b>Detalle de aprobacion</b>
+                            </td> <!--Ocupa 2 columnas-->
+                            <td width="5%" align="left" rowspan="2"><b>Trabaja</b></td>
+                            <td width="5%" align="left" rowspan="2"><b>CV</b></td>
+                            <td width="5%" align="left" rowspan="2"><b>Listado cursos</b></td>
+                            <td width="5%" align="left" rowspan="2"><b>Nota oposición</b></td>
+                            <td width="10%" align="left" rowspan="2"><b>Sección proyecto</b></td>
+                            <td width="10%" align="left" rowspan="2"><b>Estado</b></td>
+                            <td width="5%" align="left" rowspan="2" class="hide_class"><b>Per.</b></td>
+                            <td width="5%" align="left" rowspan="2" class="hide_class"><b>Horas</b></td>
+
+                        </tr>
+                        <tr>
+                            <td width="5%" align="left" class="hide_class"><b>Año</b></td>
+                            <td width="5%" align="left" class="hide_class"><b>Periodo</b></td>
+                            <td width="5%" align="left" class="hide_class"><b>Nota</b></td>
+                            <td width="5%" align="left" class="hide_class"><b>Cat.</b></td>
+                        </tr>
+                    </thead>
+                    <tbody id="fbody">
+                        <!-- Inicia ciclo para llenar tabla -->
+                        {{if lista_solicitudes is not None:}}
+                        {{for item in lista_solicitudes:}}
+                        <tr id='{{=item[0]}}-{{=item[9]}}'>
+                            <td>{{=item[0]}}</td> <!-- Carnet-->
+                            <!--<td>{{=item[23]}}</td>--> <!-- Cui-->
+                            <td>{{=item[1]}} {{=item[2]}}</td> <!-- Nombre-->
+                            <td>{{=item[7]}}</td> <!-- Area de interes-->
+                            <td>{{=item[11]}}</td> <!-- Proyecto solicitado-->
+                            <td class="hide_class">{{=item[12]}}</td> <!-- Año aprobacion-->
+                            <td class="hide_class">{{=item[13]}}</td> <!-- Periodo aprobacion-->
+                            <td class="hide_class">{{=item[14]}}</td> <!-- Nota aprobacion-->
+                            <td class="hide_class">{{=item[17]}}</td> <!-- Catedratico-->
+                            <td>{{=item[3]}}</td> <!-- Trabaja -->
+                            <td style="text-align: center;"> <!-- CV -->
+                                <a class="btn btn_rep" style="height:24px; width:24px; " title="Ver Curriculum vitae"
+                                    id="btn_ver_modal"
+                                    onclick='javascript:ver_modal("Curriculum vitae","{{=item[5]}}");'>
+                                    <img class="img_pdf" src="/cpfecys/static/images/iconos_reclutamiento/ver4.png"
+                                        height="24" width="24">
+                                </a>
+                            </td>
+                            <td style="text-align: center;"> <!-- Listado cursos -->
+                                <a class="btn btn_rep" style="height:24px; width:24px;" title="Ver listado de cursos"
+                                    id="btn_ver_modal"
+                                    onclick='javascript:ver_modal("Listado de cursos","{{=item[6]}}");'>
+                                    <img class="img_pdf" src="/cpfecys/static/images/iconos_reclutamiento/ver4.png"
+                                        height="24" width="24">
+                                </a>
+                            </td>
+                            <td> <!-- Nota oposicion-->
+                                {{if item[20]!=None:}}
+                                <input style="width:75%" id="inp_opo_nota" name="rec_opo_nota"
+                                    class="cls_opo_nota form-control" value="{{=item[20]}}" />
+                                {{else:}}
+                                <input style="width:75%" id="inp_opo_nota" name="rec_opo_nota"
+                                    class="cls_opo_nota form-control" value="" />
+                                {{pass}}
+                            </td>
+                            <td> <!-- Proyecto-->
+                                <select style="width:100%" name="select_seccion" class="form-control"
+                                    onfocus="this.oldvalue = this.value;"
+                                    onchange="javascript:validar_seccion('{{=item[0]}}-{{=item[9]}}', this);this.oldvalue = this.value;">
+                                    <option value="-1"> - - </option>
+                                    {{for seccion in item[8]:}}
+                                    {{if seccion!=item[18]:}}
+                                    <option value="{{=seccion}}">{{=seccion}}</option>
+                                    {{else:}}
+                                    <option value="{{=seccion}}" selected="">{{=seccion}}</option>
+                                    {{pass}}
+                                    {{pass}}
+                                </select>
+                            </td>
+                            <td> <!-- Estado-->
+                                <select style="width:100%" name="select_estado" class="form-control"
+                                    onchange="javascript:validar_estado('{{=item[0]}}-{{=item[9]}}');">
+                                    {{for estado in lista_estados:}}
+                                    {{if item[19]!= estado.id:}}
+                                    <option value="{{=estado.id}}">{{=estado.nombre}}</option>
+                                    {{else:}}
+                                    <option value="{{=estado.id}}" selected>{{=estado.nombre}}</option>
+                                    {{pass}}
+                                    {{pass}}
+                                </select>
+                            </td>
+                            <td class="hide_class"> <!-- Periodos asignar -->
+                                {{if item[21]!=None:}}
+                                <input style="width:55%" id="per-{{=item[0]}}-{{=item[9]}}" name="rec_opo_nota"
+                                    class="cls_per form-control" value="{{=item[21]}}" />
+                                {{else:}}
+                                <input style="width:55%" id="per-{{=item[0]}}-{{=item[9]}}" name="rec_opo_nota"
+                                    class="cls_per form-control" value="2" />
+                                {{pass}}
+                            </td>
+                            <td class="hide_class"> <!-- Horas asignar -->
+                                {{if item[22]!=None:}}
+                                <input style="width:65%" id="inp_horas" name="rec_opo_nota"
+                                    class="cls_horas form-control" value="{{=item[22]}}" />
+                                {{else:}}
+                                <input style="width:65%" id="inp_horas" name="rec_opo_nota"
+                                    class="cls_horas form-control" value="400" />
+                                {{pass}}
+                            </td>
+                        </tr>
+                        {{pass}}
+                        {{pass}}
+
+                        <!-- termina ciclo para llenar tabla -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- **************************** Modal ****************** -->
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="myModalLabel">Curriculum Vitae</h3>
+        </div>
+        <div class="modal-body">
+            <object id='visor' type='application/pdf' width='100%' height='700px'></object>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        </div>
+    </div>
+    <div id="modal_info" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3>Atención</h3>
+        </div>
+        <div class="modal-body">
+            <h3 id="h2_modal_msj"></h3>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        </div>
+    </div>
+    <!-- **************************** End Modal ****************** -->
+</div>
+
+{{block page_js}}
+<script type="text/javascript" src="{{=URL('static','sources/js/accion_admin.js')}}"></script>
+<link href="{{=URL('static', 'sources/css/rec_admin.css')}}" rel="stylesheet" type="text/css" />
+<script>
+    $(function () {
+        $('.pop').popover();
+    });
+    function visible_detail() {
+        $(".hide_class").css("display", "table-cell");
+        $(".show_class").css("display", "none");
+    }
+    function hide_detail() {
+        $(".show_class").css("display", "table-cell");
+        $(".hide_class").css("display", "none");
+    }
+
+
+    $("#searchInput").keyup(function () {
+        //split the current value of searchInput
+        var data = this.value.split(" ");
+        //create a jquery object of the rows
+        var jo = $("#fbody").find("tr");
+        if (this.value == "") {
+            jo.show();
+
+            return;
+        }
+        //hide all the rows
+        jo.hide();
+
+        //Recusively filter the jquery object to get results.
+        jo.filter(function (i, v) {
+            var $t = $(this);
+            for (var d = 0; d < data.length; ++d) {
+                if ($t.is(":contains('" + data[d] + "')")) {
+                    return true;
+                }
+            }
+            return false;
+        })
+            //show the rows that match.
+            .show();
+    }).focus(function () {
+        this.value = "";
+        $(this).css({
+            "color": "black"
+        });
+        $(this).unbind('focus');
+    }).css({
+        "color": "#C0C0C0"
+    });
+
+
+    //Metodos jquery
+    $(document).ready(function () {
+        var initialTable = new Array();
+        //obtengo los valores iniciales del grid
+        initialTable = get_items_tabla_obj();
+        $('.img_pdf').hover(function () {
+            $(this).addClass('transition');
+
+        }, function () {
+            $(this).removeClass('transition');
+        }
+        );
+        $(".cls_per").focusout(function () {
+            var num_periodos = $(this).val();
+            if (es_numero(num_periodos) == false || !num_periodos) {
+                $(this).val(2);
+                alert('Ingreso mal la cantidad periodos');
+            } else {
+                $(this).val(parseInt(num_periodos));
+            }
+        });
+
+        $(".cls_horas").focusout(function () {
+            var num_periodos = $(this).val();
+            if (es_numero(num_periodos) == false || !num_periodos) {
+                $(this).val(400);
+                alert('Ingreso mal la cantidad de horas');
+            } else {
+                $(this).val(parseInt(num_periodos));
+            }
+        });
+
+
+        $("#btn_cargar").click(function () {
+            if ((bandera_cargar == 1) && confirm('Recuerde guardar cambios antes de cargar otro proceso, ¿continuar?')) {
+                var id_proceso = $('select[name=select_proceso]').val();
+                var etiqueta_proceso = $('#select_proceso option:selected').text();
+                var parametros = "{{=URL('reclutamiento_admin', 'reporte_reclutamiento')}}?id_proceso=" + id_proceso + '&etiqueta_proceso=' + encodeURIComponent(etiqueta_proceso);
+                window.location.href = parametros;
+            } else if (bandera_cargar == 0) {
+                var id_proceso = $('select[name=select_proceso]').val();
+                var etiqueta_proceso = $('#select_proceso option:selected').text();
+                var parametros = "{{=URL('reclutamiento_admin', 'reporte_reclutamiento')}}?id_proceso=" + id_proceso + '&etiqueta_proceso=' + encodeURIComponent(etiqueta_proceso);
+                window.location.href = parametros;
+            }
+        });
+        $("#btn_guardar").click(function (e) {
+            e.preventDefault();
+            if ($("#tb_reclutamiento >tbody >tr").length > 0 && id_proceso_cont != 0) {
+                //var id_proceso=$('select[name=select_proceso]').val();
+                //var etiqueta_proceso = $('#select_proceso option:selected').text();
+                var id_proceso = id_proceso_cont;
+                var etiqueta_proceso = label_proceso;
+                var parametros = "{{=URL('reclutamiento_admin', 'mtd_guardar_rep_btn')}}?id_proceso=" + id_proceso + '&etiqueta_proceso=' + encodeURIComponent(etiqueta_proceso);
+                //window.location.href=parametros;
+                /*ahora, obtengo el grid actual y comparo cuales de los items no son iguales*/
+                var itemsNew = Array();
+                itemsNew = get_items_tabla_obj();
+                var arrItemsSend = new Array();
+                $.each(itemsNew, function (index, value) {
+                    var value2 = initialTable[index];
+                    if (value.id == value2.id) {
+                        if (value.nota_oposicion != value2.nota_oposicion || value.seccion_proyecto != value2.seccion_proyecto
+                            || value.estado != value2.estado || value.periodos != value2.periodos
+                            || value.horas != value2.horas) {
+                            arrItemsSend.push(value);
+                        }
+                    }
+                });
+                $.ajax({
+                    url: parametros,
+                    type: 'POST',
+                    //dataType: 'json',
+                    data: { tabla: JSON.stringify(arrItemsSend) }
+                })
+                    .done(function (resp) {
+                        if (resp == 'ok')
+                            location.reload();
+                    });
+            } else {
+                alert('El proceso no contiene solicitudes');
+            }
+        });
+
+        //*******************Implementando paginacion**********************************
+        /*$('td', 'fbody').each(function(i) {
+           $(this).text(i+1);
+        });*/
+        $('#tb_reclutamiento').each(function () {
+            var currentPage = 0;
+            var numPerPage = 40;
+            var $table = $(this);
+            $table.bind('repaginate', function () {
+                $table.find('tbody tr').hide().slice(currentPage * numPerPage, (currentPage + 1) * numPerPage).show();
+            });
+            $table.trigger('repaginate');
+            var numRows = $table.find('tbody tr').length;
+            var numPages = Math.ceil(numRows / numPerPage);
+            var $pager = $('<div class="pager"></div>');
+            for (var page = 0; page < numPages; page++) {
+                $('<span class="page-number"></span>').text(page + 1).bind('click', {
+                    newPage: page
+                }, function (event) {
+                    currentPage = event.data['newPage'];
+                    $table.trigger('repaginate');
+                    $(this).addClass('active').siblings().removeClass('active');
+                }).appendTo($pager).addClass('clickable');
+            }
+            $pager.insertBefore($table).find('span.page-number:first').addClass('active');
+        });
+
+        //************************Temina paginacion************************************
+    });
+
+    //---------------------- VARIABLES GLOBALES -----------------------
+
+    //---------------------- METODOS JAVASCRIPT -----------------------
+
+    //ciclo para guardar automáticamente
+    var intervalID = window.setInterval(guardar_estado_proceso, 5 * 60 * 1000);
+    var bandera_cargar = {{=bandera_cargar }};
+    var id_proceso_cont = {{=id_proceso_cont }};
+    var label_proceso = "{{=label_proceso}}";
+    var lista_pro_asignados = {{=XML(lista_pro_asignados)}};
+    function exportExcel() {
+        window.open('/reclutamiento_admin/obtener_solicitudes_export?id_proceso=' + $("#select_proceso").val());
+    }
+
+</script>
+{{end page_js}}

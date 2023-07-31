@@ -1,13 +1,10 @@
 {{extend 'dashboard.html'}}
-<div class="row-fluid">
+<div class="row-fluid mt-4">
   <div class="well span12">
-    <a onclick="window.history.back()" class="btn btn-primary"
-      ><i class="icon-arrow-left"></i>{{=T('Back')}}</a
-    >
-    <a
-      class="btn btn-success pull-right"
-      onclick="tableToExcel('courses-report','');"
-    >
+    <a onclick="window.history.back()" class="btn btn-primary">
+      <i class="icon-arrow-left"></i>{{=T('Back')}}
+    </a>
+    <a class="btn btn-success pull-right" onclick="tableToExcel('courses-report','');">
       <i class="icon-download icon-white"></i>
       {{=T('Excel (XLS)')}}
     </a>

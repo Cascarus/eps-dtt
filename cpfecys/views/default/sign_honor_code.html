@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>CPFECYS | DTT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description"
+        content="Escuela de Ciencias y Sistemas, Desarrollo de Transferencia Tecnológica, Universidad de San Carlos de Guatemala">
+    <meta name="keywords" content="DTT, ECYS, FIUSAC, SISTEMAS, Computación, Ingeniería">
+    <link rel="icon" type="image/x-icon" href="/static/build/images/favicon.ico">
+    <link rel="stylesheet" href="/static/build/css/admin-{{=school}}.css">
+    <meta http-equipv="Content-Type" content="text/html; charset=iso-8859-1">
+    {{include 'web2py_ajax.html'}}
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <br>
+                <center>
+                    <h1>Código de honor</h1>
+                    <h2>Facultad de Ingenieria USAC</h2>
+                    <h3>Escuela de Ingeniería en Ciencias y Sistemas</h3>
+                </center>
+                <br>
+                <form method="post">
+                    <div class="form-group">
+                        <textarea rows="20" class="form-control" readonly>{{=honor_code['code']}}</textarea>
+                    </div>
+                    <small>*El codigo de honor solo debe ser firmado una vez cada semestre</small>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <button type="submit" class="btn btn-success btn-block">Aceptar</button>
+                        </div>
+                        <div class="col-6 col-offset-6">
+                            <a href="/user/logout?_next=/" class="btn btn-danger btn-block">Declinar</a>
+                        </div>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

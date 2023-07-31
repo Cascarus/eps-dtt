@@ -1,6 +1,8 @@
 {{extend 'dashboard.html'}}
 
+{{block page_js}}
 <script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','intro_js/intro.js')}}"></script>
 <script type="text/javascript">
     function compararTiempos(actual, enviado) {
         actual = new Date(actual).getTime()
@@ -96,7 +98,7 @@
                             console.log(fecha)
                             if (compararTiempos(submitLoad("quiz", "get_now", ""), `${fecha} ${hora}`)) {
                                 var parametros = `?id_actividad=${idActividad}&id_quiz=${id_quiz}&fecha=${fecha}&inicio=${hora}&duracion=${duracion}&clave=${pass}&project=${project}&period=${period}`;
-                                //window.location.href = `https://${location.hostname}/quiz/test_programacion_protegida${parametros}`;
+                                window.location.href = `https://${location.hostname}/quiz/test_programacion_protegida${parametros}`;
                             } else {
                                 $("#lbMensajeError").removeAttr("hidden");
                                 $("#lbMensajeError").text("La fecha y hora de programacion no puede ser anterior a la fecha y hora actual.");
@@ -115,7 +117,7 @@
                         console.log(fecha)
                         if(compararTiempos(submitLoad("quiz", "get_now", ""), `${fecha} ${hora}`)) {
                             var parametros = `?id_actividad=${idActividad}&id_quiz=${id_quiz}&fecha=${fecha}&inicio=${hora}&duracion=${duracion}&project=${project}&period=${period}`;
-                            //window.location.href = `https://${location.hostname}/quiz/test_programacion${parametros}`;
+                            window.location.href = `https://${location.hostname}/quiz/test_programacion${parametros}`;
                         } else {
                             $("#lbMensajeError").removeAttr("hidden");
                             $("#lbMensajeError").text("La fecha y hora de programacion no puede ser anterior a la fecha y hora actual.");
@@ -129,17 +131,12 @@
         });
     });
 </script>
+{{end page_js}}
 
 <div class="mt-4">
     <div class="row-fluid">
         <center>
             <h2>Programación de evaluación: {{=metadata.tb_metadata_quiz.nombre}}
-                {{if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):}}
-                    <a onclick="javascript:introJs().setOptions({'skipLabel': 'Quitar', 'nextLabel': 'Siguiente', 'prevLabel': 'Anterior', 'doneLabel': 'Salir'}).start();" href='javascript:void(0);' class="btn btn-primary" >
-                    <span class="fa fa-question-circle"></span>
-                    </a>
-                {{pass}}
-                <br>
             </h2>
         </center>
     </div>

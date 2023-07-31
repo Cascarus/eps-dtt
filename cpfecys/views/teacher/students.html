@@ -1,0 +1,98 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12">
+        <h2>Practicantes del proyecto: <small>"{{=current_project.name}}"</small></h2>
+    </div>
+    <div class="col-12 mt-4">
+        <div class="tabbable"> <!-- Only required for left/right tabs -->
+            <ul class="nav nav-tabs">
+                <li class="nav-item"><a class="nav-link"href="#setuptab" data-toggle="tab">{{=T('Other Periods')}}</a></li>
+                {{for item in periods_before:}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{=URL(vars=dict(year_period=item.id, project=current_project.id))}}">
+                            {{if item.period == cpfecys.first_period.id:}}
+                                {{=f'{item.yearp} - {T(cpfecys.first_period_name)}'}}
+                            {{else:}}
+                                {{=f'{item.yearp} - {T(cpfecys.second_period_name)}'}}
+                            {{pass}}
+                        </a>
+                    </li>
+                {{pass}}
+                <li class="nav-item">
+                    <a class="nav-link active" href="#data{{=currentyear_period.id}}" data-toggle="tab">
+                        {{=f'{currentyear_period.yearp} - {current_period_name}'}}
+                    </a>
+                </li>
+                {{for item in periods_after:}}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{=URL(vars=dict(year_period=item.id, project=current_project.id))}}">
+                            {{if item.period == cpfecys.first_period.id:}}
+                                {{=f'{item.yearp} - {T(cpfecys.first_period_name)}'}}
+                            {{else:}}
+                                {{=f'{item.yearp} - {T(cpfecys.second_period_name)}'}}
+                            {{pass}}
+                        </a>
+                    </li>
+                {{pass}}
+            </ul>
+            <div class="tab-content mt-2">
+                <div class="tab-pane" id="setuptab">
+                    <form>
+                        <select name="year_period" class="form-control">
+                            {{for item in other_periods:}}
+                                {{if item.period == cpfecys.first_period.id:}}
+                                    <option value="{{=item.id}}">{{=f'{item.yearp} - {T(cpfecys.first_period_name)}'}}</option>
+                                {{else:}}
+                                    <option value="{{=item.id}}">{{=f'{item.yearp} - {T(cpfecys.second_period_name)}'}}</option>
+                                {{pass}}
+                            {{pass}}
+                        </select>
+                        <input type="submit" value="Ir" class="btn btn-primary">
+                    </form>
+                </div>
+                <div class="tab-pane active" id="data{{=currentyear_period.id}}">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th><center>Foto</center></th>
+                                    <th><center>Carnet</center></th>
+                                    <th><center>Nombre</center></th>
+                                    <th><center>Acciones</center></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for item in current_data:}}
+                                    <tr>
+                                        <td class="align-middle">
+                                            {{review = db((db.photo_review.user_id == item.assigned_user.id)).select(db.photo_review.accepted).first()}}
+                                            {{if review is not None:}}
+                                                {{if review.accepted:}}
+                                                    <img id="img_img" src="{{=URL('default/download', item.assigned_user.photo)}}" alt="Sin foto" height="30px" width="30px">
+                                                {{pass}}
+                                            {{pass}}
+                                        </td>
+                                        <td class="align-middle"><center>{{=item.assigned_user['username']}}</center></td>
+                                        <td class="align-middle">
+                                            <center>
+                                                {{=f"{item.assigned_user['first_name']} {item.assigned_user['last_name']}"}}
+                                            </center>
+                                        </td>
+                                        <td class="align-middle">
+                                            <center>
+                                                <a class="btn btn-primary" href="{{=URL('final_practice', vars=dict(assignation=item.id))}}">
+                                                    <i class="fa fa-list"></i>
+                                                    Progreso de práctica final
+                                                </a>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

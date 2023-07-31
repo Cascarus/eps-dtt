@@ -213,12 +213,7 @@ def iso_get_punteo(iso_encuesta_id, top, orden):
 	return query
 
 def iso_get_valor_encuesta(id_ev):
-	query = """
-	SELECT SUM(ip.valor) 
-	FROM iso_pregunta ip 
-	WHERE ip.id_ev_rendimiento = %s"""%(id_ev)
-
-	return query
+	return f"SELECT SUM(ip.valor) FROM iso_pregunta ip WHERE ip.id_ev_rendimiento = {id_ev}"
 
 def iso_get_count_completas(id_ev):
 	query = """

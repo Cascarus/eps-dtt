@@ -1,0 +1,36 @@
+{{extend 'dashboard.html'}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+
+<style>
+p {
+    white-space: pre-line;
+}
+
+    </style>
+<div class = "dttContainer">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+          <h1 class="bi bi-briefcase"style="color: white">{{=emp[0]['nombre_empresa']}}</h1>
+        </div>
+      </nav>
+      <br>
+      <br>
+<div class = "row">
+
+    <div class="col">
+        <div class="card bg-light mb-3" style="max-width: 75rem;">
+            <div class="card-header text-white bg-dark"><h4>Descripción</h4></div>
+            <div class="card-body">
+            <p><strong>{{=emp[0]['descripcion']}}</strong></p>
+            </div>
+            <div class="card-header text-white bg-dark"><h4>Información</h4></div>
+            <div class="card-body">
+                <h5 class="bi bi-person-circle">Persona encargada: {{=emp[0]['persona_encargada']}}</h5>
+                <h5 class="bi bi-telephone-fill">Teléfono: {{=emp[0]['telefono']}}</h5>
+                <h5 class="bi bi-envelope">Correo: {{=emp[0]['correo']}}</h5>
+            </div>
+</div>
+
+</div>
+
+</div>

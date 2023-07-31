@@ -1,0 +1,174 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Gestión de reclutamiento</h2>
+        </div>
+        <div class="col-12">
+            <center>{{=opciones}}</center>
+        </div>
+    </div>
+    <div class="row well">
+        <div class="col-12 text-center">
+            <h3>Reporte de estado{{=label_proceso}}</h3>
+        </div>
+        <div class="col-12">
+            <div style="float:left;">
+                <label class="lbl_seleccionar"><b>Seleccionar proceso</b></label>
+                {{=procesos_html}}
+            </div>
+            <div style="float:left;">
+                <label class="lbl_seleccionar"><b>Seleccionar Estado</b></label>
+                <div class="input-append">
+                    {{=estados_html}}
+                </div>
+            </div>
+            <div style="float:left;" class="mt-4">
+                <button class="btn btn-primary" type="button" id="btn_cargar"><i
+                        class="icon-chevron-right icon-white"></i>Cargar</button>
+            </div>
+        </div>
+        <div class="col-12">
+            <form class="form-inline">
+                <div class="input-prepend">
+                    <span class="add-on"><i class="icon-search"></i></span>
+                    <input id="inp_buscar" placeholder="Buscar..." type="text" class="input-medium form-control">
+                </div>
+            </form>
+        </div>
+        <div class="col-12">
+            <div class="table-responsive">
+                <table id="assignations" class="table table-bordered table-hover table-striped tb_reporte">
+                    <thead>
+                        <tr>
+                            <td width="5%"><b>Carnet</b></td>
+                            <td width="20%"><b>Nombre del estudiante</b></td>
+                            <td width="20%"><b>Area de interes</b></td>
+                            <td width="20%"><b>Proyecto solicitado</b></td>
+                            <td width="10%"><b>Seccion asignada</b></td>
+                            <td width="5%"><b>CV</b></td>
+                            <td width="5%"><b>Listado cursos</b></td>
+                            <td width="5%"><b>Nota oposición</b></td>
+                            <td width="10%"><b>Estado</b></td>
+                        </tr>
+                    </thead>
+                    <tbody id="tb_estado_body">
+                        <!-- Inicia ciclo para llenar tabla -->
+                        {{if lista_solicitudes!=None:}}
+                        {{for item in lista_solicitudes:}}
+                        <tr>
+                            <td>{{=item[0]}}</td>
+                            <td>{{=item[1]}} {{=item[2]}}</td>
+                            <td>{{=item[7]}}</td>
+                            <td>{{=item[11]}}</td>
+                            <td>{{=item[18]}}</td>
+                            <td>
+                                <a class="btn btn_rep" style="height:24px; width:24px;" title="Ver Curriculum vitae"
+                                    id="btn_ver_modal"
+                                    onclick='javascript:ver_modal_estado("Curriculum vitae","{{=item[5]}}");'>
+                                    <img class="img_pdf" src="{{=ruta_iconos}}/ver4.png" height="24" width="24">
+                                </a>
+                            </td>
+                            <td>
+                                <a class="btn btn_rep" style="height:24px; width:24px;" title="Ver listado de cursos"
+                                    id="btn_ver_modal"
+                                    onclick='javascript:ver_modal_estado("Listado de cursos","{{=item[6]}}");'>
+                                    <img class="img_pdf" src="{{=ruta_iconos}}/ver4.png" height="24" width="24">
+                                </a>
+                            </td>
+                            <td>{{=item[20]}}</td>
+                            <td>{{=item[8]}}</td>
+                        </tr>
+                        {{pass}}
+                        {{pass}}
+
+                        <!-- termina ciclo para llenar tabla -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="modal_estado" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="modal_label_estado">Curriculum Vitae</h3>
+        </div>
+        <div class="modal-body">
+            <object id='visor_estado' type='application/pdf' width='100%' height='700px'></object>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+        </div>
+    </div>
+</div>
+{{block page_js}}
+<script type="text/javascript" src="{{=URL('static','sources/js/accion_admin.js')}}"></script>
+<script>
+    $(function () {
+        $('.pop').popover();
+    });
+    function visible_detail() {
+        $(".hide_class").css("display", "table-cell");
+        $(".show_class").css("display", "none");
+    }
+    function hide_detail() {
+        $(".show_class").css("display", "table-cell");
+        $(".hide_class").css("display", "none");
+    }
+
+    $("#inp_buscar").keyup(function () {
+        //split the current value of searchInput
+        var data = this.value.split(" ");
+        //create a jquery object of the rows
+        var jo = $("#tb_estado_body").find("tr");
+        if (this.value == "") {
+            jo.show();
+            return;
+        }
+        //hide all the rows
+        jo.hide();
+
+        //Recusively filter the jquery object to get results.
+        jo.filter(function (i, v) {
+            var $t = $(this);
+            for (var d = 0; d < data.length; ++d) {
+                if ($t.is(":contains('" + data[d] + "')")) {
+                    return true;
+                }
+            }
+            return false;
+        })
+            //show the rows that match.
+            .show();
+    }).focus(function () {
+        this.value = "";
+        $(this).css({
+            "color": "black"
+        });
+        $(this).unbind('focus');
+    }).css({
+        "color": "#C0C0C0"
+    });
+
+    $(document).ready(function () {
+        $('.img_pdf').hover(function () {
+            $(this).addClass('transition');
+
+        }, function () {
+            $(this).removeClass('transition');
+        }
+        );
+
+        $("#btn_cargar").click(function () {
+            var id_proceso = $('#select_proceso option:selected').val();
+            var id_estado = $('#select_estado option:selected').val();
+            var etiqueta_proceso = $('#select_proceso option:selected').text();
+            var etiqueta_estado = $('#select_estado option:selected').text();
+
+            var parametros = "{{=URL('reclutamiento_admin', 'reporte_estado')}}?id_proceso=" + id_proceso + '&etiqueta_proceso=' + encodeURIComponent(etiqueta_proceso) + '&id_estado=' + id_estado + '&etiqueta_estado=' + encodeURIComponent(etiqueta_estado);
+            window.location.href = parametros;
+        });
+    });
+</script>
+{{end page_js}}

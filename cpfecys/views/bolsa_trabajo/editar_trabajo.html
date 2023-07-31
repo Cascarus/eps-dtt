@@ -1,0 +1,244 @@
+{{extend 'dashboard.html'}}
+
+<div class='row p-0 m-0'>
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Actualizar oferta laboral</h1>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/cpfecys/bolsa_trabajo/trabajos">Ofertas Laborales</a></li>
+        <li class="breadcrumb-item"><a
+                href="/cpfecys/bolsa_trabajo/view_trabajo?id={{=new_dict['trabajo']['id_oferta_laboral']}}">{{=new_dict["trabajo"]["puesto"]}}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Editar Oferta Laboral</li>
+    </ol>
+</nav>
+
+<form id="formOferta" class="m-0 p-0" action='/cpfecys/bolsa_trabajo/editar_trabajo' method="POST">
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="puestoInput" class="form-label">Puesto</label>
+            <input type="text" class="form-control" id="puestoInput" disabled
+                value="{{=new_dict['trabajo']['puesto']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="salario" class="form-label">Salario Apróximado</label>
+            <input type="numbre" min=0 class="form-control" id="salario" required
+                value="{{=new_dict['trabajo']['salario_aproximado']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="descInput" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descInput" rows="3"
+            disabled>{{=new_dict['trabajo']['descripcion']}}</textarea>
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+            <input type="date" class="form-control" id="fecha_inicio" required
+                value="{{=new_dict['trabajo']['fecha_inicio']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="fecha_vigencia" class="form-label">fecha_vigencia</label>
+            <input type="date" class="form-control" id="fecha_vigencia" required
+                value="{{=new_dict['trabajo']['fecha_vigencia']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="periodo" class="form-label">Periodo Creado</label>
+            <input type="text" class="form-control" id="periodo" disabled
+                value='Semestre {{=new_dict["trabajo"]["period"]}} - Año {{=new_dict["trabajo"]["yearp"]}}' />
+            <input type="text" class="form-control" id="periodo_id" hidden value='{{=new_dict["trabajo"]["id"]}}' />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="empresa" class="form-label">Empresa Encargada</label>
+            <input type="text" class="form-control" id="empresa" disabled
+                value='{{=new_dict["trabajo"]["nombre_empresa"]}} - Tel. {{=new_dict["trabajo"]["telefono"]}}' />
+            <input type="text" class="form-control" id="periodo_id" hidden
+                value='{{=new_dict["trabajo"]["id_empresa"]}}' />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="area" class="form-label">Área Especialidad</label>
+            <select class="form-control" id="area">
+                {{for area in new_dict['area_especialidad']:}}
+                    {{if area['id_area_especialidad'] == new_dict['trabajo']['id_area_especialidad']:}}
+                        <option value="{{=area['id_area_especialidad']}}" selected>{{=area["area_especialidad"]}}</option>
+                    {{else:}}
+                        <option value="{{=area['id_area_especialidad']}}">{{=area["area_especialidad"]}}</option>
+                    {{pass}}
+                {{pass}}
+            </select>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="estadoSelect" class="form-label">Estado</label>
+            <select class="form-control" id="estadoSelect">
+                {{for estado in new_dict['estados_registro']:}}
+                    {{if estado['id_estado_oferta_laboral'] == new_dict['trabajo']['id_estado_oferta_laboral']:}}
+                        <option value="{{=estado['id_estado_oferta_laboral']}}" selected>
+                            {{=estado["estado_oferta_laboral"]}}
+                        </option>
+                    {{else:}}
+                        <option value="{{=estado['id_estado_oferta_laboral']}}">
+                            {{=estado["estado_oferta_laboral"]}}
+                        </option>
+                    {{pass}}
+                {{pass}}
+            </select>
+        </div>
+    </div>
+    {{if new_dict['trabajo']['banner']:}}
+        <div class='row m-0 p-0 mb-3'>
+            <div class='col-12 d-flex justify-content-start'>
+                <div class="form-check">
+                    {{if new_dict['trabajo']['seleccionada'] == False:}}
+                        <input class="form-check-input" type="checkbox" value='' id="seleccionado">
+                    {{else:}}
+                        <input class="form-check-input" type="checkbox" value='' id="seleccionado" checked>
+                    {{pass}}
+                    <label class="form-check-label" for="seleccionado">
+                        Mostrar banner en página de inicio
+                    </label>
+                </div>
+            </div>
+        </div>
+    {{pass}}
+    <div class='row m-0 p-0 mb-3'>
+        <div class='col-12 d-flex justify-content-end'>
+            <button type="button" class="btn btn-primary w-auto mr-3" onclick="submitt()">Actualizar</button>
+            <button type="button" class="btn btn-danger w-auto" onclick="cancelUpdate()">Cancelar</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    $('#seleccionado').change(function () {
+        if (this.checked) {
+            $.ajax({
+                type: 'get',
+                url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/ver_seleccionados`,
+                async: false,
+                success: function (res) {
+                    res = JSON.parse(res);
+                    if (res.success && res.limite >= 11) {
+                        Swal.fire({
+                            title: 'Límite de seleccioados!',
+                            text: 'Se ha alcanzado el limite de banners a mostrar',
+                            icon: 'info'
+                        }).then(() => $('#seleccionado').prop('checked', false));
+                    } else if (!res.success) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.msg,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log(xhr, status, errorThrown);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Hubo un problema, intente más tarde',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    })
+
+    async function modal() { return text; }
+    async function enviarForm(data) {
+        if (data.estado > 2) {
+            var textoMotivo = ""
+            await Swal.fire({
+                input: 'textarea',
+                inputLabel: 'Motivo',
+                inputPlaceholder: 'Escribir motivo...',
+                inputAttributes: {
+                    'aria-label': 'Escribir motivo'
+                },
+                showCancelButton: true,
+                preConfirm: (textoo) => {
+                    textoMotivo = textoo
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    data.motivo = textoMotivo;
+                    enviarAjax(data);
+                }
+            });
+        } else {
+            enviarAjax(data);
+        }
+
+        function enviarAjax(data) {
+            $.ajax({
+                type: 'post',
+                url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/actualizar_trabajo`,
+                data: `array=${JSON.stringify(data)}`,
+                success: function (res) {
+                    res = JSON.parse(res);
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Actualizado!',
+                            text: res.msg,
+                            icon: 'success'
+                        }).then(() => window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/trabajos`);
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.msg,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log(xhr, status, errorThrown);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Hubo un problema, intente más tarde',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function quitarAcentos(cadena) {
+        const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'ñ': 'n', 'Ñ': 'N' };
+        cadena = cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+        return cadena = cadena.replace(/[^\w\s ?,:.!%()-_"@/]/gi, '');
+    }
+
+    function submitt() {
+        var form = $('#formOferta')[0]
+        const data = {
+            id_oferta: Number("{{=new_dict['trabajo']['id_oferta_laboral']}}"),
+            puesto: quitarAcentos(form[0].value),
+            salario: Number(form[1].value),
+            descripcion: quitarAcentos(form[2].value),
+            fecha_inicio: form[3].value,
+            fecha_vigencia: form[4].value,
+            periodo: form[5].value,
+            empresa: form[7].value,
+            area: Number(form[9].value),
+            estado: Number(form[10].value),
+            seleccionada: Number(form[11].checked) || 0,
+            nombre_empresa: "{{=new_dict['trabajo']['nombre_empresa']}}",
+            motivo: null
+        }
+        enviarForm(data);
+    }
+
+    function cancelUpdate() {
+        window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/trabajos`
+    }
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

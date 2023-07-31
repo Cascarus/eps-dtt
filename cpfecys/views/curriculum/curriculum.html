@@ -1,0 +1,1593 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+  <div class="col-12">
+    <div class="navbar-inner">
+      <a style="cursor: pointer">
+          <center>
+              <h2>Actualizar Mi CV</h2>
+          </center>
+      </a>
+      <p value="{{=tamanios['tamanio_curriculum']}}" id="sizeFile"></p>
+    </div>
+    <div id="div_error_0" class="alert alert-error" hidden>
+        <strong>Atención:</strong> Debe seleccionar almenos 1 proyecto.
+    </div>
+    <div id="div_error" class="alert alert-error" hidden>
+      <strong>Atención:</strong> Debe corregir los errores en el formulario.
+    </div>
+    <div id="div_info" class="alert alert-info" hidden>
+      <strong>Atención:</strong> Solo puede seleccionar 5 proyectos.
+    </div>
+  </div>
+    <div class="col-12">
+      <!-- SmartWizard html -->
+      <div id="smartwizard">
+            <ul>
+                <li>
+                    <a href="#step-1">Registro de CV<br /><small>Descripcion</small></a>
+                </li>
+                <li>
+                    <a href="#step-2">Paso 1<br /><small>Informaciòn personal</small></a>
+                </li>
+                <li>
+                    <a href="#step-3">Paso 2<br /><small>Àreas de especialidad</small></a>
+                </li>
+                <li>
+                    <a href="#step-4">Paso 3<br /><small>Experiencia laboral</small></a>
+                </li>
+                <li>
+                    <a href="#step-5">Paso 4<br /><small>Informaciòn acadèmica</small></a>
+                </li>
+                <li>
+                    <a href="#step-6">Paso 5<br /><small>Cursos y certificaciones</small></a>
+                </li>
+                <li>
+                    <a href="#step-7">Paso 6<br /><small>Habilidades tecnicas</small></a>
+                </li>
+                <li>
+                    <a href="#step-8">Paso 7<br /><small>Privacidad</small></a>
+                </li>
+            </ul>
+            <div>
+                <div id="step-1">
+                    <div id="form-step-0" role="form" data-toggle="validator">
+                        <div class="form-group"></div>
+                    </div>
+                </div>
+                <div id="step-2" style="height: 320px; overflow-y: auto">
+                    <center>
+                        <h2>Verifique sus datos personales</h2>
+                    </center>
+
+                    <div id="form-step-1" role="form" data-toggle="validator">
+                        <form id="frm_datos_personales" class="mt-4 mb-3">
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                    <label for="inp_nombre">Nombre:</label>
+                                    <input type="text" class="form-control" name="inp_nombre" id="inp_nombre"
+                                        value="{{=datos_user['first_name']}}" placeholder="Ingrese su nombre" />
+                                </div>
+                            </div>
+                            <div class="row mt-1 ">
+                                <div class="col-12">
+                                    <label for="inp_apellido">Apellido:</label>
+                                    <input type="text" class="form-control" name="inp_apellido" id="inp_apellido"
+                                        value="{{=datos_user['last_name']}}" placeholder="Ingrese su apellido" />
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                    <label for="inp_edad">Fecha de nacimiento:</label>
+                                    <input type="date" class="form-control" name="inp_edad" id="inp_edad" value="{{=datos_cv['edad']}}"
+                                        placeholder="" />
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                <label for="inp_email">Correo:</label>
+                                <input type="email" class="form-control" name="inp_email" id="inp_email"
+                                    value="{{=datos_cv['correo']}}" placeholder="example@mail.com" />
+                                </div>
+                            </div>
+                            <div class="row mt-1">
+                                <div class="col-12">
+                                <label for="inp_telefono">Telefono:</label>
+                                <input type="number" class="form-control" name="inp_telefono" id="inp_telefono"
+                                    value="{{=datos_cv['telefono']}}" placeholder="" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div id="step-3" style="height: 500px; overflow-y: auto">
+                  <center>
+                      <h2>Seleccione sus areas de especialidad</h2>
+                  </center>
+                  <div id="form-step-2" role="form" data-toggle="validator">
+                    <div class="row mt-4">
+                      <div class="form-group col-12 col-md-7">
+                        <label class="control-label"><b>Areas disponibles</b></label>
+                        <select type="text" value="" id="area" class="form-control">
+                            {{for area in areas_es:}}
+                                {{area_es = area['area_especialidad']}}
+                                {{id_area = area['id_area_especialidad']}}
+                                <option value="{{=id_area}}">{{=area_es}}</option>
+                            {{pass}}
+                        </select>
+                        <button class="btn btn-primary mt-3" type="button" id="aceptar">
+                            <i class="icon-ok-sign icon-white"></i> Aceptar
+                        </button>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <div class="row" id="div_proyectos">
+                          <h3 id="h3_proyectos_dis"></h3>
+                          <table class="table table-striped" id="tb_areas_esp">
+                              <thead>
+                                <tr>
+                                    <th width="80%" align="left">Area</th>
+                                    <th width="20%" align="left">Acción</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tb_areas_esp_body"></tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="step-4" style="height: 500px; overflow-y: auto">
+                  <center>
+                      <h2>Experiencia Laboral</h2>
+                  </center>
+                  <div id="form-step-3" role="form" data-toggle="validator">
+                    <form id="frm_experiencia" class="mt-3 mb-3">
+                      <div class="row">
+                        <div class="col-12 col-md-6 col-lg-3">
+                          <label for="inp_puesto">Puesto:</label>
+                          <input type="text" class="form-control" name="inp_puesto" id="inp_puesto" value=""
+                              placeholder="Ingrese su puesto" />
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                          <label for="inp_empresa">Empresa:</label>
+                          <input type="text" class="form-control" name="inp_empresa" id="inp_empresa" value=""
+                              placeholder="Ingrese la empresa donde laboro" />
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                          <label for="inp_fecha_in">Fecha de Inicio:</label>
+                          <input type="date" class="form-control" name="inp_fecha_in" id="inp_fecha_in" value=""
+                              placeholder="" />
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-3">
+                          <label for="inp_fecha_fin">Fecha de Finalizacion:</label>
+                          <input type="date" class="form-control" name="inp_fecha_fin" id="inp_fecha_fin" value=""
+                              placeholder="" />
+                        </div>
+                      </div>
+                      <div class="row">
+                          <div class="col-12">
+                            <div class="span5">
+                              <label for="inp_descripcion">Descripcion:</label>
+                              <textarea type="textarea" class="form-control" name="inp_descripcion" id="inp_descripcion" value=""
+                                placeholder="" rows="3"></textarea>
+                            </div>
+                          </div>
+                          <div class="col-12 col-md-6 col-lg-3">
+                            <input class="form-check-input ml-2" type="checkbox" value="" id="defaultCheck1"
+                              onchange="switchEmpleo(event)" name="inp_empleoActual">
+                            <label class="form-check-label ml-4" for="defaultCheck1">
+                              Empleo Actual
+                            </label>
+                          </div>
+                          <div class="col-12 col-lg-2">
+                            <button class="btn btn-primary mt-3" type="button" id="agregarExp">
+                                <i class="fa fa-plus"></i> Agregar
+                            </button>
+                            <button class="btn btn-danger mt-3 d-none" type="button" id="cancelarExp">
+                                Cancelar
+                            </button>
+                          </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12 ">
+                          <div class="row" id="div_experiencias">
+                            <h3 id="h3_proyectos_dis"></h3>
+                            <table class="table table-hover ml-2 mr-2" id="tb_experiencia">
+                              <thead class="thead-dark">
+                                <tr>
+                                  <th align="left">Puesto</th>
+                                  <th align="left">Empresa</th>
+                                  <th align="left">Fecha Inicio</th>
+                                  <th align="left">Fecha Fin</th>
+                                  <th align="left">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tb_experiencia_body"></tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div id="step-5" class="">
+                  <center>
+                      <h2>Informacion Academica</h2>
+                  </center>
+                  <div id="form-step-4" role="form" data-toggle="validator">
+                    <form id="frm_info_academica" class="mt-3 mb-3">
+                      <div class="row">
+                        <div class="col-12">
+                          <form id="frm_documentos" method="post" enctype="multipart/form-data">
+                            <div class="row mt-4">
+                              <div class="col-12 col-md-6">
+                                  <label for="inp_creditos">Creditos Aprobados:</label>
+                                  <input id="inp_creditos" class="form-control" name="inp_creditos" type="number"
+                                  value="{{=datos_cv['creditos_aprobados']}}">
+                              </div>
+                              <div class="col-12 col-md-6">
+                                  <label for="inp_lis_cursos">Cursos Aprobados: </label>
+                                  <input id="inp_lis_cursos" class="form-control" name="inp_lis_cursos" type="file" class="file"
+                                  value="{{=datos_cv['cursos_aprobados']}}" onchange="onChange(event)">
+                                  <p id="cursos_aprobados_actuales">{{=datos_cv['cursos_aprobados']}}</p>
+                              </div>
+                            </div>
+                          </form>
+                          <form id="why" method="post" enctype="multipart/form-data"></form>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div id="step-6" style="height: 500px; overflow-y: auto">
+                  <center>
+                      <h2>Cursos y Certificaciones</h2>
+                  </center>
+                  <div id="form-step-5" role="form" data-toggle="validator">
+                    <form id="frm_certificaciones" class="mt-3 mb-3">
+                      <div class="row">
+                        <div class="col-12 col-md-8">
+                          <label for="inp_nombre_cert">Curso o Certificacion:</label>
+                          <input type="text" class="form-control" name="inp_nombre_cert" id="inp_nombre_cert" value=""
+                              placeholder="Nombre del curso o certificacion" />
+                        </div>
+                        <div class="col-12 col-md-4">
+                          <label for="inp_fecha_cert">Fecha de Expedicion:</label>
+                          <input type="date" class="form-control" name="inp_fecha_cert" id="inp_fecha_cert" value=""
+                              placeholder="" />
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12 col-md-8">
+                          <input class="form-check-input ml-2" type="checkbox" id="defaultCheck2" onchange="switchCert(event)"
+                            name="inp_certActual">
+                          <label class="form-check-label ml-4" for="defaultCheck2">
+                              Certificación con Título Online
+                          </label>
+                        </div>
+                        <div class="col-12 col-md-8">
+                          <div class="span5">
+                            <br>
+                            <label for="inp_enlace_cert">Enlace:</label>
+                            <input type="url" class="form-control" name="inp_enlace_cert" id="inp_enlace_cert" value=""
+                              placeholder="" />
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-8">
+                          <div class="span5">
+                            <br>
+                            <label for="inp_cert">PDF de Certificación: </label>
+                            <input id="inp_cert" class="form-control" name="inp_cert" type="file" class="file"
+                              onchange="onChange2(event)">
+                            <p id="certificacion_actual"></p>
+                          </div>
+                        </div>
+                        <div class="col-12 col-md-2">
+                          <button class="btn btn-primary mt-3" type="button" id="agregarCurso">
+                              <i class="fa fa-plus"></i> Agregar
+                          </button>
+                          <button class="btn btn-danger mt-3 d-none" type="button" id="cancelarCurso">
+                              Cancelar
+                          </button>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-12 ">
+                          <div class="row" id="div_certificaciones">
+                            <table class="table table-hover ml-2 mr-2" id="tb_certificaciones">
+                              <thead class="thead-dark">
+                                <tr>
+                                  <th align="left">Nombre</th>
+                                  <th align="left">Fecha de Expedicion</th>
+                                  <th width="20%" align="left">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="tb_certificaciones_body">
+                                {{for certificacion in certificaciones:}}
+                                  <tr id="{{=certificacion['id_certificacion']}}">
+                                    <td>{{=certificacion['nombre_certificacion']}}</td>
+                                    <td>{{=certificacion['fecha_expedicion']}}</td>
+                                    <td class="text-center">
+                                      {{if certificacion['tipo'] == 1:}}
+                                        {{archivo = certificacion['enlace']}}
+                                        <button class="btn btn-primary btn-sm" onclick='abrirPDF("{{=archivo}}")'>
+                                          <i class="fa fa-fw fa fa-download"></i>
+                                        </button>
+                                      {{else:}}
+                                        <a class="btn btn-primary btn-sm" href="{{=certificacion['enlace']}}" target="_blank">
+                                          <i class="fa fa-fw fa fa-eye"></i>
+                                        </a>
+                                      {{pass}}
+                                      {{id_cert = certificacion['id_certificacion']}}
+                                      <button class="btn btn-primary btn-sm" type="button"
+                                        onclick='local_setEditarCertificacion("{{=id_cert}}")'>
+                                        <i class="fa fa-fw fa fa-edit"></i>
+                                      </button>
+                                      <button class="btn btn-danger btn-sm" type="button"
+                                        onclick='eliminar_certificacion("{{=id_cert}}")'><i
+                                            class="fa fa-fw fa fa-trash"></i>
+                                      </button>
+                                    </td>
+                                  </tr>
+                                {{pass}}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+                <div id="step-7" style="height: 500px; overflow-y: auto">
+                  <center>
+                      <h2>Seleccione sus habilidades tecnicas</h2>
+                  </center>
+                  <div id="form-step-6" role="form" data-toggle="validator">
+                    <div class="row">
+                      <div class="form-group col-12 col-md-7">
+                        <label class="control-label"><b>Seleccione 1 o mas:</b></label>
+                        <select type="text" value="" id="habilidades" class="form-control">
+                          {{for habilidad in habilidades:}}
+                            <option value="{{=habilidad['id_habilidad']}}">{{=habilidad['habilidad']}}</option>
+                          {{pass}}
+                        </select>
+                        <button class="btn btn-primary mt-3" type="button" id="agregarHabilidad">
+                          <i class="icon-ok-sign icon-white"></i> Agregar
+                        </button>
+                      </div>
+                      <div class="col-12 col-md-4">
+                        <div class="row" id="div_proyectos">
+                          <h3 id="h3_proyectos_dis"></h3>
+                          <table class="table table-striped" id="tb_habilidades">
+                            <thead>
+                              <tr>
+                                <th width="80%" align="left">Habilidad</th>
+                                <th width="20%" align="left"></th>
+                              </tr>
+                            </thead>
+                            <tbody id="tb_habilidades_body"></tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div id="step-8" style="height: 500px; overflow-y: auto">
+                  <center>
+                      <h2>Escoja el tipo de privacidad para su CV</h2>
+                  </center>
+                  <br /><br />
+                  <form style="width: 40%; margin-left: auto; margin-right: auto;">
+                    <div id='type'>
+                      <p style="font-size:18px;">
+                        Actualmente, el estado de tu CV es: </br> </p>
+                      <p style="font-size:18px;" id="radioPrivacidad">{{='No seleccionado' if len(areas_est) <= 0 else 'Privado'
+                          if areas_est[0]['id_estado_visibilidad']==1 else 'Público' }}
+                      </p>
+                      <input type='radio' id='radio_1' name='type' value='0' />
+                      <label for="radio_1" style="font-size:18px;">Público</label>
+                      <br /><br />
+                      <input type='radio' id='radio_2' name='type' value='1' />
+                      <label for="radio_2" style="font-size:18px;">Privado</label>
+                    </div>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+  <!-- Include SmartWizard CSS -->
+  <link href="{{=URL('static', 'sources/css/smart_wizard.min.css')}}" rel="stylesheet" type="text/css" />
+  <!-- Optional SmartWizard theme -->
+  <link href="{{=URL('static', 'sources/css/smart_wizard_theme_arrows.min.css')}}" rel="stylesheet" type="text/css" />
+  <link href="{{=URL('static', 'sources/css/validators.css')}}" rel="stylesheet" type="text/css" />
+  <!-- Include SmartWizard JavaScript source -->
+  <script src="{{=URL('static', 'sources/js/jquery.smartWizard.min.js')}}"></script>
+  <!-- Include jQuery Validator plugin -->
+  <script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
+  <script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
+  <script type="text/javascript" src="{{=URL('static','sources/js/accion.js')}}"></script>
+  <script type="text/javascript" src="{{=URL('static','sources/js/cv.js')}}"></script>
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script type="text/javascript">
+    var cv, lst;
+    var extension, nombre, documento;
+    let empleoActual = false;
+
+    function switchEmpleo(event) {
+      empleoActual = !empleoActual;
+      $('#inp_fecha_fin').prop('disabled', empleoActual);
+    }
+
+    let certOnline = false;
+    function switchCert(event) {
+      certOnline = !certOnline;
+      $('#inp_cert').prop('disabled', !certOnline);
+      $('#inp_enlace_cert').prop('disabled', certOnline);
+      $('#inp_cert').val('');
+      $('#inp_enlace_cert').val('');
+      temp_nombre = "";
+      temp_doc = "";
+    }
+
+    //*************************************** VALIDATOR PLUGIN **********************************************
+    jQuery.validator.setDefaults({
+      debug: true,
+      success: "valid",
+    });
+
+    // Validar seccion de datos personales
+    var obj_frm_datos_personales = $("#frm_datos_personales");
+    obj_frm_datos_personales.validate({
+      rules: {
+        inp_nombre: "required",
+        inp_apellido: "required",
+        inp_edad: {
+          required: true,
+          date: true
+        },
+        inp_email: "required",
+        inp_telefono: {
+          required: true,
+          minlength: 8,
+          maxlength: 8,
+        },
+      },
+      messages: {
+        inp_nombre: "*Este campo es obligatorio",
+        inp_apellido: "*Este campo es obligatorio",
+        inp_edad: "*Este campo es obligatorio",
+        inp_email: "*Este campo es obligatorio",
+        inp_apellido: {
+          required: "*Este campo es obligatorio",
+          minlength: "*Debe ingresar un valor de 1 o 2 digitos",
+          maxlength: "*Debe ingresar un valor de 1 o 2 digitos",
+        },
+        inp_telefono: {
+          required: "*Este campo es obligatorio",
+          minlength: "*Debe ingresar un valor de 8 digitos",
+          maxlength: "*Debe ingresar un valor de 8 digitos",
+        },
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element)
+          .parents(".span5")
+          .addClass("has-success")
+          .removeClass("has-error");
+      },
+    });
+
+
+    $.validator.addMethod('mindate', function (v, el, maxDate) {
+      if (this.optional(el)) {
+        return true;
+      }
+
+      var maxDatee = new Date($("#inp_fecha_fin").val())
+      var selectedDate = new Date($("#inp_fecha_in").val());
+      return maxDatee >= selectedDate;
+    }, 'La fecha de inicio debe ser anterior a {0}.');
+
+
+    let today = new Date();
+    var obj_frm_experiencia = $("#frm_experiencia");
+    obj_frm_experiencia.validate({
+      rules: {
+        inp_puesto: "required",
+        inp_empresa: "required",
+        inp_fecha_in: {
+          required: true,
+          date: true,
+        },
+        inp_fecha_fin: {
+          required: false,
+          date: true,
+          mindate: $("#inp_fecha_fin").val()
+        },
+        inp_descripcion: "required",
+      },
+      messages: {
+        inp_puesto: "*Este campo es obligatorio",
+        inp_empresa: "*Este campo es obligatorio",
+        inp_fecha_in: {
+          required: "*Este campo es obligatorio"
+        },
+        inp_fecha_fin: {
+          mindate: "*La fecha de finalizacion debe ser mas reciente que la fecha de inicio"
+        },
+        inp_descripcion: "*Este campo es obligatorio",
+      }
+    });
+
+    $.validator.addMethod('filesize', function (value, element, param) {
+      return this.optional(element) || (element.files[0].size <= param)
+    });
+
+    var obj_frm_info_academica = $("#frm_info_academica");
+    var myFileSize = $("sizeFile").val()
+
+    obj_frm_info_academica.validate({
+      rules: {
+        inp_creditos: "required",
+        inp_lis_cursos: {
+          required: ($("#cursos_aprobados_actuales").text() == ""),
+          accept: "pdf",
+          filesize: myFileSize || 3048576
+        }
+      },
+      messages: {
+        inp_creditos: "*Este campo es obligatorio"
+      }
+    });
+
+    var obj_frm_certificaciones = $("#frm_certificaciones");
+    var myFileSize = $("sizeFile").val()
+
+    obj_frm_certificaciones.validate({
+      rules: {
+        inp_cert: {
+          accept: "pdf",
+          filesize: myFileSize || 3048576
+        }
+      },
+      messages: {
+        inp_cert: "*Solo se aceptan archivos PDF"
+      }
+    });
+
+    $.validator.addMethod('maxdate', function (v, el, maxDate) {
+      if (this.optional(el)) {
+        return true;
+      }
+
+      //var maxDate = new Date(year + '-' + month + '-' + day)
+      var maxDate = new Date(maxDate)
+      var selectedDate = new Date($("#inp_fecha_cert").val());
+      return maxDate >= selectedDate;
+    }, 'La fecha de la certificacion debe de ser anterior a {0}.');
+
+
+    var day = today.getDate()
+    var month = today.getMonth() + 1
+    var year = today.getFullYear()
+
+    if (day <= 18) {
+      day = day + 10
+    } else {
+      day = 1
+      if (month <= 11) {
+        month = month + 1
+      } else {
+        month = 1
+        year = year + 1
+      }
+    }
+    var maxDate = new Date(year + '-' + month + '-' + day)
+    var obj_frm_certificaciones = $("#frm_certificaciones");
+    obj_frm_certificaciones.validate({
+      rules: {
+        inp_nombre_cert: "required",
+        inp_fecha_cert: {
+          required: true,
+          date: true,
+          maxdate: maxDate
+        },
+        inp_enlace_cert: {
+          url: true
+        }
+      },
+      messages: {
+        inp_nombre_cert: "*Este campo es obligatorio",
+        inp_fecha_cert: {
+          required: "*Este campo es obligatorio"
+        },
+        inp_fecha_cert: {
+          maxdate: "*La fecha de finalizacion debe ser anterior"
+        },
+      }
+    });
+
+    //********************************** TERMINA VALIDATOR PLUGIN *******************************************
+
+
+    function swalTest() {
+      Swal.fire({
+        icon: 'success',
+        title: 'CV Actualizado!',
+        text: 'Tu CV ahora es visible para los reclutadores'
+      })
+    }
+
+    //********************************* EVENTOS SMART WIZARD *************************************************
+    $(document).ready(function () {
+      $("#fixheight").click(function () {
+        $("#wizard").smartWizard("fixHeight");
+      });
+      // Step show event
+      $("#smartwizard").on(
+        "showStep",
+        function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
+          //alert("You are on step "+stepNumber+" now");
+          if (stepPosition === "first") {
+            $("#prev-btn").addClass("disabled");
+            $("#final-btn").attr("disabled", true);
+          } else if (stepPosition === "final") {
+            $("#next-btn").addClass("disabled");
+            $("#final-btn").attr("disabled", false);
+          } else {
+            $("#prev-btn").removeClass("disabled");
+            $("#next-btn").removeClass("disabled");
+            $("#final-btn").attr("disabled", true);
+          }
+        }
+      );
+
+      // Toolbar extra buttons - FINISH BUTTON
+      var btnFinish = $('<button id="final-btn" type="submit"></button>')
+        .text("Finalizar")
+        .addClass("btn btn-success")
+        .on("click", function () {
+          var fd = new FormData();
+
+          var privacidad = 1;
+
+          $("#radio_1").is(":checked") ? privacidad = 2 : $('#radioPrivacidad').text() == 'Público' ? privacidad = 2 : privacidad = 1;
+          $("#radio_2").is(":checked") ? privacidad = 1 : privacidad = privacidad;
+
+          fd.append("nombre", $("#inp_nombre").val());
+          fd.append("apellido", $("#inp_apellido").val());
+          fd.append("edad", $("#inp_edad").val());
+          fd.append("correo", $("#inp_email").val());
+          fd.append("telefono", $("#inp_telefono").val());
+          fd.append("creditos", $("#inp_creditos").val());
+
+          let areas_copy = [...all_areas];
+          let areas_nuevas = areas_copy.splice(areas.length);
+          fd.append("areas_especialidad", JSON.stringify(areas_nuevas));
+          let exp_copy = [...all_exp];
+          let nueva_experiencia = exp_copy.splice(experiencia_lab.length);
+          fd.append("experiencia_laboral", JSON.stringify(nueva_experiencia));
+          let hab_copy = [...all_habilidades];
+          let nuevas_habilidades = hab_copy.splice(habilidades.length);
+          fd.append("habilidades_tecnicas", JSON.stringify(nuevas_habilidades));
+
+          let cursos_copy = [...all_certificaciones];
+          let nuevas_certificaciones = [...all_certificaciones];
+          fd.append("certificaciones", JSON.stringify(nuevas_certificaciones));
+
+          // si es la primera vez
+          if (($("#cursos_aprobados_actuales").text() == "")) {
+            fd.append("nombre_cv", nombre); //cursos_aprobados_actuales
+            fd.append("documento_cv", documento);
+          } else {
+            // si está editando
+            fd.append("nombre_cv", $("#cursos_aprobados_actuales").text());
+            fd.append("documento_cv", documento || "");
+          }
+
+
+
+          fd.append("privacidad", privacidad);
+          $.ajax({
+            url: "registrar_cv",
+            type: "POST",
+            //dataType: 'json',
+            data: fd,
+            success: function (resp) {
+              if (resp == "ok") {
+
+                Swal.fire({
+                  icon: 'success',
+                  title: 'CV Actualizado!',
+                  text: 'Tu CV ahora es visible para los reclutadores'
+                })
+
+
+                location.reload();
+              } else {
+                 Swal.fire({
+                  icon: 'error',
+                   title: 'Error al actualizar tu CV',
+                   text: 'Por favor intentalo mas tarde'
+                 })
+                // location.reload();
+              }
+            },
+            cache: false,
+            contentType: false,
+            processData: false,
+          });
+
+        });
+
+
+      var btnCancel = $('<button></button>').text('Cancelar')
+        .addClass('btn btn-danger')
+        .on('click', function () { $('#smartwizard').smartWizard("reset"); });
+
+      // Smart Wizard
+      $("#smartwizard").smartWizard({
+        selected: 0,
+        theme: "arrows",
+        keyNavigation: false,
+        autoAdjustHeight: true,
+        transitionEffect: "slide",
+        showStepURLhash: true,
+        useURLhash: false,
+        toolbarSettings: {
+          toolbarPosition: "bottom",
+          toolbarButtonPosition: "left",
+          showPreviousButton: true,
+          toolbarExtraButtons: [btnFinish],
+        },
+        anchorSettings: {
+          anchorClickable: false, // Enable/Disable anchor navigation
+          enableAllAnchors: false, // Activates all anchors clickable all times
+        },
+        lang: { next: "Siguiente", previous: "Anterior" },
+      });
+
+      $("#prev-btn").on("click", function () {
+        // Navigate previous
+        $("#smartwizard").smartWizard("prev");
+        return true;
+      });
+
+      $("#next-btn").on("click", function () {
+        // Navigate next
+        $("#smartwizard").smartWizard("next");
+        return true;
+      });
+
+      $("#smartwizard").on(
+        "leaveStep",
+        function (e, anchorObject, stepNumber, stepDirection) {
+          if (stepDirection === "forward" && stepNumber == 1) {
+            if (obj_frm_datos_personales.valid()) {
+              $('#div_error').hide('slow');
+              return true;
+            }
+            else {
+              $('#div_error').show('slow');
+              return false;
+            }
+          } else if (stepDirection === "forward" && stepNumber == 4) {
+            if (obj_frm_info_academica.valid()) {
+              $("#div_error").hide("slow");
+              return true
+            } else {
+              $("#div_error").show("slow");
+              return false;
+            }
+
+          }
+          return true;
+        }
+      );
+
+    });
+
+    // *************************** SECCION AREA DE ESPECIALIDAD ************************
+
+    // Array con areas asignadas al usuario desde la db
+    let areas = [];
+    // Array con todas las areas (asignadas y por asignar) en la sesión
+    let all_areas = [];
+
+    $("#aceptar").click(function () {
+      const area = $("#area").find(":selected").text(); // Nombre del area 
+      const cod_area = $("#area").find(":selected").val(); // Id del area
+
+      // Validar que el area deseada no ha sido registrada 
+      let flag = true;
+      all_areas.forEach((area) => {
+        if (area.id_area_especialidad === cod_area) flag = false;
+      });
+
+      // Si el area no existe, agregarla al array
+      if (flag) {
+        var new_area = "";
+        let new_obj = {
+          id_area_especialidad: cod_area,
+          area_especialidad: area
+        };
+        all_areas.push(new_obj);
+        $("#tb_areas_esp_body").append(
+          `<tr id="${cod_area}"><td>${area}</td><td><button class="btn btn-danger btn-sm "  onclick="eliminar_area(${cod_area})"><i class="fa fa-trash"></i></button></td></tr>`
+        );
+      }
+    });
+
+    $.ajax({
+      url: "/curriculum/user_cv_id",
+      type: "get",
+      async: false,
+      data: {},
+      success: function (data, status) {
+        areas = [...JSON.parse(data)];
+        all_areas = [...JSON.parse(data)];
+        areas.forEach((area, i) => {
+          $("#tb_areas_esp_body").append(
+            `<tr id="${area.id_area_especialidad}"><td>${area.area_especialidad}</td><td><button class="btn btn-danger btn-sm"  onclick="eliminar_area(${area.id_area_especialidad})"><i class="fa fa-trash"></i></button></td></tr>`
+          );
+        });
+      },
+      error: function (error) {
+      },
+    });
+
+    function eliminar_area(cod_area) {
+      all_areas = all_areas.filter(data => data.id_area_especialidad != cod_area)
+
+      $("#tb_areas_esp_body").children().remove()
+      all_areas.forEach((area, i) => {
+        $("#tb_areas_esp_body").append(
+          `<tr id="${area.id_area_especialidad}"><td>${area.area_especialidad}</td><td><button class="btn btn-danger btn-sm"  onclick="eliminar_area(${area.id_area_especialidad})"><i class="fa fa-trash"></i></button></td></tr>`
+        );
+      });
+
+      var fd = new FormData();
+      fd.append("id_area", cod_area);
+
+      $.ajax({
+        url: "eliminar_area",
+        type: "POST",
+        //dataType: 'json',
+        data: fd,
+        success: function (resp) {
+          if (resp == "ok") {
+             Swal.fire({
+               icon: 'success',
+               title: 'CV Actualizado!'
+             })
+            // location.reload();
+          } else {
+             Swal.fire({
+               icon: 'error',
+               title: 'Error al actualizar tu CV',
+               text: 'Por favor intentalo mas tarde'
+             })
+            // location.reload();
+          }
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+      });
+    }
+
+
+    // ********************************* FIN AREAS DE ESPECIALIDAD ****************************
+
+    // ********************************* SECCION EXPERIENCIA LABORAL *****************************
+
+    // Array con los registros de experiencia laboral del usuario
+    let experiencia_lab = [];
+    // Array con todos los registros (asignados y por asignar)
+    let all_exp = [];
+    // Contador para manejo de nuevos identificadores
+    let contador_exp = 0;
+    // Bandera para identificar si un elemento esta registrado en la bd al momento de editar
+    let editFlag = false;
+    let edit_indx = -1;
+
+    $.ajax({
+      url: "/curriculum/obtener_experiencia_lab",
+      type: "get",
+      async: false,
+      data: {},
+      success: function (data, status) {
+        experiencia_lab = [...JSON.parse(data)];
+        all_exp = [...JSON.parse(data)];
+        if (experiencia_lab.length > 0)
+          contador_exp = experiencia_lab[experiencia_lab.length - 1].id_experiencia + 1; // inicializar el contador en el ultimo id utilizado
+        else
+          contador_exp = 1; // Si no hay registros, inicia en 1 
+        experiencia_lab.forEach((exp, i) => {
+          $("#tb_experiencia_body").append(
+            `<tr id="${exp.id_experiencia}"><td>${exp.puesto}</td><td>${exp.empresa}</td><td >${exp.fecha_inicio}</td><td >${exp.fecha_fin == null ? "" : exp.fecha_fin}</td>
+              <td class="text-center">
+                <button class="btn btn-primary btn-sm" type="button"  onclick="setEditarExperiencia(${exp.id_experiencia})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                <button class="btn btn-danger btn-sm" type="button"  onclick="eliminar_experiencia(${exp.id_experiencia})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                  </td>
+          </tr>`
+          );
+        });
+      },
+      error: function () {
+      },
+    });
+
+    $("#cancelarExp").click(function () {
+      $("#inp_puesto").val("");
+      $("#inp_empresa").val("");
+      $("#inp_fecha_in").val("");
+      $("#inp_fecha_fin").val("");
+      $("#inp_descripcion").val("");
+      document.getElementById("agregarExp").innerHTML = '<i class="fa fa-plus"></i> Agregar';
+      document.getElementById("cancelarExp").classList.add("d-none");
+    })
+
+    $("#agregarExp").click(function () {
+
+      // Validar campos requeridos
+      if (obj_frm_experiencia.valid()) {
+        $('#div_error').hide('slow');
+      }
+      else {
+        $('#div_error').show('slow');
+        return;
+      }
+
+      // Verificar si se esta editando
+      if (editFlag) {
+        guardarCambios(edit_indx);
+        $("#inp_puesto").val("");
+        $("#inp_empresa").val("");
+        $("#inp_fecha_in").val("");
+        $("#inp_fecha_fin").val("");
+        $("#inp_descripcion").val("");
+        document.getElementById("cancelarExp").classList.add("d-none");
+        return;
+      }
+
+      // Obtener los valores del formulario
+      const puesto = $("#inp_puesto").val();
+      const empresa = $("#inp_empresa").val();
+      const fecha_inicio = $("#inp_fecha_in").val();
+      const fecha_fin = empleoActual ? "" : $("#inp_fecha_fin").val();
+      const descripcion = $("#inp_descripcion").val();
+
+      // Agregar nueva experiencia al array
+      let new_obj = {
+        id_experiencia: contador_exp,
+        puesto: puesto,
+        empresa: empresa,
+        fecha_inicio: fecha_inicio,
+        fecha_fin: fecha_fin,
+        descripcion: descripcion
+      };
+      all_exp.push(new_obj);
+
+      // Renderizar nuevo elemento en la tabla
+      $("#tb_experiencia_body").append(
+        `<tr id="${contador_exp}"><td>${puesto}</td><td>${empresa}</td><td>${fecha_inicio}</td><td>${fecha_fin == null ? "" : fecha_fin}</td>
+            <td class="text-center">
+              <button class="btn btn-primary btn-sm" type="button"  onclick="setEditarExperiencia(${contador_exp})"><i class="fa fa-fw fa fa-edit" ></i></button>
+              <button class="btn btn-danger btn-sm" type="button" onclick="eliminar_experiencia(${contador_exp})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                </td>
+        </tr>`
+      );
+      contador_exp++; // Incrementar id
+
+      // Limpiar campos
+      $("#inp_puesto").val("");
+      $("#inp_empresa").val("");
+      $("#inp_fecha_in").val("");
+      $("#inp_fecha_fin").val("");
+      $("#inp_descripcion").val("");
+    });
+
+    function eliminar_experiencia(id_experiencia) {
+
+      all_exp = all_exp.filter(data => data.id_experiencia != id_experiencia)
+
+      $("#tb_experiencia_body").children().remove()
+      all_exp.forEach((exp, i) => {
+        $("#tb_experiencia_body").append(
+          `<tr id="${exp.id_experiencia}"><td>${exp.puesto}</td><td>${exp.empresa}</td><td >${exp.fecha_inicio}</td><td >${exp.fecha_fin == null ? "" : exp.fecha_fin}</td>
+              <td class="text-center">
+                <button class="btn btn-primary btn-sm" type="button"  onclick="setEditarExperiencia(${exp.id_experiencia})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                <button class="btn btn-danger btn-sm" type="button"  onclick="eliminar_experiencia(${exp.id_experiencia})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                  </td>
+          </tr>`
+        );
+      });
+
+      var fd = new FormData();
+      fd.append("id_experiencia", id_experiencia);
+
+      $.ajax({
+        url: "eliminar_experiencia",
+        type: "POST",
+        //dataType: 'json',
+        data: fd,
+        success: function (resp) {
+          if (resp == "ok") {
+
+             Swal.fire({
+               icon: 'success',
+               title: 'CV Actualizado!'
+             })
+
+
+            // location.reload();
+          } else {
+             Swal.fire({
+             icon: 'error',
+               title: 'Error al actualizar tu CV',
+               text: 'Por favor intentalo mas tarde'
+             })
+            // location.reload();
+          }
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+      });
+
+
+    }
+
+
+    function swalExperiencia(puesto, empresa, descripcion) {
+
+      Swal.fire({
+        title: 'Detalle Experiencia Laboral',
+        icon: 'info',
+        html:
+          `
+          <br>
+          <table class="table table-bordered table-dark">
+          <tr>
+              <td>Puesto</td><td class="table-light" style="color:black;">${puesto}</td>
+          <tr>
+            <tr>
+              <td>Empresa</td><td class="table-light" style="color:black;">${empresa}</td>
+          <tr> 
+            <tr>
+              <td>Descripcion</td><td class="table-light" style="color:black;">${descripcion}</td>
+          <tr>
+          </table>                 
+
+          `,
+        text: "piola",
+        showCloseButton: false,
+        showCancelButton: false,
+        focusConfirm: false,
+        confirmButtonText:
+          '<i class="fa fa-thumbs-up"></i> Ok!',
+      })
+    }
+
+
+    // ******************************************** FIN EXPERIENCIA LABORAL *************************************
+
+    // ***************************************** SECCION INFORMACIÓN ACADÉMICA ******************************
+
+    var file
+    function onChange(event) {
+      file = event.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        nombre = file.name;
+        documento = e.target.result;
+      }
+      reader.readAsDataURL(event.target.files[0])
+    }
+
+    var file2
+    var temp_nombre;
+    var temp_doc;
+    function onChange2(event) {
+      file2 = event.target.files[0];
+      var reader = new FileReader();
+      reader.onload = function (e) {
+        temp_nombre = file2.name;
+        temp_doc = e.target.result;
+      }
+      reader.readAsDataURL(event.target.files[0])
+    }
+
+    $("#agregarAcademia").click(function () {
+    })
+
+
+    // ***************************************** FIN INFORMACIÓN ACADÉMICA **********************************
+
+    // ***************************************** SECCION CURSOS Y CERTIFICACIONES ******************************
+
+    // Array con certificaciones registradas por el usuario
+    let certificaciones = [];
+    let all_certificaciones = [];
+    // Contador para manejo de nuevos identificadores
+    let contadorCert = 0;
+
+    getCertificaciones();
+    switchCert(undefined);
+
+    function getCertificaciones() {
+      $.ajax({
+        url: "/curriculum/obtener_certificaciones",
+        type: "get",
+        async: false,
+        data: {},
+        success: function (data, status) {
+          certificaciones = [...JSON.parse(data)];
+          all_certificaciones = [...JSON.parse(data)];
+        },
+        error: function () {
+        },
+      });
+
+      $.ajax({
+        url: "/curriculum/obtener_max_id_cert",
+        type: "get",
+        async: false,
+        data: {},
+        success: function (data, status) {
+          contadorCert = parseInt(data) + 1
+        },
+        error: function () {
+        },
+      });
+    }
+
+    $("#cancelarCurso").click(function () {
+      $("#inp_nombre_cert").val("");
+      $("#inp_fecha_cert").val("");
+      $("#inp_enlace_cert").val("");
+
+      editFlag = false;
+      edit_indx = -1;
+      indiceFisico = -1;
+      certSeleccionado = {}
+
+      document.getElementById("agregarCurso").innerHTML = '<i class="fa fa-plus"></i> Agregar';
+      document.getElementById("cancelarCurso").classList.add("d-none");
+    })
+
+    var indiceFisico = -1;
+    var certSeleccionado = {}
+    function local_setEditarCertificacion(id_cert) {
+      indiceFisico = -1;
+      edit_indx = id_cert;
+      certSeleccionado = {};
+
+      all_certificaciones.forEach((cert, idx) => {
+        if (cert.id_certificacion == id_cert) {
+          $("#inp_nombre_cert").val(cert.nombre_certificacion);
+          $("#inp_fecha_cert").val(cert.fecha_expedicion);
+          $("#inp_enlace_cert").val(cert.enlace);
+          indiceFisico = idx;
+          certSeleccionado = cert;
+          return;
+        }
+      });
+
+      document.getElementById("agregarCurso").innerHTML = '<i class="fa fa-save"></i> Guardar';
+      document.getElementById("cancelarCurso").classList.remove("d-none");
+
+      // para poner los inputs correspondientes segun el tipo
+      if (certSeleccionado != undefined) {
+        // si es un archivo
+        if (certSeleccionado.tipo == 1) {
+          certOnline = true;
+          $('#inp_cert').prop('disabled', false);
+          $('#inp_enlace_cert').prop('disabled', true);
+          $('#inp_enlace_cert').val('');
+          $("#defaultCheck2").prop("checked", false);
+        } else {
+          certOnline = false;
+          $('#inp_cert').prop('disabled', true);
+          $('#inp_enlace_cert').prop('disabled', false);
+          temp_nombre = "";
+          temp_doc = "";
+          $("#defaultCheck2").prop("checked", true);
+        }
+      }
+    }
+
+    $("#agregarCurso").click(function () {
+      // Validar campos requeridos
+      if (obj_frm_certificaciones.valid()) {
+        $('#div_error').hide('slow');
+      }
+      else {
+        $('#div_error').show('slow');
+        return;
+      }
+
+      // Obtener valores del formulario
+      const nombre = $("#inp_nombre_cert").val();
+      const fecha = $("#inp_fecha_cert").val();
+      var enlace = "";
+
+      // que mantenga los datos de la certificacion seleccionada pero que actualice solo los nuevos
+      let new_obj = certSeleccionado;
+      new_obj.nombre_certificacion = nombre;
+      new_obj.fecha_expedicion = fecha;
+
+      if (certOnline) {
+        new_obj.tipo = 1
+        // no actualiza enlace porque puede que ya tenga uno siendo archivo
+      } else {
+        new_obj.tipo = 0
+        // se toma el valor del enlace
+        enlace = $("#inp_enlace_cert").val();
+        new_obj.enlace = enlace;
+      }
+
+      // si es un archivo que agregue esa información
+      if (new_obj.tipo == 1) {
+        if (temp_nombre != "" && temp_doc != "") {
+          new_obj.enlace = temp_nombre;
+          new_obj.pdf_certificacion = temp_doc;
+        }
+      }
+
+      // Verificar si se esta editando una certificacion
+      if (indiceFisico != -1) {
+        id_cert = new_obj.id_certificacion
+
+        // si es una certificacion registrada en la base que active bandera para editarla
+        if (new_obj.esNueva == '0') {
+          new_obj.paraEditar = '1';
+        }
+
+        var fd = new FormData();
+        fd.append("certificacion", JSON.stringify(new_obj));
+
+        $.ajax({
+          url: "actualizar_certificaciones",
+          type: "POST",
+          //dataType: 'json',
+          data: fd,
+          success: function (respp) {
+            var resp = JSON.parse(respp)
+
+            if (resp.success) {
+              /*
+              Swal.fire({
+                icon: 'success',
+                title: 'Certificaciones actualizadas',
+                text: 'Actualizado'
+              })
+              */
+              if (new_obj.tipo == 1) {
+                $('#tb_certificaciones tr[id="' + id_cert + '"]').find("td").eq(0).html(nombre);
+                $('#tb_certificaciones tr[id="' + id_cert + '"]').find("td").eq(1).html(fecha);
+                $('#tb_certificaciones tr[id="' + id_cert + '"]').find("td").eq(2).html(
+                  `<button class="btn btn-primary btn-sm" onclick='abrirPDF(${String("\"" + resp.enlace + "\"")})'>
+                    <i class="fa fa-fw fa fa-download"></i>
+                  </button>
+                  <button class="btn btn-primary btn-sm" type="button"  onclick="local_setEditarCertificacion(${id_cert})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                  <button class="btn btn-danger btn-sm" type="button" onclick="eliminar_certificacion(${id_cert})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                  `
+                );
+              } else {
+                $('#tb_certificaciones tr[id="' + id_cert + '"]').find("td").eq(0).html(nombre);
+                $('#tb_certificaciones tr[id="' + id_cert + '"]').find("td").eq(1).html(fecha);
+                $('#tb_certificaciones tr[id="' + id_cert + '"]').find("td").eq(2).html(
+                  `<a class="btn btn-primary btn-sm" href="${enlace}" target="_blank"><i class="fa fa-fw fa fa-eye" ></i></a>
+                  <button class="btn btn-primary btn-sm" type="button"  onclick="local_setEditarCertificacion(${id_cert})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                  <button class="btn btn-danger btn-sm" type="button" onclick="eliminar_certificacion(${id_cert})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                  `
+                );
+              }
+
+
+
+              document.getElementById("cancelarCurso").classList.add("d-none");
+              document.getElementById("agregarCurso").innerHTML = '<i class="fa fa-plus"></i> Agregar';
+              $("#inp_nombre_cert").val("");
+              $("#inp_fecha_cert").val("");
+              $("#inp_enlace_cert").val("");
+              $("#inp_cert").val("");
+
+              // para que luego no piense otra vez que es nueva o que quiere editarla
+              new_obj.esNueva = '0'
+              new_obj.paraEditar = '0'
+
+              // location.reload();
+              all_certificaciones[indiceFisico] = new_obj;
+              certificaciones[indiceFisico] = new_obj;
+            } else {
+               Swal.fire({
+                 icon: 'error',
+                 title: 'Error al actualizar tu CV',
+                 text: 'Por favor intentalo mas tarde'
+               })
+              // location.reload();
+            }
+          },
+          cache: false,
+          contentType: false,
+          processData: false,
+        });
+
+
+      }
+      else {
+        new_obj.id_certificacion = contadorCert
+        new_obj.paraEditar = '0';
+        new_obj.esNueva = '1';
+
+        var fd = new FormData();
+        fd.append("certificacion", JSON.stringify(new_obj));
+
+        $.ajax({
+          url: "actualizar_certificaciones",
+          type: "POST",
+          //dataType: 'json',
+          data: fd,
+          success: function (respp) {
+            var resp = JSON.parse(respp)
+
+            if (resp.success) {
+              /*
+              Swal.fire({
+                icon: 'success',
+                title: 'Certificaciones actualizadas',
+                text: 'Actualizado'
+              })
+              */
+              // para que luego no piense otra vez que es nueva
+              new_obj.esNueva = '0'
+              new_obj.paraEditar = '0'
+              new_obj.enlace = resp.enlace
+
+              all_certificaciones.push(new_obj)
+              certificaciones.push(new_obj)
+
+              // Renderizar nueva certificacion
+              if (new_obj.tipo == 1) {
+                $("#tb_certificaciones_body").append(
+                  `<tr id="${contadorCert}"><td>${nombre}</td><td>${fecha}</td>
+                <td class="text-center">
+                  <button class="btn btn-primary btn-sm" onclick='abrirPDF(${String("\"" + resp.enlace + "\"")})'>
+                                <i class="fa fa-fw fa fa-download"></i>
+                              </button>
+                      <button class="btn btn-primary btn-sm" type="button"  onclick="local_setEditarCertificacion(${contadorCert})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                      <button class="btn btn-danger btn-sm" type="button" onclick="eliminar_certificacion(${contadorCert})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                        </td>
+                </tr>`
+                );
+              } else {
+                $("#tb_certificaciones_body").append(
+                  `<tr id="${contadorCert}"><td>${nombre}</td><td>${fecha}</td>
+                <td class="text-center">
+                  <a class="btn btn-primary btn-sm" href="${resp.enlace}" target="_blank"><i class="fa fa-fw fa fa-eye" ></i></a>
+                      <button class="btn btn-primary btn-sm" type="button"  onclick="local_setEditarCertificacion(${contadorCert})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                      <button class="btn btn-danger btn-sm" type="button" onclick="eliminar_certificacion(${contadorCert})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                        </td>
+                </tr>`
+                );
+              }
+
+              contadorCert++; // Incrementar id
+            } else {
+               Swal.fire({
+                 icon: 'error',
+                 title: 'Error al actualizar tu CV',
+                 text: 'Por favor intentalo mas tarde'
+               })
+              // location.reload();
+            }
+          },
+          cache: false,
+          contentType: false,
+          processData: false,
+        });
+
+      }
+
+
+      // Limpiar campos
+      $("#inp_nombre_cert").val("");
+      $("#inp_fecha_cert").val("");
+      $("#inp_enlace_cert").val("");
+      $("#inp_cert").val("");
+
+      editFlag = false;
+      edit_indx = -1;
+      indiceFisico = -1;
+      certSeleccionado = {}
+
+      //getCertificaciones();
+    });
+
+    function eliminar_certificacion(id_certificacion) {
+      all_certificaciones = all_certificaciones.filter(data => data.id_certificacion != id_certificacion)
+
+      $("#tb_certificaciones_body").children().remove()
+      certificaciones = [];
+      all_certificaciones.forEach((exp, i) => {
+        $("#tb_certificaciones_body").append(
+          `<tr id="${exp.id_certificacion}"><td>${exp.nombre_certificacion}</td><td>${exp.fecha_expedicion}</td>
+          <td class="text-center">
+            <a class="btn btn-primary btn-sm" href="${exp.enlace}" target="_blank"><i class="fa fa-fw fa fa-eye" ></i></a>
+                <button class="btn btn-primary btn-sm" type="button"  onclick="local_setEditarCertificacion(${exp.id_certificacion})"><i class="fa fa-fw fa fa-edit" ></i></button>
+                <button class="btn btn-danger btn-sm" type="button" onclick="eliminar_certificacion(${exp.id_certificacion})"><i class="fa fa-fw fa fa-trash" ></i></button>                        
+                  </td>
+          </tr>`
+        );
+        certificaciones.push(exp);
+      });
+
+      var fd = new FormData();
+      fd.append("id_certificacion", id_certificacion);
+
+      $.ajax({
+        url: "eliminar_certificacion",
+        type: "POST",
+        //dataType: 'json',
+        data: fd,
+        success: function (resp) {
+          if (resp == "ok") {
+
+             Swal.fire({
+               icon: 'success',
+               title: 'CV Actualizado!'
+             })
+
+
+            // location.reload();
+          } else {
+             Swal.fire({
+               icon: 'error',
+               title: 'Error al actualizar tu CV',
+               text: 'Por favor intentalo mas tarde'
+             })
+            // location.reload();
+          }
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+      });
+
+    }
+
+    function abrirPDF(certificado) {
+      var fd = new FormData();
+      fd.append("documento_cv", certificado);
+
+      $.ajax({
+
+        url: "obtener_cv",
+        type: "POST",
+        data: fd,
+        success: function (resp) {
+          downloadPDF(resp)
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+
+
+      });
+    }
+
+    function downloadPDF(pdf) {
+      const linkSource = `data:application/pdf;base64,${pdf}`;
+      const downloadLink = document.createElement("a");
+      const fileName = "Certificado.pdf";
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    }
+
+
+
+    // ************************************* FIN CURSOS Y CERTIFICACIONES ******************************************
+    // ********************************** SECCION DE HABILIDADES TECNICAS ******************************************
+
+    // Array de habilidades asociadas al usuario, registradas en la bd
+    let habilidades = [];
+    // Array con todas las habilidades (asignadas y por asignar)
+    let all_habilidades = [];
+    $.ajax({
+      url: "/curriculum/obtener_habilidades",
+      type: "get",
+      async: false,
+      data: {},
+      success: function (data, status) {
+        habilidades = [...JSON.parse(data)];
+        all_habilidades = [...JSON.parse(data)];
+        habilidades.forEach((habilidad, i) => {
+          $("#tb_habilidades_body").append(
+            `<tr id="${habilidad.id_habilidad}"><td>${habilidad.habilidad}</td><td><button class="btn btn-danger btn-sm"  onclick="eliminar_habilidad(${habilidad.id_habilidad})"><i class="fa fa-trash"></i></button></td></tr>`
+          );
+        });
+      },
+      error: function () { },
+    });
+
+
+    $("#agregarHabilidad").click(function () {
+      const habilidad = $("#habilidades").find(":selected").text(); // Nombre de la habilidad
+      const id_habilidad = $("#habilidades").find(":selected").val(); // Id de la habilidad
+
+      // Validad que la habilidad deseada no ha sido asociada al usuario
+      let flag = true;
+      all_habilidades.forEach((habilidad) => {
+        if (habilidad.id_habilidad == id_habilidad) flag = false;
+      });
+
+
+      if (flag) {
+        // Registrar en el array de habilidades el nuevo objeto
+        let new_obj = {
+          id_habilidad: id_habilidad,
+          habilidad: habilidad
+        };
+        all_habilidades.push(new_obj);
+        // Renderizar nueva habilidad
+        $("#tb_habilidades_body").append(
+          `<tr id="${id_habilidad}"><td>${habilidad}</td><td><button class="btn btn-danger btn-sm"  onclick="eliminar_habilidad(${id_habilidad})"><i class="fa fa-trash"></i></button></td></tr>`
+        );
+      }
+    });
+
+    function eliminar_habilidad(id_habilidad) {
+      all_habilidades = all_habilidades.filter(data => data.id_habilidad != id_habilidad)
+      $("#tb_habilidades_body").children().remove()
+
+      all_habilidades.forEach((habilidad, i) => {
+        $("#tb_habilidades_body").append(
+          `<tr id="${habilidad.id_habilidad}"><td>${habilidad.habilidad}</td><td><button class="btn btn-danger btn-sm"  onclick="eliminar_habilidad(${habilidad.id_habilidad})"><i class="fa fa-trash"></i></button></td></tr>`
+        );
+      });
+
+      var fd = new FormData();
+      fd.append("id_habilidad", id_habilidad);
+
+      $.ajax({
+        url: "eliminar_habilidad",
+        type: "POST",
+        //dataType: 'json',
+        data: fd,
+        success: function (resp) {
+          if (resp == "ok") {
+
+             Swal.fire({
+               icon: 'success',
+               title: 'CV Actualizado!'
+             })
+
+
+            // location.reload();
+          } else {
+             Swal.fire({
+               icon: 'error',
+               title: 'Error al actualizar tu CV',
+               text: 'Por favor intentalo mas tarde'
+             })
+            // location.reload();
+          }
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+      });
+
+
+
+    }
+
+  </script>
+{{end page_js}}

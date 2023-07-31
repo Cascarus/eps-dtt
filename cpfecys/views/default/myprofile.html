@@ -1,0 +1,42 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>Perfil</h1>
+    </div>
+    <div class="col-12">
+        {{if request.args(0) == 'profile':
+            if auth.has_membership('Academic') or auth.has_membership('Student'):}}
+                <div class="alert"  style="width:90%;" id="notice_1">
+
+                    {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
+                    if review is None:
+                        }}<div class="alert alert-warning" role="alert">
+                            <label color="blue"> {{=T('Pending Photo')}}</label><br>
+                        {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
+                        </div>
+                    {{else:
+                        if review.accepted == True:
+                            }}<div class="alert alert-success"><label color="green">{{=T('Photo Accepted')}}</label></div>
+                        {{else:
+                            }}<div class="alert alert-danger"><strong>¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!</strong><br>
+                            {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
+                            </div>
+                        {{pass
+                    pass
+                    }}
+                </div>
+            {{pass}}
+        {{pass}}
+    </div>
+    <div class="col-12">
+        {{=form}}
+    </div>
+</div>
+
+{{block page_js}}
+    {{if (request.args(0) == 'profile')&(auth.has_membership('Teacher')):}}
+    <script type="text/javascript">
+        $("#auth_user_photo__label").replaceWith("<a class='btn btn-success' href='{{=URL('default','myprofile/profile' , vars=dict(edit_foto=True) )}}'>{{=T('Active Photo Edit')}}</a>");
+    </script>
+    {{pass}}
+{{end page_js}}

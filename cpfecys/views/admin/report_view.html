@@ -1,403 +1,411 @@
 {{extend 'dashboard.html'}}
 
 
-<p><a onclick="window.history.back()" class="btn btn-primary" ><i class="icon-arrow-left"></i> Back</a></p>
+<p><a onclick="window.history.back()" class="btn btn-primary"><i class="icon-arrow-left"></i> Back</a></p>
 <div class="row-fluid">
-      <div class="well span12">
-        <h3>{{=T('Report Grading')}}</h3>
-        <div id="grading-notification"></div>
-        {{if (report.assignation.project.area_level.name!='DTT Tutor Académico')or(report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name!='Draft' and report.status.name!='Recheck')):}}
-          <form class="form-horizontal" action="{{=URL('admin', 'report/grade')}}" method="POST">
-            <div class="control-group">
-              <label class="control-label" for="status-drop">{{=T('Status')}}</label>
-              <div class="controls">
-                <select name="status" id="status-drop" class="form-control">
-                  {{for status in status_list:}}
-                    <option value="{{=status.id}}"
-                    {{if status.id==report.status.id:}}selected{{pass}}>
-                    {{=T(add_timing(status.name))}}
-                    </option>
-                  {{pass}}
-                </select>
-              </div>
-            </div>
-            <div class="control-group">
-              <input type="hidden" name="report" value="{{=report.id}}"/>
-              <label class="control-label" for="score">{{=T('Score')}}</label>
-              <div class="controls">
-                <input class="span3" type="text" id="score" name="score" placeholder="{{=T('Score')}}">
-                <span id="label-status" class="label">{{=T('Not graded')}}</span>
-                <span class="label label-info">{{=T('Minimum value to aprove')}}: {{=parameters.min_score}}</span>
-                <div id="score-error" class="alert alert-error input-xlarge" hidden>
-                  {{=T('Please use only numeric values from zero to one hundred to score this report.')}}
-                </div>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="comment">{{=T('Comment')}}</label>
-              <div class="controls input-xxlarge">
-                <textarea id="comment" name="comment" rows="3" placeholder="{{=T('Comment')}}"></textarea>
-                <div id="comment-error" class="alert alert-error input-xlarge" hidden>
-                  {{=T('When a report es reproved or set to be improved, a comment giving more information is needed.')}}
-                </div>
-              </div>
-            </div>
-
-            <div class="control-group">
-              <div class="controls">
-                <div class="alert alert-info span8">
-                  <label class="checkbox">
-                    <input id="send_mail" name="send_mail" type="checkbox"> {{=T('Send Mail')}}
-                  </label>
-                  <p>
-                    <h3>
-                      {{=T('Previous grading information')}}:
-                    </h3>
-                    <p>
-                      <table class="table">
-                        <tr>
-                          <td>
-                            {{=T('Score')}}
-                          </td>
-                          <td>
-                            {{=report.score or 0}}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {{=T('Admin Score')}}
-                          </td>
-                          <td>
-                            {{=report.admin_score or 0}}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {{=T('DTT aproval')}}
-                          </td>
-                          <td>
-                            {{if report.dtt_approval:}}
-                              <span class="label label-success">
-                                {{=T('Approved')}}</span>
-                            {{elif report.dtt_approval == False:}}
-                              <span class="label label-important">
-                                {{=T('Failed')}}</span>
-                            {{else:}}
-                              <span class="label">{{=T('Pending')}}</span>
-                              {{pass}}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {{=T('Teacher comment')}}
-                          </td>
-                          <td>
-                            {{=report.teacher_comment or '-'}}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {{=T('Admin comment')}}
-                          </td>
-                          <td>
-                            {{=report.admin_comment or '-'}}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td>
-                            {{=T('Score date')}}
-                          </td>
-                          <td>
-                            {{=report.score_date}}
-                          </td>
-                        </tr>
-                      </table>
-                    </p>
-                 </p>
-
-                </div>
-                 
-              </div>
-            </div>
-            
-            <div class="control-group">
-              <div class="controls">
-                <button type="submit" id="submit-grading" class="btn btn-primary">{{=T('Grade report')}}</button>
-              </div>
-            </div>
-          </form>
-          {{pass}}
-
-          <table>
-            <tr>
-              <td>
-                <form action="{{=URL('admin', 'report/approve')}}">
-                  <input type="hidden" name="report" value="{{=report.id}}"/>
-                  <button type="submit" id="submit-grading" class="btn btn-success">
-                    {{=T('DTT approval')}}</button>
-                </form>
-              </td>
-              <td>
-                <form action="{{=URL('admin', 'report/fail')}}">
-                  <input type="hidden" name="report" value="{{=report.id}}"/>
-                  <button type="submit" id="submit-grading" class="btn btn-danger">
-                    {{=T('DTT failing')}}</button>
-                </form>
-              </td>
-              <td>
-                <form action="{{=URL('admin', 'report/pending')}}">
-                  <input type="hidden" name="report" value="{{=report.id}}"/>
-                  <button type="submit" id="submit-grading" class="btn btn-primary">
-                    {{=T('DTT pending')}}</button>
-                </form>
-              </td>
-            </tr>
-          </table>
+  <div class="well span12">
+    <h3>{{=T('Report Grading')}}</h3>
+    <div id="grading-notification"></div>
+    {{if (report.assignation.project.area_level.name!='DTT Tutor
+    Académico')or(report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name!='Draft' and
+    report.status.name!='Recheck')):}}
+    <form class="form-horizontal" action="{{=URL('admin', 'report/grade')}}" method="POST">
+      <div class="control-group">
+        <label class="control-label" for="status-drop">{{=T('Status')}}</label>
+        <div class="controls">
+          <select name="status" id="status-drop" class="form-control">
+            {{for status in status_list:}}
+            <option value="{{=status.id}}" {{if status.id==report.status.id:}}selected{{pass}}>
+              {{=T(add_timing(status.name))}}
+            </option>
+            {{pass}}
+          </select>
+        </div>
       </div>
+      <div class="control-group">
+        <input type="hidden" name="report" value="{{=report.id}}" />
+        <label class="control-label" for="score">{{=T('Score')}}</label>
+        <div class="controls">
+          <input class="span3" type="text" id="score" name="score" placeholder="{{=T('Score')}}">
+          <span id="label-status" class="label">{{=T('Not graded')}}</span>
+          <span class="label label-info">{{=T('Minimum value to aprove')}}: {{=parameters.min_score}}</span>
+          <div id="score-error" class="alert alert-error input-xlarge" hidden>
+            {{=T('Please use only numeric values from zero to one hundred to score this report.')}}
+          </div>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="comment">{{=T('Comment')}}</label>
+        <div class="controls input-xxlarge">
+          <textarea id="comment" name="comment" rows="3" placeholder="{{=T('Comment')}}"></textarea>
+          <div id="comment-error" class="alert alert-error input-xlarge" hidden>
+            {{=T('When a report es reproved or set to be improved, a comment giving more information is needed.')}}
+          </div>
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="controls">
+          <div class="alert alert-info span8">
+            <label class="checkbox">
+              <input id="send_mail" name="send_mail" type="checkbox"> {{=T('Send Mail')}}
+            </label>
+            <p>
+            <h3>
+              {{=T('Previous grading information')}}:
+            </h3>
+            <p>
+            <table class="table">
+              <tr>
+                <td>
+                  {{=T('Score')}}
+                </td>
+                <td>
+                  {{=report.score or 0}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {{=T('Admin Score')}}
+                </td>
+                <td>
+                  {{=report.admin_score or 0}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {{=T('DTT aproval')}}
+                </td>
+                <td>
+                  {{if report.dtt_approval:}}
+                  <span class="label label-success">
+                    {{=T('Approved')}}</span>
+                  {{elif report.dtt_approval == False:}}
+                  <span class="label label-important">
+                    {{=T('Failed')}}</span>
+                  {{else:}}
+                  <span class="label">{{=T('Pending')}}</span>
+                  {{pass}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {{=T('Teacher comment')}}
+                </td>
+                <td>
+                  {{=report.teacher_comment or '-'}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {{=T('Admin comment')}}
+                </td>
+                <td>
+                  {{=report.admin_comment or '-'}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  {{=T('Score date')}}
+                </td>
+                <td>
+                  {{=report.score_date}}
+                </td>
+              </tr>
+            </table>
+            </p>
+            </p>
+
+          </div>
+
+        </div>
+      </div>
+
+      <div class="control-group">
+        <div class="controls">
+          <button type="submit" id="submit-grading" class="btn btn-primary">{{=T('Grade report')}}</button>
+        </div>
+      </div>
+    </form>
+    {{pass}}
+
+    <table>
+      <tr>
+        <td>
+          <form action="{{=URL('admin', 'report/approve')}}">
+            <input type="hidden" name="report" value="{{=report.id}}" />
+            <button type="submit" id="submit-grading" class="btn btn-success">
+              {{=T('DTT approval')}}</button>
+          </form>
+        </td>
+        <td>
+          <form action="{{=URL('admin', 'report/fail')}}">
+            <input type="hidden" name="report" value="{{=report.id}}" />
+            <button type="submit" id="submit-grading" class="btn btn-danger">
+              {{=T('DTT failing')}}</button>
+          </form>
+        </td>
+        <td>
+          <form action="{{=URL('admin', 'report/pending')}}">
+            <input type="hidden" name="report" value="{{=report.id}}" />
+            <button type="submit" id="submit-grading" class="btn btn-primary">
+              {{=T('DTT pending')}}</button>
+          </form>
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
 <div class="row-fluid">
   <div class="navbar">
-      <div class="navbar-inner">
-        <a class="brand" href="#">
-            {{=T('View Report:')}}
-            <small>{{=report.report_restriction['name']}}</small>
-            <a class="btn pull-right" onclick="window.print();"><i class="icon-print"></i></a>
-        </a>
-      </div>
+    <div class="navbar-inner">
+      <a class="brand" href="#">
+        {{=T('View Report:')}}
+        <small>{{=report.report_restriction['name']}}</small>
+        <a class="btn pull-right" onclick="window.print();"><i class="icon-print"></i></a>
+      </a>
+    </div>
   </div>
 </div>
 <div style="border:solid #ddd 1px;">
-    <h1 style="text-align:center;">
-        {{=report.report_restriction['name']}}
-    </h1>
-    <div style="padding:3px;">
-        <strong>{{=T('Student')}}: </strong> {{=report.assignation.assigned_user.username}} -  {{=report.assignation.assigned_user.last_name}}, {{=report.assignation.assigned_user.first_name}}<br />
-        <strong>{{=T('Project')}}: </strong> {{=report.assignation.project.name}} <br />
-        <strong>{{=T('Project Leader')}}:</strong> {{if teacher:}}
-            {{=teacher.username}} - {{=teacher.first_name}} {{=teacher.last_name}}
-            {{else:}} {{=T('Unassigned')}} {{pass}}<br />
-        <strong>{{=T('Area')}}: </strong> {{=report.assignation.project.area_level.name}} <br />
-        <strong>{{=T('Period')}}: </strong> {{=T(report.assignation.period.period.name)}} - 
-           {{=report.assignation.period.yearp}} <br />
+  <h1 style="text-align:center;">
+    {{=report.report_restriction['name']}}
+  </h1>
+  <div style="padding:3px;">
+    <strong>{{=T('Student')}}: </strong> {{=report.assignation.assigned_user.username}} -
+    {{=report.assignation.assigned_user.last_name}}, {{=report.assignation.assigned_user.first_name}}<br />
+    <strong>{{=T('Project')}}: </strong> {{=report.assignation.project.name}} <br />
+    <strong>{{=T('Project Leader')}}:</strong> {{if teacher:}}
+    {{=teacher.username}} - {{=teacher.first_name}} {{=teacher.last_name}}
+    {{else:}} {{=T('Unassigned')}} {{pass}}<br />
+    <strong>{{=T('Area')}}: </strong> {{=report.assignation.project.area_level.name}} <br />
+    <strong>{{=T('Period')}}: </strong> {{=T(report.assignation.period.period.name)}} -
+    {{=report.assignation.period.yearp}} <br />
+  </div>
+  <hr />
+  {{if not(report.heading is None):}}
+  <!-- Display Helper -->
+  {{inc_vars = dict(editable = False,
+  edit_action = '',
+  delete_action = '',
+  content = MARKMIN(report.heading, markmin_settings))}}
+  {{include 'include/display-report-header.html'}}
+  <!-- //Display Helper -->
+  {{pass}}
+  <div class="container">
+    <div class="row-fluid">
+      <div style="padding:15px;">
+        <h1>
+          <span class="icon-tasks"></span>
+          {{=T('Activities Log')}}
+        </h1>
+        <span>
+          <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
+          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or
+          report.status.name=='Recheck'):}}
+          <span><strong>{{=T('Total Registered Activities')}}:</strong>
+            {{=len(activitiesTutor['activities_WM'])+len(activitiesTutor['activities_M'])}} </span>
+          {{else:}}
+          <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
+          {{pass}}
+        </span>
+      </div>
+    </div>
+    <div class="row-fluid">
+      {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or
+      report.status.name=='Recheck'):}}
+      {{for log in logs:}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      anomaly = (log.log_type['name'] == 'Anomaly'),
+      log_type = T(log.log_type['name']),
+      date = log.entry_date,
+      edit_action = '',
+      delete_action = '',
+      content = MARKMIN(log.description, markmin_settings))}}
+      {{include 'include/display-report-log.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+
+      <!--ACTIVITIES WITHOUT METRIC-->
+      {{for awm in activitiesTutor['activities_WM']:}}
+      {{inc_vars = dict(editable = False,
+      anomaly = False,
+      log_type = T('Activity'),
+      date = awm.date_start,
+      edit_action = None,
+      delete_action = None,
+      content = MARKMIN('Nombre: "'+awm.name+'" Descripción: "'+awm.description+'"', markmin_settings))}}
+      {{include 'include/display-report-log.html'}}
+      {{pass}}
+      <!--ACTIVITIES WITHOUT METRIC-->
+
+      <!--ACTIVITIES WITH METRIC-->
+      {{for awm in activitiesTutor['activities_M']:}}
+      {{inc_vars = dict(editable = False,
+      anomaly = False,
+      log_type = T('Activity'),
+      date = awm[0],
+      edit_action = None,
+      delete_action = None,
+      content = MARKMIN(awm[1], markmin_settings))}}
+      {{include 'include/display-report-log.html'}}
+      {{pass}}
+      <!--ACTIVITIES WITH METRIC-->
+      {{else:}}
+      {{for log in logs:}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      anomaly = (log.log_type['name'] == 'Anomaly'),
+      log_type = T(log.log_type['name']),
+      date = log.entry_date,
+      edit_action = '',
+      delete_action = '',
+      content = MARKMIN(log.description, markmin_settings))}}
+      {{include 'include/display-report-log.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+      {{pass}}
     </div>
     <hr />
-    {{if not(report.heading is None):}}
-    <!-- Display Helper -->
-    {{inc_vars = dict(editable = False,
-    edit_action = '',
-    delete_action = '',
-    content = MARKMIN(report.heading, markmin_settings))}}
-    {{include 'include/display-report-header.html'}}
-    <!-- //Display Helper -->
-    {{pass}}
-    <div class="container">
-        <div class="row-fluid">
-            <div style="padding:15px;">
-                <h1>
-                    <span class="icon-tasks"></span>
-                    {{=T('Activities Log')}}
-                </h1>
-                <span>
-                    <span><strong>{{=T('Total Anomalies')}}:</strong> {{=anomalies}} </span> |
-                    {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
-                        <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(activitiesTutor['activities_WM'])+len(activitiesTutor['activities_M'])}} </span>
-                    {{else:}}
-                        <span><strong>{{=T('Total Registered Activities')}}:</strong> {{=len(logs)}} </span>
-                    {{pass}}
-                </span>
-            </div>
-        </div>
-        <div class="row-fluid">
-          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
-            {{for log in logs:}}
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = False,
-            anomaly =  (log.log_type['name'] == 'Anomaly'),
-            log_type = T(log.log_type['name']),
-            date = log.entry_date,
-            edit_action = '',
-            delete_action = '',
-            content = MARKMIN(log.description, markmin_settings))}}
-            {{include 'include/display-report-log.html'}}
-            <!-- //Display Helper -->
-            {{pass}}
-            
-            <!--ACTIVITIES WITHOUT METRIC-->
-            {{for awm in activitiesTutor['activities_WM']:}}
-                {{inc_vars = dict(editable = False,
-                anomaly =  False,
-                log_type = T('Activity'),
-                date = awm.date_start,
-                edit_action = None,
-                delete_action = None,
-                content = MARKMIN('Nombre: "'+awm.name+'"      Descripción: "'+awm.description+'"', markmin_settings))}}
-                {{include 'include/display-report-log.html'}}
-            {{pass}}
-            <!--ACTIVITIES WITHOUT METRIC-->
-
-            <!--ACTIVITIES WITH METRIC-->
-            {{for awm in activitiesTutor['activities_M']:}}
-                {{inc_vars = dict(editable = False,
-                anomaly =  False,
-                log_type = T('Activity'),
-                date = awm[0],
-                edit_action = None,
-                delete_action = None,
-                content = MARKMIN(awm[1], markmin_settings))}}
-                {{include 'include/display-report-log.html'}}
-            {{pass}}
-            <!--ACTIVITIES WITH METRIC-->
+    <div class="row-fluid">
+      <div style="padding:15px;">
+        <h1>
+          <span class="icon-adjust"></span>
+          <strong>{{=T('Activities Log with metrics')}}</strong>
+        </h1>
+        <span>
+          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or
+          report.status.name=='Recheck'):}}
+          <strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(activitiesTutor['activities_M'])}}
           {{else:}}
-            {{for log in logs:}}
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = False,
-            anomaly =  (log.log_type['name'] == 'Anomaly'),
-            log_type = T(log.log_type['name']),
-            date = log.entry_date,
-            edit_action = '',
-            delete_action = '',
-            content = MARKMIN(log.description, markmin_settings))}}
-            {{include 'include/display-report-log.html'}}
-            <!-- //Display Helper -->
-            {{pass}}
+          <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
           {{pass}}
-        </div>
-        <hr />
-        <div class="row-fluid">
-            <div style="padding:15px;">
-                <h1>
-                    <span class="icon-adjust"></span>
-                    <strong>{{=T('Activities Log with metrics')}}</strong>
-                </h1>
-                <span>
-                    {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
-                        <strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(activitiesTutor['activities_M'])}}
-                    {{else:}}
-                        <span><strong>{{=T('Total activity logs with metrics')}}:</strong> {{=len(metrics)}}</span>
-                    {{pass}}
-                </span>
-            </div>
-        </div>
-        <div class="row-fluid">
-          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
-            {{for metric in activitiesTutor['activities_M']:}}
-                <!-- Display Helper -->
-                {{inc_vars = dict(editable = False,
-                metric = metric,
-                edit_action = None,
-                delete_action = None)}}
-                {{include 'include/display-report-metric.html'}}
-                <!-- //Display Helper -->
-            {{pass}}
-          {{else:}}
-            {{for metric in metrics:}}
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = False,
-            metric = metric,
-            edit_action = '',
-            delete_action = '')}}
-            {{include 'include/display-report-metric.html'}}
-            <!-- //Display Helper -->
-            {{pass}}
-          {{pass}}
-          {{for final in final_r:}}
-          <!-- Display Helper -->
-          {{inc_vars = dict(editable = False,
-          final = final,
-          edit_action = 'final-edit-activity-' + str(final.id),
-          delete_action = 'delete-final-' + str(final.id))}}
-          {{include 'include/display-final-report.html'}}
-          <!-- //Display Helper -->
-          {{pass}}
-        </div>
-        <hr />
-        {{if not(report.hours is None):}}
-        <div class="row-fluid">
-            <div style="padding:15px;">
-                <h1>
-                    <span class="icon-time"></span>
-                    <strong>{{=T('Accomplished Hours')}}</strong>
-                </h1>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <!-- Accomplished Hours display Helper-->
-            {{inc_vars = dict(editable = False,
-            id = 'display-report-hours',
-            reports = assignation_reports,
-            edit_action = '',
-            delete_action = '')}}
-            {{include 'include/display-report-hours.html'}}
-            <!-- //Accomplished Hours display Helper-->
-        </div>
-        {{pass}}
-        
-        {{if not(report.desertion_started is None):}}
-        <div class="row-fluid">
-            <div style="padding:15px;">
-                <h1>
-                    <span class="icon-user"></span>
-                    <strong>{{=T('Desertion logs')}}</strong>
-                </h1>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = False,
-            id = 'display-desertion',
-            reports = assignation_reports,
-            desertion_started = report.desertion_started,
-            desertion_gone = report.desertion_gone,
-            desertion_continued = report.desertion_continued,
-            edit_action = '',
-            delete_action = '')}}
-            {{include 'include/display-report-desertion.html'}}
-            <!-- //Display Helper -->
-        </div>
-        {{pass}}
-        <div class="row-fluid">
-            <div style="padding:15px;">
-                <h1>
-                    <span class="icon-time"></span>
-                    {{=T('Future Activities Log')}}
-                </h1>
-            </div>
-        </div>
-        <div class="row-fluid">
-          {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):}}
-            {{for log in activitiesTutor['activities_F']:}}
-                <!-- Display Helper -->
-                {{inc_vars = dict(editable = False,
-                date = log.date_start,
-                edit_action = None,
-                delete_action = None,
-                content = MARKMIN('Nombre: "'+log.name+'" Descripción: "'+log.description+'"', markmin_settings))}}
-                {{include 'include/display-report-log-future.html'}}
-                <!-- //Display Helper -->
-            {{pass}}
-          {{else:}}
-            {{for log in report.log_future.select():}}
-            <!-- Display Helper -->
-            {{inc_vars = dict(editable = False,
-            date = log.entry_date,
-            edit_action = '',
-            delete_action = '',
-            content = MARKMIN(log.description, markmin_settings))}}
-            {{include 'include/display-report-log-future.html'}}
-            <!-- //Display Helper -->
-            {{pass}}
-          {{pass}}
-        </div>
+        </span>
+      </div>
     </div>
-    {{if not(report.footer is None):}}
-    <!-- Display Helper -->
-    {{inc_vars = dict(editable = False,
-    edit_action = '',
-    delete_action = '',
-    content = MARKMIN(report.footer, markmin_settings))}}
-    {{include 'include/display-report-header.html'}}
-    <!-- //Display Helper -->
+    <div class="row-fluid">
+      {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or
+      report.status.name=='Recheck'):}}
+      {{for metric in activitiesTutor['activities_M']:}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      metric = metric,
+      edit_action = None,
+      delete_action = None)}}
+      {{include 'include/display-report-metric.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+      {{else:}}
+      {{for metric in metrics:}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      metric = metric,
+      edit_action = '',
+      delete_action = '')}}
+      {{include 'include/display-report-metric.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+      {{pass}}
+      {{for final in final_r:}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      final = final,
+      edit_action = 'final-edit-activity-' + str(final.id),
+      delete_action = 'delete-final-' + str(final.id))}}
+      {{include 'include/display-final-report.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+    </div>
+    <hr />
+    {{if not(report.hours is None):}}
+    <div class="row-fluid">
+      <div style="padding:15px;">
+        <h1>
+          <span class="icon-time"></span>
+          <strong>{{=T('Accomplished Hours')}}</strong>
+        </h1>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <!-- Accomplished Hours display Helper-->
+      {{inc_vars = dict(editable = False,
+      id = 'display-report-hours',
+      reports = assignation_reports,
+      edit_action = '',
+      delete_action = '')}}
+      {{include 'include/display-report-hours.html'}}
+      <!-- //Accomplished Hours display Helper-->
+    </div>
     {{pass}}
+
+    {{if not(report.desertion_started is None):}}
+    <div class="row-fluid">
+      <div style="padding:15px;">
+        <h1>
+          <span class="icon-user"></span>
+          <strong>{{=T('Desertion logs')}}</strong>
+        </h1>
+      </div>
+    </div>
+    <div class="row-fluid">
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      id = 'display-desertion',
+      reports = assignation_reports,
+      desertion_started = report.desertion_started,
+      desertion_gone = report.desertion_gone,
+      desertion_continued = report.desertion_continued,
+      edit_action = '',
+      delete_action = '')}}
+      {{include 'include/display-report-desertion.html'}}
+      <!-- //Display Helper -->
+    </div>
+    {{pass}}
+    <div class="row-fluid">
+      <div style="padding:15px;">
+        <h1>
+          <span class="icon-time"></span>
+          {{=T('Future Activities Log')}}
+        </h1>
+      </div>
+    </div>
+    <div class="row-fluid">
+      {{if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or
+      report.status.name=='Recheck'):}}
+      {{for log in activitiesTutor['activities_F']:}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      date = log.date_start,
+      edit_action = None,
+      delete_action = None,
+      content = MARKMIN('Nombre: "'+log.name+'" Descripción: "'+log.description+'"', markmin_settings))}}
+      {{include 'include/display-report-log-future.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+      {{else:}}
+      {{for log in report.log_future.select():}}
+      <!-- Display Helper -->
+      {{inc_vars = dict(editable = False,
+      date = log.entry_date,
+      edit_action = '',
+      delete_action = '',
+      content = MARKMIN(log.description, markmin_settings))}}
+      {{include 'include/display-report-log-future.html'}}
+      <!-- //Display Helper -->
+      {{pass}}
+      {{pass}}
+    </div>
+  </div>
+  {{if not(report.footer is None):}}
+  <!-- Display Helper -->
+  {{inc_vars = dict(editable = False,
+  edit_action = '',
+  delete_action = '',
+  content = MARKMIN(report.footer, markmin_settings))}}
+  {{include 'include/display-report-header.html'}}
+  <!-- //Display Helper -->
+  {{pass}}
 </div>
 {{block page_js}}
 <script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
@@ -405,71 +413,69 @@
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/highcharts.js"></script>
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/data.js"></script>
 <script type="text/javascript" src="{{=URL('static','js')}}/highcharts/js/modules/exporting.js"></script>
-<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css"/>
-<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css"/>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css" />
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css" />
 
 <script type="text/javascript">
 
-  $('#score').keyup(function(){
+  $('#score').keyup(function () {
 
     value = parseInt($('#score').val());
-    if(isNaN(value) || value < 0 || value > 100)
-    {
+    if (isNaN(value) || value < 0 || value > 100) {
       $('#label-status').attr('class', 'label label');
       $('#label-status').html('No calificado');
       $('#score-error').hide('slow');
       $('#comment-error').hide('slow');
     }
-    else if(value < {{=parameters.min_score}})
-    {
-      $('#label-status').attr('class', 'label label-important');
-      $('#label-status').html('Reprobado');
-      $('#revision-alert').show('slow');
-    }
-    else if (value == {{=parameters.min_score}})
-    {
-      $('#label-status').attr('class', 'label label-warning');
-      $('#label-status').html('Aprobado con nota mínima');
-      $('#revision-alert').hide('slow');
-    }
+    else if (value < {{=parameters.min_score }
+  })
+  {
+    $('#label-status').attr('class', 'label label-important');
+    $('#label-status').html('Reprobado');
+    $('#revision-alert').show('slow');
+  }
+    else if (value == {{=parameters.min_score }})
+  {
+    $('#label-status').attr('class', 'label label-warning');
+    $('#label-status').html('Aprobado con nota mínima');
+    $('#revision-alert').hide('slow');
+  }
     else
-    {
-      $('#label-status').attr('class', 'label label-success');
-      $('#label-status').html('Aprobado');
-      $('#revision-alert').hide('slow');
-    }
+  {
+    $('#label-status').attr('class', 'label label-success');
+    $('#label-status').html('Aprobado');
+    $('#revision-alert').hide('slow');
+  }
   });
 
-  $('#submit-grading').click(function(){
+  $('#submit-grading').click(function () {
     value = parseInt($('#score').val());
     comment = $('#comment').val()
     checked = $('#improve').is(':checked');
-    if(value < 0 || value > 100)
-    {
+    if (value < 0 || value > 100) {
       $('#score-error').show('slow');
       return false;
     }
-    if(value < {{=parameters.min_score}})
-    {
-      if(!comment)
-      {
-        $('#score-error').hide('slow');
-      }
+    if (value < {{=parameters.min_score }
+  })
+  {
+    if (!comment) {
+      $('#score-error').hide('slow');
     }
+  }
     else
-    {
-      if(checked && !comment)
-      {
-        $('#score-error').hide('slow');
-        $('#comment-error').show('slow');
-        return false;
-      }
+  {
+    if (checked && !comment) {
+      $('#score-error').hide('slow');
+      $('#comment-error').show('slow');
+      return false;
     }
+  }
   });
 </script>
 <script>
-jQuery(document).ready(function() {
-  jQuery('.markmin-area').css('width','500px').css('height','200px').markItUp(mySettings);
-});
+  jQuery(document).ready(function () {
+    jQuery('.markmin-area').css('width', '500px').css('height', '200px').markItUp(mySettings);
+  });
 </script>
 {{end page_js}}

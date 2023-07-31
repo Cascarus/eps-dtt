@@ -1,0 +1,136 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Gestión de reclutamiento</h2>
+            <center>{{=opciones}}</center>
+        </div>
+    </div>
+    <div class="row well">
+        <div class="col-12 text-center">
+            <h3>Crear proceso de reclutamiento</h3>
+        </div>
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <td>
+                            <form id="formulario" class="form-horizontal">
+                                <div class="control-group form-group">
+                                    <label class="control-label" for="inp_anio">Año</label>
+                                    <div class="controls">
+                                        <input type="number" class="form-control" name="inp_anio"
+                                            placeholder="Año del proceso" />
+                                    </div>
+                                </div>
+                                <div class="control-group form-group">
+                                    <label class="control-label" for="sel_periodo">Periodo del proceso</label>
+                                    <div class="controls">
+                                        <select name="sel_periodo" class="form-control">
+                                            {{if periodos is not None:}}
+                                            {{for item in periodos:}}
+                                            <option value="{{=item.id}}">{{=T(item.name)}}
+                                            {{pass}}
+                                                {{pass}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group form-group">
+                                    <label class="control-label" for="inp_inicio">Fecha de inicio</label>
+                                    <div class="controls">
+                                        <input type="text" class="datepicker form-control" name="inp_inicio"
+                                            placeholder="Ingrese fecha de inicio" />
+                                    </div>
+                                </div>
+                                <div class="control-group form-group">
+                                    <label class="control-label" for="inp_fin">Fecha de finalización</label>
+                                    <div class="controls">
+                                        <input type="text" class="datepicker form-control" name="inp_fin"
+                                            placeholder="Ingrese fecha de finalización" />
+                                    </div>
+                                </div>
+                                <div class="control-group form-group">
+                                    <label class="control-label" for=""></label>
+                                    <div class="controls">
+                                        <button class="btn btn-primary" type="button" id="btn_crear"><i
+                                                class="icon-ok-sign icon-white"></i>Crear</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{block page_js}}
+    <link rel="stylesheet" href="{{=URL('static', ruta_fuente+'css/datepicker.css')}}" type="text/css" />
+    <script type="text/javascript" src="{{=URL('static',ruta_fuente+'js/bootstrap-datepicker.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static',ruta_fuente+'js/accion_admin.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
+    <link href="{{=URL('static', 'sources/css/rec_admin.css')}}" rel="stylesheet" type="text/css" />
+    <script>
+        jQuery.validator.setDefaults({
+            debug: true,
+            success: "valid"
+        });
+
+        var obj_formulario = $("#formulario");
+        obj_formulario.validate({
+            rules: {
+                inp_anio: {
+                    required: true,
+                    minlength: 4,
+                    maxlength: 4,
+                    range: [1980, 2050]
+                },
+                inp_inicio: "required",
+                inp_fin: "required"
+            },
+            messages: {
+                inp_anio: {
+                    required: "Ingrese el año",
+                    minlength: "El año no debe ser menor de 4 digitos",
+                    maxlength: "El año no debe ser mayor de 4 digitos"
+                },
+                inp_inicio: "Ingrese una fecha válida",
+                inp_fin: "Ingrese una fecha válida",
+            },
+
+            highlight: function (element, errorClass, validClass) {
+                $(element).parents(".col-sm-5").addClass("has-error").removeClass("has-success");
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).parents(".col-sm-5").addClass("has-success").removeClass("has-error");
+            }
+        });
+
+        $('#btn_crear').click(function () {
+
+            if (obj_formulario.valid()) {
+                var anio = $('input[name=inp_anio]').val();
+                var periodo = $('select[name=sel_periodo]').val();
+                var inicio = $('input[name=inp_inicio]').val();
+                var fin = $('input[name=inp_fin]').val();
+                //var permanente=$('#chk_permanente').prop('checked');
+                var permanente = false;
+                var esPermanente = 0;
+                esPermanente = (permanente) ? 1 : 0;
+                //alert('Año: '+anio+' Periodo: '+ periodo +' Inicio: '+inicio+' Fin: '+fin+' Permanente: '+esPermanente);
+                var parametros = "{{=URL('reclutamiento_admin', 'mtd_crear_proceso')}}?anio=" + anio + "&periodo=" + periodo + "&inicio=" + inicio + "&fin=" + fin + "&permanente=" + esPermanente;
+
+                window.location.href = parametros;
+            } else {
+                alert("El formulario contiene errores");
+            }
+        });
+
+        $(document).ready(function () {
+            $(function () {
+                $('.datepicker').datepicker({ format: 'yyyy-mm-dd' });
+            });
+
+        });
+    </script>
+    {{end page_js}}

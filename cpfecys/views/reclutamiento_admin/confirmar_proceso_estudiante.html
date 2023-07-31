@@ -1,0 +1,122 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Gestión de reclutamiento</h2>
+        </div>
+        <div class="col-12">
+            <center>{{=opciones}}</center>
+        </div>
+    </div>
+    <div class="row well">
+        <div class="col-12 text-center">
+            <h3>Confirmar proceso{{=label_proceso}}</h3>
+        </div>
+        <div class="col-12">
+            <label class="lbl_seleccionar"><b>Seleccionar proceso</b></label>
+            <div class="input-append">
+                {{=procesos_html}}
+                <div class="mt-2">
+                    <button class="btn btn-primary" type="button" id="btn_cargar">
+                        <i class="icon-refresh icon-white"></i>Cargar
+                    </button>
+                    <button class="btn btn-success" type="button" id="btn_confirmar">
+                        <i class="icon-ok icon-white"></i>Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-striped tb_reporte">
+                    <thead>
+                        <tr>
+                            <td width="50%"><b>Parámetro</b></td>
+                            <td width="50%"><b>Descripción</b></td>
+                        </tr>
+                    </thead>
+                    <tbody id="tb_estado_body">
+                        <!-- Inicia ciclo para llenar tabla -->
+                        {{if info_proceso is not None:}}
+                            <tr>
+                                <td><i class="icon-check"></i> Año</td>
+                                <td>{{=info_proceso[0][2]}}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="icon-check"></i> Periodo</td>
+                                <td>{{=info_proceso[0][1]}}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="icon-calendar"></i> Fecha de inicio</td>
+                                <td>{{=info_proceso[0][3]}}</td>
+                            </tr>
+                            <tr>
+                                <td><i class="icon-calendar"></i> Fecha finalizacion</td>
+                                <td>{{=info_proceso[0][4]}}</td>
+                            </tr>
+                        {{pass}}
+                        {{if num_aprobados > 0:}}
+                            <tr>
+                                <td><i class="icon-ok"></i> Solicitudes aprobadas</td>
+                                <td>{{=num_aprobados}}</td>
+                            </tr>
+                        {{else:}}
+                            <tr class="error">
+                                <td><i class="icon-remove"></i> Solicitudes aprobadas</td>
+                                <td>{{=num_aprobados}}</td>
+                            </tr>
+                        {{pass}}
+                        <!-- termina ciclo para llenar tabla -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="modal_confirmar_proceso" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-left">
+                    <h3 class="modal-title" id="modal_confirmar_h3">Atención</h3>
+                </div>
+                <div class="modal-body">
+                    <p id="modal_confirmar_p"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+                    <button class="btn btn-primary" id="btn_mod_confirmar">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{block page_js}}
+<script>
+    $(document).ready(function () {
+        $("#btn_cargar").click(function () {
+            var id_proceso = $('#select_proceso option:selected').val();
+            var etiqueta_proceso = $('#select_proceso option:selected').text();
+
+            var parametros = "{{=URL('reclutamiento_admin', 'confirmar_proceso_estudiante')}}?id_proceso=" + id_proceso + '&etiqueta_proceso=' + encodeURIComponent(etiqueta_proceso);
+            window.location.href = parametros;
+        });
+
+        $("#btn_confirmar").click(function () {
+            if (contador_estados > 0) {
+                var mensaje = '¿Desea asignar los proyectos aprobados para el proceso{{=label_proceso}}?'
+                $("#modal_confirmar_p").html(mensaje);
+                $("#modal_confirmar_proceso").modal('show');
+            } else {
+                alert("No hay proyectos que asignar");
+            }
+        });
+        
+        $("#btn_mod_confirmar").click(function () {
+            $("#modal_confirmar_proceso").modal('hide');
+            var parametros = "{{=URL('reclutamiento_admin', 'mtd_asignar_proyecto')}}?id_proceso=" + id_proceso_cont;
+            window.location.href = parametros;
+        });
+    });
+    var contador_estados = {{=num_aprobados }};
+    var id_proceso_cont = {{=id_proceso_cont }};
+</script>
+{{end page_js}}

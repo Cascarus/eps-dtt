@@ -1,0 +1,41 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h2>Definición de hoja de calificación.</h2>
+    </div>
+    <div class="col-12">
+        <h5>{{=actname}}</h5>
+    </div>
+    <div class="col-12">
+        <div class="well" id="principal_div">
+            <div>
+                <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}" class="btn btn-primary"><i class="icon-arrow-left"></i>{{=T('Back')}}</a>
+            </div>
+            <br>
+            <div id="div_definicion"></div>
+        </div>
+    </div>
+</div>
+{{block page_js}}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#div_definicion").load("{{=URL('cpn_gestion','marco_definicion.html', vars=dict(project=project,\
+																					activity=activity,\
+																					actname=actname,\
+																					acttype=acttype,\
+																					year=year)\
+									)}}");
+    });
+
+    window.onload = function() {
+        var estado_hoja = "{{=estado_hoja}}"; // "True" || "False"
+        var href_regreso = "{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}";
+
+        if(estado_hoja.localeCompare("True") == 0){
+            if(!confirm("La plantilla está completa, si decide modificarla se perderán las hojas calificadas desde el dispositivo móvil, ¿continuar?")){
+                window.localtion.href=href_regreso;
+            }
+        }
+    };
+</script>
+{{{end page_js}}}

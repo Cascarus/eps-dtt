@@ -1,0 +1,27 @@
+{{extend 'dashboard.html'}}
+<h1>Cantidad de Participantes en la Evaluación: {{=encuesta[0].nombre}}</h1>
+<hr />
+<div class="web2py_grid">
+    <div class="web2py_table">
+        <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+            <table>
+                <thead>
+                    <th><a href="#">Nombre Curso</a></th>
+                    <th><a href="#">Nombre Completo</a></th>
+                    <th><a href="#">Iniciadas</a></th>
+                    <th><a href="#">Completadas</a></th>
+                </thead>
+                <tbody>
+                    {{for dato in completada:}}
+                        <tr>
+                            <td>{{=dato[2]}}</td>
+                            <td>{{=dato[3]}}</td>
+                            <td>{{=dato[4]}}</td>
+                            <td>{{=dato[0]}}</td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

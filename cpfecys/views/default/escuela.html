@@ -1,0 +1,56 @@
+{{extend 'layout.html'}}
+<style>
+    /* Estilos CSS para las animaciones */
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Aplicar animaciones a los elementos */
+    .fadeIn {
+        animation-name: fadeIn;
+    }
+
+    .slideIn {
+        animation-name: slideIn;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 style="color: orange; font-size: 32px">Escuela de Ciencias y Sistemas</h1>
+            <hr style="border-color: gray;"> 
+            <p class="animated fadeIn" style="color: rgb(122, 86, 18);font-size: 18px">Ubicada en la Facultad de Ingenieria, Nivel 0, Ciudad Universitaria Zona 12, Guatemala, Guatemala</p>
+        </div>
+        <div class="col-6" style="width: 100%; height: 400px; margin-top: 20px;">
+            <img class="dttcontent__escuela" src="/static/build/images/ecys/escuela-01.jpg" alt="Escuela de Ciencias y Sistemas">
+        </div>
+        <div class="col-6">
+            
+            <div style="width: 100%; height: 400px; margin-top: 20px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15515.443127821477!2d-90.55345977316117!3d14.587861491668347!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85890f9084fb7cc7%3A0x78f330bfb33c9da3!2sFacultad%20de%20Ingenier%C3%ADa%20USAC!5e0!3m2!1sen!2sgt!4v1664395811527!5m2!1sen!2sgt" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

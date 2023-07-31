@@ -1,0 +1,104 @@
+{{extend 'layout.html'}}
+<style>
+    /* Estilos CSS para las animaciones */
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Aplicar animaciones a los elementos */
+    .fadeIn {
+        animation-name: fadeIn;
+    }
+
+    .slideIn {
+        animation-name: slideIn;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12 animated fadeIn">
+
+             <div class="container">
+                    <div class="row">
+                        <div class="col-12 animated fadeIn">
+                            <br>
+                        <div style="width: 100%; display: flex; justify-content: center;">
+                                  <table class="table-responsive-md animated slideIn" style="width: 100%;">
+                                    <tr>
+                                      <td colspan="4" class="text-center">
+                                        <h1 style="color: orange;">Perfil del Egresado</h1>
+                                        <hr style="border-color: gray;">    
+                                    </td>
+                                   </tr>
+                                   <tr>
+                                    <td style="width: 33.33%; vertical-align: top; text-align: left; padding-right: 22px;">
+                                        <p><strong style="color: rgb(85, 81, 81);"> El ingeniero en Ciencias y Sistemas desarrolla y pone en marcha proyectos relacionados con sistemas operativos, redes de computadoras, arquitecturas de computadoras, teorización de compiladores, complejidad de algoritmos e inteligencia artificial.</strong></p>
+                                    </td>
+                                    <td style="width: 33.33%; vertical-align: top; text-align: justify; padding-right: 22px;">
+                                        <p><strong style="color: rgb(85, 81, 81);">Plantea solución a los problemas complejos, aplicando un enfoque de sistemas para su priorización y resolución sistemática.</strong></p>
+                                      </td>
+                                      
+                                    <td style="width: 33.33%; vertical-align: top; text-align: right; padding-right: 22px;">
+                                        <p><strong style="color: rgb(85, 81, 81);">Analiza, diseña e implementa sistemas de bases de datos, sistemas de información y software.</p></strong>
+                                    </td>
+                                  </tr>
+                                  </table>
+                         </div>
+                         </div>
+                    </div>
+            </div>
+            <br>
+            <br>
+            <div class="col-12">
+                    <h1 style="color: orange;">Campo de Actividad</h1>
+                    <hr style="border-color: gray;">
+                
+            </div>
+            <div class="col-12">
+             
+                <hr>
+                <ul>
+                  <li>
+                    <h4>Creación e implementación de sistemas basados en la información:</h4>
+                    <p>Utilizando tecnologías como sistemas operativos, redes, compiladores, desarrollo de software y componentes de computación.</p>
+                  </li>
+                  <li>
+                    <h4>Integración de sistemas:</h4>
+                    <p>Aplicando técnicas de mejora y herramientas de ingeniería de sistemas, como la modelización, simulación, análisis estadístico e inteligencia artificial.</p>
+                  </li>
+                  <li>
+                    <h4>Análisis y solución de problemas complejos:</h4>
+                    <p>Aplicando el análisis de sistemas y el procesamiento de información para obtener mejores soluciones en empresas comerciales, de servicios e industrias en general.</p>
+                  </li>
+                  <li>
+                    <h4>Sistematización y automatización de procesos:</h4>
+                    <p>En empresas comerciales, de servicios, industriales y organizaciones sociales o gubernamentales, utilizando tecnologías informáticas.</p>
+                  </li>
+                  <li>
+                    <h4>Optimización e implementación de procesos:</h4>
+                    <p>Relacionados con el cambio organizacional, coordinación de equipos multifuncionales y adopción de metodologías para mejorar la productividad.</p>
+                  </li>
+                </ul>
+              </div>
+              
+    </div>
+</div>

@@ -1,22 +1,20 @@
-{{var_do=False}}
-<!--Check that the current date is in the period that de administrator has register-->
 {{from datetime import datetime}}
-{{date1=None}}
-{{tiempo=str(datetime.now())}}
-{{dateInicialP = db.executesql('SELECT date(\''+tiempo+'\');',as_dict=True)}}
-{{for d0 in dateInicialP:}}
-	{{date1=d0['date(\''+tiempo+'\')']}}
+{{var_do = False}}
+<!--Check that the current date is in the period that de administrator has register-->
+{{date1 = None}}
+{{tiempo = str(datetime.now())}}
+{{date_inicial_p = db.executesql(f"SELECT date('{tiempo}');", as_dict=True)}}
+{{for d0 in date_inicial_p:}}
+	{{date1 = d0[f"date('{tiempo}')"]}}
 {{pass}}
 
 <!--emarquez: periodos, -->
-
 {{if cpfecys.is_semestre(request.vars['year']):}}	
-	{{actualSemester = db(db.period_year.id==semestre2.id).select().first()}}
-	{{comparacion = T(actualSemester.period.name)+" "+str(actualSemester.yearp)}}
-	{{date_var = db((db.student_control_period.period_name==comparacion)).select().first()}}
-
+	{{actual_semester = db(db.period_year.id == semestre2.id).select(db.period_year.period, db.period_year.yearp, db.period_year.id).first()}}
+	{{comparacion = f'{T(actual_semester.period.name)} {actual_semester.yearp}'}}
+	{{date_var = db((db.student_control_period.period_name == comparacion)).select(db.student_control_period.date_start_semester, db.student_control_period.date_finish_semester).first()}}
 	{{if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:}}
-		{{var_do=True}}
+		{{var_do = True}}
 	{{pass}}
 	<!--End of the check of period-->
 
@@ -25,18 +23,17 @@
 	{{exception_t_var = False}}
 	{{no_menu=True}}
 {{else:}}
-	{{actualSemester = db(db.period_year.id==semestre2.id).select().first()}}
-	{{date_var = db((db.period_detail.period==actualSemester.period)).select().first()}}
-
+	{{actual_semester = db(db.period_year.id == semestre2.id).select(db.period_year.period, db.period_year.yearp, db.period_year.id).first()}}
+	{{date_var = db((db.period_detail.period == actual_semester.period)).select(db.student_control_period.date_start_semester, db.student_control_period.date_finish_semester).first()}}
 	{{if date1 >= date_var.date_start_semester and date1 <= date_var.date_finish_semester:}}
-		{{var_do=True}}
+		{{var_do = True}}
 	{{pass}}
 	<!--End of the check of period-->
 
-	{{exception_query = db(db.course_laboratory_exception_period.project == project.id).select().first()}}
+	{{exception_query = db(db.course_laboratory_exception_period.project == project.id).select(db.course_laboratory_exception_period.t_edit_lab, db.course_laboratory_exception_period.s_edit_course).first()}}
 	{{exception_s_var = False}}
 	{{exception_t_var = False}}
-	{{no_menu=True}}
+	{{no_menu = True}}
 {{pass}}
 
 
@@ -45,38 +42,38 @@
 	{{exception_s_var = exception_query.s_edit_course}}
 {{pass}}
 
-{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project == True):}}
-	{{no_menu=False}}
+{{if (auth.has_membership('Super-Administrator')) or (auth.has_membership('Ecys-Administrator')) or ((auth.has_membership('Teacher') or auth.has_membership('Student')) and assigned_to_project):}}
+	{{no_menu = False}}
 {{pass}}
 
-{{if request.vars['operation'] == "div_update": }}
+{{if request.vars['operation'] == "div_update":}}
 	<center>
 		<div id="table_activity_without_metric" class="table-responsive">
 			<center>
-			<table>
-				<tr>
-					<td>
-						<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
-						<a id="awmLB" style="cursor:pointer;" onclick="visible_lab_activities_wm();">
-                    		{{=T('Laboratory Activities')}}
-                    	</a>
-					</td>
-					<td></td>
-					<td>
-						<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>
-						<a id="awmCB" style="cursor:pointer;" onclick="visible_class_activities_wm();">
-                    		{{=T('Class Activities')}}
-                    	</a>
-					</td>
-					<td></td>
-					<td>
-						<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
-						<a id="awmAB" style="cursor:pointer;" onclick="visible_all_activities_wm();">
-                    		{{=T('All activities')}}
-                    	</a>
-					</td>
-				</tr>
-			</table>
+				<table>
+					<tr>
+						<td>
+							<span class="label label-success">&nbsp;&nbsp;&nbsp;</span>
+							<a id="awmLB" style="cursor:pointer;" onclick="visible_lab_activities_wm();">
+								{{=T('Laboratory Activities')}}
+							</a>
+						</td>
+						<td></td>
+						<td>
+							<span class="label label-warning">&nbsp;&nbsp;&nbsp;</span>
+							<a id="awmCB" style="cursor:pointer;" onclick="visible_class_activities_wm();">
+								{{=T('Class Activities')}}
+							</a>
+						</td>
+						<td></td>
+						<td>
+							<span class="label label-info">&nbsp;&nbsp;&nbsp;</span>
+							<a id="awmAB" style="cursor:pointer;" onclick="visible_all_activities_wm();">
+								{{=T('All activities')}}
+							</a>
+						</td>
+					</tr>
+				</table>
 			</center>
 		  	<table class="table table-bordered">
 		  		<tr bgcolor="#E6E6E6">
@@ -101,7 +98,7 @@
 						{{=T('Date')}}
 					</th>
 				</tr>
-				{{tActivitiesWM = db((db.course_activity_without_metric.semester==actualSemester.id)&(db.course_activity_without_metric.assignation==project.id)).select()}}
+				{{tActivitiesWM = db((db.course_activity_without_metric.semester==actual_semester.id)&(db.course_activity_without_metric.assignation==project.id)).select()}}
 				{{for tAct in tActivitiesWM:}}
 					{{if tAct.laboratory==True:}}
 						<tr class="activity_without_metric_lab">
@@ -201,7 +198,6 @@
 		{{pass}}
 	</ul> 
 {{pass}}
-
 
 <script type="text/javascript">
 	function visible_lab_activities_wm(){

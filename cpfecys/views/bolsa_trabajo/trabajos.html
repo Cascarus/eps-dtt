@@ -1,0 +1,261 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class='row p-0 m-0'>
+        <div class='d-flex w-100 justify-content-center py-3 px-0'>
+            <h2>
+                Ofertas laborales registradas
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                    <span class="fa fa-question-circle"></span>
+                  </button>
+            </h2>
+        </div>
+    </div>
+
+    <div id="div1" class='row p-3 m-3'>
+        <table class="table table-hover">
+            <thead style="background-color: #EAEAEA;">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Empresa</th>
+                    <th scope="col">Puesto Laboral</th>
+                    <th scope="col">Salario</th>
+                    <th scope="col">Area Especialidad</th>
+                    <th scope="col">Año</th>
+                    <th scope="col">Semestre</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"></th>
+                </tr>
+                <tr>
+                    <td scope="row"></td>
+                    <form action='/cpfecys/bolsa_trabajo/trabajos' method="GET">
+                    <td>
+                        <select class="form-control" id="id_empresa" name='id_empresa' onsubmit="this.form.submit()">
+                            <option value="0">Todos</option>
+                            {{for empresa in new_dict["empresas"]:}}
+                                <option value="{{=empresa['id_empresa']}}">{{=empresa['nombre_empresa']}}</option>
+                            {{pass}}
+                        </select>
+                    </td>
+                    <td>    
+                        <input type="text" id="puesto" name="puesto" class="form-control" onsubmit="this.form.submit()"/>
+                    </td>
+                    <td></td>
+                    <td>
+                        <select class="form-control" id="area" name='area' onsubmit="this.form.submit()">
+                            <option value="0">Todos</option>
+                            {{for area in new_dict["area_especialidad"]:}}
+                                <option value="{{=area['id_area_especialidad']}}">{{=area['area_especialidad']}}</option>
+                            {{pass}}
+                        </select>
+                    </td>
+
+                    <td colspan="2">
+                        <select class="form-control" id="periodo" name='periodo' onsubmit="this.form.submit()">
+                            {{for periodo in new_dict["periodos"]:}}
+                                <option value="{{=periodo['id']}}">{{=periodo['yearp']}} - {{=periodo['period']}}</option>
+                            {{pass}}
+                            <option value="0">Todos</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="status" name='status' onsubmit="this.form.submit()">
+                            <option value="0">Todos</option>
+                            {{for estado in new_dict["estados_registro"]:}}
+                                <option value="{{=estado['id_estado_oferta_laboral']}}">{{=estado['estado_oferta_laboral']}}</option>
+                            {{pass}}
+                            </select>
+                    </td>
+                    <td><button type="submit" class="btn btn-primary mb-3">Aplicar filtro</button></td>
+                    </form>
+                </tr>
+            </thead>
+            <tbody id="myTable">
+                {{for trabajo in new_dict['trabajos']:}}
+                <tr>
+                    <td scope="row">{{=trabajo["id_oferta_laboral"]}}</td>
+                    <td>{{=trabajo["nombre_empresa"]}}</td>
+                    <td>{{=trabajo["puesto"]}}</td>
+                    <td>Q.{{=trabajo["salario_aproximado"]}}</td>
+                    <td>{{=trabajo["area_especialidad"]}}</td>
+                    <td>{{=trabajo["yearp"]}}</td>
+                    <td>{{=trabajo["period"]}}</td>
+                    <td class="text-center">
+                        {{if trabajo["id_estado_oferta_laboral"] == 1:}}
+                            <span class="badge badge-info">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 2:}}
+                            <span class="badge badge-success">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 3:}}
+                            <span class="badge badge-danger">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 4:}}
+                            <span class="badge badge-success">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 5:}}
+                            <span class="badge badge-warning">
+                        {{else:}}
+                            <span>
+                        {{pass}}
+                        {{=trabajo["estado_oferta_laboral"]}}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a class="btn btn-default btn-sm" href="/cpfecys/bolsa_trabajo/view_trabajo?id={{=trabajo['id_oferta_laboral']}}">
+                            <i class="fa fa-fw fa fa-eye" ></i> Ver
+                        </a>
+                        <a class="btn btn-default btn-sm" href="/cpfecys/bolsa_trabajo/editar_trabajo?id={{=trabajo['id_oferta_laboral']}}">
+                            <i class="fa fa-fw fa fa-edit" ></i>Editar
+                        </a>
+                        <a class="btn btn-danger btn-sm" href="#" onclick="eliminar({{=trabajo['id_oferta_laboral']}}, '{{=trabajo['puesto']}}')">
+                            <i class="fa fa-fw fa fa-trash" ></i> Eliminar
+                        </a>
+                        {{if trabajo['banner']:}}
+                            {{if trabajo['seleccionada'] == 1:}}
+                            <a class="btn btn-default btn-sm" href="/cpfecys/static/bolsa_trabajo/ofertas/{{=trabajo['banner']}}" target="_blank">
+                                <i class="fa fa-fw fa fa-eye"></i> Banner
+                            </a>
+                            {{else:}}
+                            <a class="btn btn-secondary btn-sm" href="/cpfecys/static/bolsa_trabajo/ofertas/{{=trabajo['banner']}}" target="_blank">
+                                <i class="fa fa-fw fa fa-eye"></i> Banner
+                            </a>
+                            {{pass}}
+                        {{pass}}
+                    </td>
+                </tr>
+                {{pass}}
+            </tbody>
+            <tfoot style="background-color: #EAEAEA;">
+                <tr>
+                    <th scope="col" colspan="8" class="text-right">
+                        {{=new_dict["inicio_empresas"]}} - {{=new_dict["fin_empresas"]}} de {{=new_dict["cantidad_empresas"]}}
+                    </th>
+                    <th scope="col" class="d-flex justify-content-around">
+                        <a href='?page=1&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                        </a>
+                        {{if new_dict["prev_page"] != 0:}}
+                            <a href='?page={{=new_dict["prev_page"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                            </a>
+                        {{else:}}
+                            <a href='?page=1&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                            </a>
+                        {{pass}}
+                        {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}}
+                            <a href='?page={{=new_dict["next_page"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                            </a>
+                        {{else:}}
+                            <a href='?page={{=new_dict["cantidad_paginas"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                            </a>
+                        {{pass}}
+                        <a href='?page={{=new_dict["cantidad_paginas"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                        </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="myModalLabel">{{=T('ayuda admin, Ofertas Laborales Registradas')}}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    {{=T('Este modulo representa la vista de Ofertas Laborales Registradas por las empresas al sistema.')}}
+                </p>
+                <p>
+                    {{=T('Botones por tupla:')}}
+                </p>
+                <p>
+                    {{=T('En este apartado encontraremos 4 botones por cada tupla u oferta de trabajo, en ellos podremos:')}}
+                </p>
+                <p>
+                    {{=T('Boton Ver: nos permite ver los datos de oferta laboral.')}}
+                </p>
+                <p>
+                    {{=T('Boton Editar: nos permite editar los datos de la oferta laboral, Su principal funcion es Aprobar, rechazar o bien dejarlo en estado En aprobacion, que es un estado de espera, asi como tambien podremos dar permisos para que el Banner de la oferta laboral sea visible en el home de la pagina web de DTT')}}
+                </p>
+                <p>
+                    {{=T('Boton Eliminar: nos permite eliminar la oferta laboral, para ya no tener la tupla de esa oferta laboral.')}}
+                </p>
+                <p>
+                    {{=T('Boton Banner: nos permite poder visualizar el banner de la oferta laboral.')}}
+                </p>
+                <p>
+                    {{=T('Boton en el encabezado Aplicar filtro:')}}
+                </p>
+                <p>
+                    {{=T('Este boton nos permite realizar una busqueda o filtro de una forma especifica, donde podemos seleccionar, la empresa, puesto, area especialidad, periodo y estado de la oferta laboral. no siendo estrictamente necesario seleccionar todos. en el perido tiene por defecto seleccionado el mas reciente, pero teniendo la opcion de poder seleccionar la opcion de "Todos" esto para poder realizar una busqueda especifica global de todos lo periodos.')}}
+                </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">{{=T('Close')}}</button>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+<style>
+    #div1 {
+        display: block;
+        overflow:auto;
+        width:auto;
+    }
+</style>
+
+<script>
+    function eliminar(id, nombre) {
+        Swal.fire({
+            title: 'Eliminar',
+            text: `Seguro que desea eliminar la oferta laboral: ${nombre}`,
+            icon: 'question',
+            showDenyButton: true,
+            confirmButtonText: 'Eliminar',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    "id_oferta_laboral": Number(id)
+                }
+                $.ajax({
+                    type: 'post',
+                    url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/eliminar_trabajo`,
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Eliminado!',
+                                text: res.msg,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/trabajos`;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -1,0 +1,131 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+  <div class="col-12">
+    <h2>
+      <center>
+        Carga masiva de alumnos
+        <a href="#myModal" role="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal"><span class="fa fa-question-circle"></span></a><br>
+        <small>{{=name}} - {{=T(current_period.period.name)}} {{=current_period.yearp}}</small>
+      </center>
+    </h2>
+  </div>
+  <div class="col-12">
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Ayuda carga masiva alumnos</h5>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-12">
+                <p>
+                  Las cargas, automáticamente registrarán al estudiante en el listado general y lo asignarán al proyecto en donde fue realizada al carga.
+                </p>
+                <ul class="p-2">
+                  <li type="circle">{{=T('The characteristics of the bulk load file are:')}}</li>
+                  <li type="circle">{{=T('Comma delimited CSV Extension.')}}</li>
+                  <li type="circle">{{=T('2 Columns')}}:
+                    <dl>
+                      <style>
+                        .circle_list {
+                          display: inline-block;
+                          width: 5px;
+                          height: 5px;
+                          border-radius: 50%;
+                          background-color: black;
+                          margin-right: 5px;
+                        }
+                      </style>
+                      <dd>
+                        <span class="circle_list"></span>
+                        {{=T('Driver: is a field where the student card number is entered.')}}
+                      </dd>
+                      <dd>
+                        <span class="circle_list"></span>
+                        {{=T('Laboratory: is a True or False field, which specifies whether or not the student takes the laboratory.')}}
+                      </dd>
+                    </dl>
+                  </li>
+                </ul>
+                <p>
+                  {{=T('You can download the example file example pressing the download button.')}}
+                </p>
+                <a href="{{=URL('student_academic','example_upload')}}" target="blank" class="btn btn-primary">Descargar Ejemplo</a>
+              </div>
+            </div>    
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{if success:}}
+      <div class="accordion" id="accordion2">
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+              <span class="icon-remove"></span> {{=T('User upload errors')}}
+              <span class="pull-right">{{=T('Total Errors: ') + len(errors)}}</span>
+            </a>
+          </div>
+          <div id="collapseOne" class="accordion-body collapse">
+            <div class="accordion-inner">
+              <ul>
+                {{for error in errors:}}
+                  <li class="error">
+                    <pre>
+                      {{for row in error:}}{{=row}}{{pass}}
+                    </pre>
+                  </li>
+                {{pass}}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+              <span class="icon-warning-sign"></span> {{=T('Notifications')}}
+              <span class="pull-right">{{=T('Total Notifications: ') + len(avisos)}}</span>
+            </a>
+          </div>
+          <div id="collapseTwo" class="accordion-body collapse">
+            <div class="accordion-inner">
+              <ul>
+                {{for warning in avisos:}}
+                  <li class="error">
+                    <pre>
+                      {{for row in warning:}}{{=row}}{{pass}}
+                    </pre>
+                  </li>
+                {{pass}}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{else:}}
+      <div class="well mt-4">
+        {{if auth.has_membership('Student'):}}
+          {{if date_finish is not None:}}
+            {{if datetime.datetime.now() < date_finish:}}
+              <div class="alert alert-danger">{{=T('Deadline for entry')}}: {{=date_finish}}.</div>
+              <div class="alert alert-warning"><b>{{=T('Note')}}:</b> {{=T('This process can take several minutes')}}.</div>
+              {{=FORM(INPUT(_type='file', _name='csvfile'), DIV(INPUT(_type='submit', _class='btn btn-primary',_value=T('Upload')), _class='mt-2'))}}
+            {{else:}}
+                <div class="alert alert-danger">{{=T('It ended the date of admission')}}.</div>    
+            {{pass}}
+          {{else:}}
+            <div class="alert alert-danger">{{=T('It ended the date of admission')}}.</div>
+          {{pass}}
+        {{else:}}
+          <div class="alert alert-warning"><b>{{=T('Note')}}:</b> {{=T('This process can take several minutes')}}.</div>
+          {{=FORM(INPUT(_type='file', _name='csvfile'), DIV(INPUT(_type='submit', _class='btn btn-primary', _value=T('Upload')), _class='mt-2'))}}
+        {{pass}}    
+      </div>
+    {{pass}}
+  </div>
+</div>

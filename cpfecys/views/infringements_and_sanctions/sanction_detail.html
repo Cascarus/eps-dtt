@@ -1,0 +1,197 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <center>
+        <h2>
+            {{=sancion[0]}}
+            <br>
+            <small>
+                <span class="badge badge-{{=help_status[sancion[8]][1]}}">
+                    {{=help_status[sancion[8]][0]}}
+                </span>
+            </small>
+        </h2>
+        <h4>
+            {{=sancion[1]}} en {{=sancion[2]}}
+        </h4>
+    </center>
+    <div class="row">
+        <div class="col">
+            <form 
+                {{if administrar is True:}} 
+                    {{if sancion[8] < 3:}}
+                        action="{{=URL('infringements_and_sanctions','sanction_detail',type_view+'/'+id_sancion)}}"
+                        method="POST" 
+                    {{pass}} 
+                {{pass}}>
+                <div class="form-group">
+                    <label for="dateSanction">Fecha</label>
+                    <input class="form-control" type="text" name="dateSanction" id="dateSanction" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="causeSanction">Causa</label>
+                    <input type="text" name="causeSanction" id="causeSanction" class="form-control"
+                        value="{{=sancion[4]}}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="descriptionSanction">Descripción</label>
+                    <textarea maxlength="250" name="descriptionSanction" id="descriptionSanction" rows="5"
+                        class="form-control" readonly>{{=sancion[5]}}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="profSanction">Catedrático</label>
+                    <input type="text" name="profSanction" id="profSanction" class="form-control"
+                        value="{{=sancion[6]}}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="reporterSanction">Quien reporto</label>
+                    <input type="text" name="reporterSanction" id="reporterSanction" class="form-control"
+                        value="{{=sancion[7]}}" readonly>
+                </div>
+                {{if administrar is True:}}
+                    {{if int(sancion[8]) == 1: }}
+                        <hr />
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="fechaReunion">Fecha de la reunión</label>
+                                    <input type="date" name="fechaReunion" id="fechaReunion" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="horaReunion">Hora de la reunión</label>
+                                    <input type="time" name="horaReunion" id="horaReunion" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="mensajeReunion">Mensaje de reunión</label>
+                            <textarea maxlength="250" name="mensajeReunion" id="mensajeReunion" rows="10" class="form-control" required></textarea>
+                        </div>
+                        <input type="hidden" name="cursoReunion" id="cursoReunion" value="{{=sancion[0]}}">
+                        <input type="hidden" name="razonReunion" id="razonReunion" value="{{=sancion[1]}} en {{=sancion[2]}}">
+                    {{pass}}
+                    <div class="form-group">
+                        {{if int(sancion[8]) < 3:}} 
+                            <button type="submit" class="btn btn-block btn-info">
+                                {{=help_status[sancion[8]+1][2]}}
+                            </button>
+                        {{elif sancion[8] == 3 or type_view == 'admin':}}
+                            <a class="btn btn-block btn-success" href="{{=URL('infringements_and_sanctions','sanction_penalty', type_view + '/' + id_sancion)}}">Administrar
+                                penalizaciones
+                            </a>
+                        {{pass}}
+                    </div>
+                    <input type="hidden" id="estado" name="estado" value="{{=sancion[8]+29}}">
+                {{pass}}
+            </form>
+            {{if not type_view == 'student':}}
+                <br>
+                <center>
+                    <h5>Implicados</h5>
+                </center>
+                <table class="table table-striped">
+                    {{if sancion[8] > 3:}}
+                        {{if generar_PDF:}}
+                            <colgroup>
+                                <col style="width:10%">
+                                <col style="width:30%">
+                                <col style="width:30%">
+                                <col style="width:15%">
+                                <col style="width:15%">
+                            </colgroup>
+                        {{else:}}
+                            <colgroup>
+                                <col style="width:20%">
+                                <col style="width:30%">
+                                <col style="width:30%">
+                                <col style="width:20%">
+                            </colgroup>
+                        {{pass}}
+                    {{else:}}
+                        <colgroup>
+                            <col style="width:15%">
+                            <col style="width:55%">
+                            <col style="width:30%">
+                        </colgroup>
+                    {{pass}}
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Carnet</th>
+                            <th>Nombre</th>
+                            <th>Penalización</th>
+                            {{if sancion[8] > 3:}}
+                                {{if generar_PDF:}}
+                                    <th>Generar PDF</th>
+                                {{pass}}
+                                <th>Ver Sanción escrita</th>
+                            {{pass}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for implicado in implicados:}}
+                            <tr>
+                                <td>{{=implicado[0]}}</td>
+                                <td>{{=implicado[1]}}</td>
+                                <td>
+                                    {{if implicado[2] is not None:}}
+                                    {{=implicado[2]}}
+                                    {{else:}}
+                                        Sin penalizar
+                                    {{pass}}
+                                </td>
+                                {{if sancion[8] > 3:}}
+                                    {{if generar_PDF:}}
+                                        <td>
+                                            <center>
+                                                <a href="{{=URL('infringements_and_sanctions','generate_sanction_sign' + '?student='+str(implicado[3])+'&sanction='+id_sancion)}}"
+                                                    class="btn btn-sm btn-info" target="_blank">Generar sanción escrita</a>
+                                            </center>
+                                        </td>
+                                    {{pass}}
+                                    <td>
+                                        <center>
+                                            {{if type_view == 'admin' or implicado[4] is None: }}
+                                                <a href="{{=URL('infringements_and_sanctions','upload_sanction_signed'+'?student='+str(implicado[3])+'&sanction='+id_sancion)}}" class="btn btn-sm btn-primary">
+                                                    {{if type_view == 'admin':}}
+                                                        Ver/Subir
+                                                    {{else:}}
+                                                        Subir
+                                                    {{pass}}
+                                                </a>
+                                            {{else:}}
+                                                <a href="{{=URL('infringements_and_sanctions', 'download_sanction_signed', str(implicado[4]))}}" class="btn btn-sm btn-info">Ver</a>
+                                            {{pass}}
+                                        </center>
+                                    </td>
+                                {{pass}}
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+                {{if type_view == 'admin':}}
+                    <a href="{{=URL('infringements_and_sanctions', 'sanction_manage_involve', id_sancion)}}" class="btn btn-block btn-info">
+                        Administrar involucrados
+                    </a>
+                {{pass}}
+            {{elif penalizacion is not None:}}
+                <br>
+                <center>
+                    <h3>
+                        Penalización: <span class="badge badge-info">{{=penalizacion['penalizacion']}}</span>
+                    </h3>
+                    <a href="{{=URL('infringements_and_sanctions', 'download_sanction_signed', str(penalizacion['documento']))}}" class="btn btn-block btn-info">
+                        Ver sanción firmada
+                    </a>
+                </center>
+            {{pass}}
+        </div>
+    </div>
+</div>
+<script>
+    const date_ = new Date("{{=sancion[3]}}");
+    $('#dateSanction').val(date_.toLocaleDateString('es-GT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    //{{if session.fys_debug_error is not None:}}
+    console.log(`{{=session.fys_debug_error}}`)
+//{{pass}}
+</script>

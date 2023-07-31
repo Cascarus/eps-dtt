@@ -1,0 +1,227 @@
+{{extend 'dashboard.html'}}
+
+<div class='row p-0 m-0'>
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Ofertas Laborales Registradas</h1>
+    </div>
+</div>
+
+<div class='row p-3 m-3'>
+    <table class="table table-hover">
+        <thead style="background-color: #EAEAEA;">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Puesto Laboral</th>
+                <th scope="col">Salario</th>
+                <th scope="col">Area Especialidad</th>
+                <th scope="col">Año</th>
+                <th scope="col">Semestre</th>
+                <th scope="col">Estado</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td scope="row"></td>
+                <td>
+                    <form action='/cpfecys/oferta_laboral/seguimiento_ofertas' method="GET">
+                        <input type="text" id="puesto" name="puesto" class="form-control" />
+                    </form>
+                </td>
+                <td></td>
+                <td>
+                    <form action='/cpfecys/oferta_laboral/seguimiento_ofertas' method="GET">
+                        <select class="form-control" id="area" name='area' onchange="this.form.submit()">
+                            <option value="">Seleccione uno</option>
+                            <option value="0">Todos</option>
+                            {{for area in new_dict["area_especialidad"]:}}
+                                <option value="{{=area['id_area_especialidad']}}">{{=area['area_especialidad']}}</option>
+                            {{pass}}
+                        </select>
+                    </form>
+                </td>
+                <td colspan="2">
+                    <form action='/cpfecys/oferta_laboral/seguimiento_ofertas' method="GET">
+                        <select class="form-control" id="periodo" name='periodo' onchange="this.form.submit()">
+                            <option value="">Seleccione uno</option>
+                            <option value="0">Todos</option>
+                            {{for periodo in new_dict["periodos"]:}}
+                                <option value="{{=periodo['id']}}">{{=periodo['yearp']}} - {{=periodo['period']}}</option>
+                            {{pass}}
+                        </select>
+                    </form>
+                </td>
+                <td>
+                    <form action='/cpfecys/oferta_laboral/seguimiento_ofertas' method="GET">
+                        <select class="form-control" id="status" name='status' onchange="this.form.submit()">
+                            <option value="">Seleccione uno</option>
+                            <option value="0">Todos</option>
+                            {{for estado in new_dict["estados_registro"]:}}
+                                <option value="{{=estado['id_estado_oferta_laboral']}}">
+                                    {{=estado['estado_oferta_laboral']}}
+                                </option>
+                            {{pass}}
+                        </select>
+                    </form>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            {{for trabajo in new_dict['trabajos']:}}
+                <tr>
+                    <td scope="row">{{=trabajo["id_oferta_laboral"]}}</td>
+                    <td>{{=trabajo["puesto"]}}</td>
+                    <td>Q.{{=trabajo["salario_aproximado"]}}</td>
+                    <td>{{=trabajo["area_especialidad"]}}</td>
+                    <td>{{=trabajo["yearp"]}}</td>
+                    <td>{{=trabajo["period"]}}</td>
+                    <td class="text-center">
+                        {{if trabajo["id_estado_oferta_laboral"] == 1:}}
+                            <span class="badge badge-info">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 2:}}
+                            <span class="badge badge-success">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 3:}}
+                            <span class="badge badge-danger">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 4:}}
+                            <span class="badge badge-success">
+                        {{elif trabajo["id_estado_oferta_laboral"] == 5:}}
+                            <span class="badge badge-warning">
+                        {{else:}}
+                            <span>
+                        {{pass}}
+                            {{=trabajo["estado_oferta_laboral"]}}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a class="btn btn-primary btn-sm"
+                            href="/cpfecys/oferta_laboral/view_oferta?id={{=trabajo['id_oferta_laboral']}}">
+                            <i class="fa fa-fw fa fa-eye"></i>
+                        </a>
+                        {{if trabajo["yearp"] == new_dict["periodos"][0]["yearp"] and trabajo["period"] == new_dict["periodos"][0]["period"]:}}
+                            <a class="btn btn-warning btn-sm"
+                                href="/cpfecys/oferta_laboral/editar_oferta?id={{=trabajo['id_oferta_laboral']}}">
+                                <i class="fa fa-fw fa fa-edit"></i>
+                            </a>
+                            <a class="btn btn-danger btn-sm" href="#"
+                                onclick="eliminar({{=trabajo['id_oferta_laboral']}}, '{{=trabajo['puesto']}}')">
+                                <i class="fa fa-fw fa fa-trash"></i>
+                            </a>
+                        {{pass}}
+                    </td>
+                    <td>
+                        {{if trabajo["id_estado_oferta_laboral"] > 1:}}
+                            <a class="btn btn-primary btn-sm"
+                                href="/cpfecys/oferta_laboral/view_aplicantes?id_oferta={{=trabajo['id_oferta_laboral']}}">
+                                Ver aplicantes
+                            </a><br /><br />
+                            <a class="btn btn-success btn-sm"
+                                href="/cpfecys/oferta_laboral/buscar_aplicantes?id_oferta={{=trabajo['id_oferta_laboral']}}">
+                                Ver CV públicos
+                            </a>
+                        {{else:}}
+                            <a class="btn btn-primary btn-sm disabled"
+                                href="/cpfecys/oferta_laboral/view_aplicantes?id_oferta={{=trabajo['id_oferta_laboral']}}">
+                                Ver aplicantes
+                            </a><br /><br />
+                            <a class="btn btn-success btn-sm disabled"
+                                href="/cpfecys/oferta_laboral/buscar_aplicantes?id_oferta={{=trabajo['id_oferta_laboral']}}">
+                                Ver CV públicos
+                            </a>
+                        {{pass}}
+                    </td>
+                </tr>
+            {{pass}}
+        </tbody>
+        <tfoot style="background-color: #EAEAEA;">
+            <tr>
+                <th scope="col" colspan="8" class="text-right">
+                    {{=new_dict["inicio_empresas"]}} - {{=new_dict["fin_empresas"]}} de
+                    {{=new_dict["cantidad_empresas"]}}
+                </th>
+                <th scope="col" class="d-flex justify-content-around">
+                    <a
+                        href='?page=1&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                        <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                    </a>
+                    {{if new_dict["prev_page"] != 0:}}
+                        <a
+                            href='?page={{=new_dict["prev_page"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        </a>
+                    {{else:}}
+                        <a
+                            href='?page=1&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                        </a>
+                    {{pass}}
+                    {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} 
+                        <a
+                            href='?page={{=new_dict["next_page"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                    {{else:}}
+                        <a
+                            href='?page={{=new_dict["cantidad_paginas"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                    {{pass}}
+                    <a
+                        href='?page={{=new_dict["cantidad_paginas"]}}&id_empresa={{=new_dict["id_empresa"]}}&area={{=new_dict["area"]}}&periodo={{=new_dict["periodo"]}}&status={{=new_dict["status"]}}&puesto={{=new_dict["puesto"]}}'>
+                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                    </a>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+    function eliminar(id, nombre) {
+        Swal.fire({
+            title: 'Eliminar',
+            text: `Seguro que desea eliminar la oferta laboral: ${nombre}`,
+            icon: 'question',
+            showDenyButton: true,
+            confirmButtonText: 'Eliminar',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    "id_oferta_laboral": Number(id)
+                }
+                $.ajax({
+                    type: 'post',
+                    url: '/cpfecys/oferta_laboral/eliminar_trabajo',
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Eliminado!',
+                                text: res.msg,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location = '/cpfecys/oferta_laboral/seguimiento_ofertas';
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

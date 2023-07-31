@@ -1,0 +1,44 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4 col-12">
+    <center>
+        <h1>Préstamos</h1>
+    </center>
+    <div>
+        {{if len(prestamos)> 0:}}
+            <div class="web2py_grid">
+                <div class="web2py_table">
+                    <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Utensilio</th>
+                                    <th>Fecha préstamo</th>
+                                    <th>Fecha estimada de devolución</a></th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for prestamo in prestamos:}}
+                                    <tr>
+                                        <td>{{=prestamo.iso_utensilio.descripcion}}</td>
+                                        <td>{{=prestamo.iso_prestamo.fecha_prestamo}}</td>
+                                        <td>{{=prestamo.iso_prestamo.fecha_est_dev}}</td>
+                                        <td>
+                                            <a class="button btn btn-default"
+                                                href="{{=URL('iso_prestamo', 'registrar_devolucion', args=(prestamo.iso_prestamo.id))}}">
+                                                <span class="icon pen icon-pencil glyphico glyphico-arrow pencil" /></span>
+                                                <span class="buttontext button" title="Registrar Devolución">Registrar
+                                                    Devolución</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        {{else:}}
+                <h4>No se encontraron prestamos</h4>
+        {{pass}}
+    </div>
+</div>

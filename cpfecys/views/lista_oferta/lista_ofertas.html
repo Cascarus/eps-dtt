@@ -1,0 +1,93 @@
+{{extend 'dashboard.html'}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+<style>
+    a {
+        color: black;
+    }
+
+    .btsize {
+        width: 40px;
+        height: 40px;
+        align-items: center;
+    }
+
+    .isize {
+        align-items: center;
+        padding-top: 10px;
+    }
+</style>
+<div class="dttContainer">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <h1 class="bi bi-journal-code" style="color: white"> Ofertas laborales</h1>
+        </div>
+    </nav>
+    <br>
+    <div class="row">
+        <div class="col">
+            <input type="text" class="form-control" id="myInput" onkeyup="myFunction()" placeholder="Bucar por empresa..." title="Type in a name">
+            <table id="myTable" class="table table-striped table-bordered table-sm">
+                <thead class="thead-dark">
+                    <tr>
+                        <th style="width:40%;">Puesto</th>
+                        <th style="width:40%;">Empresa</th>
+                        <th style="width:40%;">Area</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{for item in ofertas:}}
+                        <tr>
+                            <td>
+                                <a style="cursor:pointer;" class="link-primary"
+                                href="{{=URL('lista_oferta', 'vista_oferta', vars=dict(num=item['id_oferta_laboral'] * 109324 + 134544))}}">
+                                    {{=item['PUESTO']}}
+                                </a>
+                            </td>
+                            <td>{{=item['nombre_empresa']}}</td>
+                            <td>{{=item['area_especialidad']}}</td>
+                            <td>
+                                <a style="cursor:pointer;" class="btn btn-info"
+                                href="{{=URL('lista_oferta', 'vista_oferta', vars=dict(num=item['id_oferta_laboral'] * 109324 + 134544))}}">
+                                    <i class="isize bi bi-journal-check"></i>
+                                </a>
+                                Aplicar
+                            </td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-4">
+            <div class="card position-fixed" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-header card-title bi bi-person-circle">Mi CV</h5>
+                    <p class="card-text">Puedes editar tu cv antes de registrar una solicitud</p>
+                    <a class="btn btn-primary btn-lg ml-3  bi bi-pencil-square" href="/curriculum/previa" role="button">Editar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css"></script>
+<script>
+    function myFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+</script>

@@ -1,0 +1,269 @@
+{{extend 'layout-en.html'}}
+
+{{block title}}
+    Desarrollo de Transferencia Tecnológica | Escuela de Ciencias y Sistemas
+{{end}}
+
+{{block articulos}}
+    <div style="border-bottom: 5px double #fbac00; margin-bottom:20px">
+        <h1 style="margin: 0em">Magazine ECYS</h1>
+    </div>
+
+    <div class="carousel2" style="margin-top:-60px">
+        {{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(0, 1)):}}
+            <a class="carousel2-item" href="https://dtt-ecys.org/magazine/public_edicionRevista">
+                <img src="{{= URL('static/mgz_files', art.image_file)}}" style="height: 300px;width:300px">
+            </a>
+            {{pass}}
+
+        {{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(1, 2)):}}
+            <a class="carousel2-item" href="https://dtt-ecys.org/magazine/public_edicionRevista">
+                <img src="{{= URL('static/mgz_files', art.image_file)}}" style="height: 300px;width:300px">
+            </a>
+            {{pass}}
+
+        {{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(2, 3)):}}
+            <a class="carousel2-item" href="https://dtt-ecys.org/magazine/public_edicionRevista">
+                <img src="{{= URL('static/mgz_files', art.image_file)}}" style="height: 300px;width:300px">
+            </a>
+            {{pass}}
+
+        {{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(3, 4)):}}
+            <a class="carousel2-item" href="https://dtt-ecys.org/magazine/public_edicionRevista">
+                <img src="{{= URL('static/mgz_files', art.image_file)}}" style="height: 300px;width:300px">
+            </a>
+            {{pass}}
+
+
+        {{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(4, 5)):}}
+            <a class="carousel2-item" href="https://dtt-ecys.org/magazine/public_edicionRevista">
+                <img src="{{= URL('static/mgz_files', art.image_file)}}" style="height: 300px;width:300px">
+            </a>
+            {{pass}}
+
+        {{for art in db(db.magazine).select(orderby=~db.magazine.id, limitby=(5, 6)):}}
+            <a class="carousel2-item" href="https://dtt-ecys.org/magazine/public_edicionRevista">
+                <img src="{{= URL('static/mgz_files', art.image_file)}}" style="height: 300px;width:300px">
+            </a>
+            {{pass}}
+    </div>
+{{end}}
+
+
+
+{{block carrousell}}
+    <!-- Carousel -->
+    <div style="border-bottom: 5px double #fbac00; margin-bottom:20px">
+        <h1 style="margin: 0em">Noticias destacadas</h1>
+    </div>
+    <div id="my_carousel" class="carousel slide">
+        <div class="carousel-inner">
+            <div class="item active">
+                <img src="/cpfecys/static/images/home-images/sl-4.jpg">
+                <div class="container">
+                    <div class="carousel-caption">
+                        <div class="ja-ss-desc" style="position: static;width: 90%">
+                            <h3>Escuela de Ciencias y Sistemas</h3>
+                            <p>Facultad de Ingeniería - USAC</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{contador_f = 0}}
+            {{for notification in range(len(front_notification) - 1, -1, -1):}}
+                {{print(notification)}}
+                {{contador_f += 1}}
+                {{if front_notification[notification].visible:}}
+                    {{if front_notification[notification].promoted:}}
+                        <div class="item">
+                            {{if front_notification[notification].image_file is None or front_notification[notification].image_file == '': }}
+                                <img src="/cpfecys/static/images/home-images/slide-02.jpg">
+                            {{else:}}
+                                <img src="{{= URL('default/download', front_notification[notification].image_file)}}" alt="Notification" title="Notification">
+                            {{pass}}
+                            <div class="container">
+                                <div class="carousel-caption">
+                                    <h1>{{=front_notification[notification].name}}</h1>
+                                    <p class="lead">
+                                        {{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
+                                    </p>
+                                    <a class="btn btn-large btn-primary" href="{{=URL('default', 'notification', vars=dict(notification = front_notification[notification].id))}}">
+                                        Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {{else:}}
+                        <div class=" item">
+                            {{if front_notification[notification].image_file is None or front_notification[notification].image_file == '': }}
+                                <img src="/cpfecys/static/images/home-images/slide-02.jpg" alt="">
+                            {{else:}}
+                                <img src="{{= URL('default/download', front_notification[notification].image_file)}}">
+                            {{pass}}
+                            <div class="container">
+                                <div class="carousel-caption">
+                                    <h1>{{=front_notification[notification].name}}</h1>
+                                    <p class="lead">
+                                        {{=MARKMIN(front_notification[notification].content_text[:150], markmin_settings)}}
+                                    </p>
+                                    <a class="btn btn-large btn-primary" href="{{=URL('default', 'notification', vars=dict(notification = front_notification[notification].id))}}">
+                                        Ver
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {{pass}}
+                {{pass}}
+            {{pass}}
+        </div>
+        <a class=" left carousel-control" href="#my_carousel" data-slide="prev">&lsaquo;</a>
+        <a class="right carousel-control" href="#my_carousel" data-slide="next">&rsaquo;</a>
+    </div>
+<!-- /.carousel -->
+{{end}}
+
+
+{{block redes}}
+    <div 
+        class="fb-page" 
+        data-href="https://www.facebook.com/ecysFIUSAC" 
+        data-tabs="timeline,events,messages" 
+        data-small-header="false" 
+        data-width="500" 
+        data-height="1000" 
+        data-adapt-container-width="true" 
+        data-hide-cover="false" 
+        data-show-facepile="true"
+    >
+        <blockquote cite="https://www.facebook.com/ecysFIUSAC" class="fb-xfbml-parse-ignore">
+            <a href="https://www.facebook.com/ecysFIUSAC">ECYS - USAC</a>
+        </blockquote>
+    </div>
+{{end}}
+
+{{block contenido}}
+    <div style="border-top: 5px double #cbcbcb; margin-top:40px;">
+        <div id="ja-topsl1" class="wrap ">
+            <div class="main clearfix">
+                <!-- SPOTLIGHT -->
+                <div class="ja-box column ja-box-full" style="width: 100%;">
+                    <div class="ja-moduletable moduletable" id="mod_109">
+                        <div class="ja-box-ct clearfix">
+                            <div class="custom">
+                                <div class="department-list">
+                                    <ul class="department-list">
+                                        <li class="icon-1">
+                                            <a href="{{=URL('default', 'resources',vars = dict(r = 10))}}" title="Horarios del semestre">
+                                                Horarios
+                                            </a>
+                                            <span class="department-name">Horarios</span>
+                                        </li>
+                                        <li class="icon-2">
+                                            <a href="{{=URL('default', 'events')}}" title="Eventos de la Escuela">
+                                                Eventos
+                                            </a>
+                                            <span class="department-name">Eventos</span>
+                                        </li>
+                                        <li class="icon-3">
+                                            <a href="{{=URL('default', 'resources',vars = dict(r = 13))}}" title="Programas de curso">
+                                                Programas
+                                            </a>
+                                            <span class="department-name">Programas</span>
+                                        </li>
+                                        <li class="icon-4">
+                                            <a href="https://www.ingenieria.usac.edu.gt/" title="Enlace a la pagina de Ingenieria">
+                                                Ingenieria
+                                            </a>
+                                            <span class="department-name">Universidad</span>
+                                        </li>
+                                        <li class="icon-5">
+                                            <a href="/index.php/finance" title="Sample">
+                                                Finance
+                                            </a>
+                                            <span class="department-name">Finance</span>
+                                        </li>
+                                        <li class="icon-5">
+                                            <a href="/index.php/finance" title="Sample">
+                                                Finance
+                                            </a>
+                                            <span class="department-name">Finance</span>
+                                        </li>
+                                        <li class="icon-6">
+                                            <a href="https://www.facebook.com/ecysFIUSAC" title="Siguenos en --Facebook---">
+                                                Facebook
+                                            </a>
+                                            <span class="department-name">Facebook</span>
+                                        </li>
+                                        <li class="icon-7">
+                                            <a href="" title="Siguenos en Twitter">Twitter</a>
+                                            <span class="department-name">Twitter</span>
+                                        </li>
+                                        <li class="icon-8">
+                                            <a href="" title="Siguenos en nuestro canal de Youtube">
+                                                Youtube
+                                            </a>
+                                            <span class="department-name">Youtube</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css" />
+    <script type="text/javascript">
+        jQuery(document).ready(function ($) {
+            jQuery(".mostrar").click(function () {
+                var q_valor = jQuery(this).html();
+                var q_id = jQuery(this).attr("data-id");
+                if (q_valor == "mas") {
+                    jQuery(this).html("menos");
+                    jQuery("#data-" + q_id + " .less").fadeOut(1);//.css("display","none");//
+                    jQuery("#data-" + q_id + " .all").fadeIn(100);//.css("display","block");//
+                } else {
+                    jQuery(this).html("mas");
+                    jQuery("#data-" + q_id + " .less").fadeIn(1);//.css("display","block");//
+                    jQuery("#data-" + q_id + " .all").fadeOut(100);//.css("display","none");//
+                }
+            });
+        });
+    </script>
+
+    {{if auth.has_membership('Academic') or auth.has_membership('Student'):}}
+        {{review = db((db.photo_review.user_id == auth.user.id)).select().first()}}
+        {{if review is None:}}
+            <script>
+                alert("{{=T('Your photo has not been reviewed. Please contact an academic tutor to be accepted.')}}");
+            </script>
+        {{else:}}
+            {{if review.accepted == False:}}
+                <script>
+                    alert("¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!\n{{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}");
+                </script>
+            {{pass}}
+        {{pass}}
+    {{pass}}
+    <script>
+        !function ($) {
+            $(function () {
+                $('#my_carousel').carousel()
+            })
+        }(window.jQuery)
+    </script>
+    <div id="fb-root"></div>
+    <script>
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = 'https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.1&appId=255919408374225&autoLogAppEvents=1';
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+
+{{end}}

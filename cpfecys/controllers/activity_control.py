@@ -2,9 +2,11 @@
 import cpfecys
 import iso_utils
 import csv
+import time
+import json
+import chardet
 
 from datetime import datetime, date
-import time
 
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
 def courses_list():
@@ -40,20 +42,20 @@ def courses_list():
     if(auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & (ecys_var))):
         periods = db(db.period_year).select()
     else:
-        periods_temp = db(db.period_year).select(orderby=~db.period_year.id)
-        periods = []
+        periodos_query = db(db.period_year).select(orderby=~db.period_year.id)
+        periods = [periodo]
 
         #emarquez
         periods_var = []
-        for period_temp in periods_temp:
+        for period_temp in periodos_query:
             added = False
             if auth.has_membership('Student') or auth.has_membership('Teacher'):
                 try:
                     #emarquez: se modifica el if para exluir periodos variables
                     if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == db.period_year.id) 
                     & (db.user_project.period != db.period_detail.period) & ((db.user_project.period <= period_temp.id) 
-                    & ((db.user_project.period + db.user_project.periods) > period_temp.id))).select(db.user_project.id).first() is not None:
-                        periods.append(periodo)
+                    & ((db.user_project.period.cast('integer') + db.user_project.periods) > period_temp.id))).select(db.user_project.id).first() is not None:
+                        periods.append(period_temp)
                         added = True
 
                     #emarquez: se agregan los periodos variables
@@ -68,8 +70,25 @@ def courses_list():
                     if db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == period_temp.id)).select(db.academic_course_assignation.id).first() is not None:
                         if not added:
                             periods.append(period_temp)
+
+                    if db((db.academic_course_assignation.carnet == academic_var.id) & (db.period_year.id == period_temp.id)
+                        & (db.academic_course_assignation.semester == period_temp.id) & (db.period_year.period == db.period_detail.period)).select(db.academic_course_assignation.id).first() is not None:
+                        if not added:
+                            periods_var.append(period_temp)
                 except:
                     None
+
+        periodos_auxiliar = []
+        for periodo_temp in periods:
+            if periodo_temp.id not in [periodo_aux.id for periodo_aux in periodos_auxiliar]:
+                periodos_auxiliar.append(periodo_temp)
+        periods = periodos_auxiliar
+
+        periodos_auxiliar = []
+        for periodo_temp in periods_var:
+            if periodo_temp.id not in [periodo_aux.id for periodo_aux in periodos_auxiliar]:
+                periodos_auxiliar.append(periodo_temp)
+        periods_var = periodos_auxiliar
 
     def consultar_evaluacion(curso):
         proyecto = curso.project
@@ -101,7 +120,7 @@ def courses_list():
 
         courses = db((db.project.area_level == area.id) & (db.user_project.project == db.project.id)
                 & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= periodo.id)
-                & ((db.user_project.period + db.user_project.periods) > periodo.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
+                & ((db.user_project.period.cast('integer') + db.user_project.periods) > periodo.id))).select(db.project.ALL, orderby=db.project.name, distinct=True)
     
         for course in courses:
             average_laboratory = float(0)
@@ -145,7 +164,7 @@ def courses_list():
         #emarquez_ fin nueva forma de obtener cursos tomando en cuenta los periodos variables
     elif auth.has_membership('Student'):
         courses_admin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == db.period_year.id)
-                        & ((db.user_project.period <= periodo.id) & ((db.user_project.period + db.user_project.periods) > periodo.id))
+                        & ((db.user_project.period <= periodo.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > periodo.id))
                         & (db.user_project.project == db.project.id) & (db.project.area_level == area.id)).select()
         count_courses_admin_t = len(courses_admin)
 
@@ -206,7 +225,7 @@ def students_control():
     if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
         try:
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project_var)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
             if assigantion is None:
                 academic_var = db(db.academic.carnet==auth.user.username).select().first()
                 try:
@@ -244,7 +263,7 @@ def control_weighting():
     #emarquez: adaptacion periodos variables
     if cpfecys.is_semestre(request.vars['year']):
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == request.vars['project'])
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     else:
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
     #emarquez
@@ -269,7 +288,7 @@ def control_activity():
 
     if cpfecys.is_semestre(request.vars['year']):
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project.id)
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     else:
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
 
@@ -295,7 +314,7 @@ def activity():
 
     if cpfecys.is_semestre(request.vars['year']):        
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project)
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     else:
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
 
@@ -348,7 +367,7 @@ def general_report_activities():
     if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
         if cpfecys.is_semestre(request.vars['period']):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project_var.id)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         else:
             assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project_var.id)
                             & (db.user_project.period == year.id)).select(db.user_project.ALL).first()
@@ -375,11 +394,11 @@ def general_report_activities():
         exception_s_var = exception_query.s_edit_course
 
     if cpfecys.is_semestre(request.vars['period']):
-        teacher = db(((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))
+        teacher = db(((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))
                     & (db.user_project.project == project_var.id) & (db.user_project.assigned_user==db.auth_user.id)
                     & (db.auth_user.id==db.auth_membership.user_id) & (db.auth_membership.group_id==3)).select(db.auth_user.first_name, db.auth_user.last_name).first()    
 
-        practice = db(((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))
+        practice = db(((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))
                     & (db.user_project.project == project_var.id) & (db.user_project.assigned_user == db.auth_user.id)
                     & (db.auth_user.id == db.auth_membership.user_id) & (db.auth_membership.group_id == 2)).select(db.auth_user.first_name, db.auth_user.last_name)
     else:
@@ -686,7 +705,7 @@ def general_report_activities():
 
     course_ended = False
     course_ended_var = db((db.course_ended.project == project_var.id) & (db.course_ended.period == year.id)).select().first()
-    if course_ended_var != None:
+    if course_ended_var is not None:
         if course_ended_var.finish:
             course_ended = True
 
@@ -694,27 +713,27 @@ def general_report_activities():
         response.flash = T('Course hasn’t finalized.')
 
     return dict(
-                project = project_var,
-                year = year,
-                teacher=teacher,
-                practice=practice,
-                students=students,
-                CourseCategory=course_category,
-                CourseActivities=course_activities,
-                existLab=exist_lab,
-                LabCategory=lab_category,
-                LabActivities=lab_activities,
-                validateLaboratory=validate_laboratory,
-                totalLab=total_lab,
-                controlP=control_p,
-                var_final_grade = var_final_grade,
-                requirement=requirement,
-                course_ended = course_ended,
-                exception_s_var=exception_s_var,
-                exception_t_var=exception_t_var,
-                tutor_access = tutor_access,
-                action_Export=action_export
-            )
+        project=project_var,
+        year=year,
+        teacher=teacher,
+        practice=practice,
+        students=students,
+        course_category=course_category,
+        course_activities=course_activities,
+        exist_lab=exist_lab,
+        lab_category=lab_category,
+        lab_activities=lab_activities,
+        validateLaboratory=validate_laboratory,
+        totalLab=total_lab,
+        controlP=control_p,
+        var_final_grade=var_final_grade,
+        requirement=requirement,
+        course_ended=course_ended,
+        exception_s_var=exception_s_var,
+        exception_t_var=exception_t_var,
+        tutor_access=tutor_access,
+        action_Export=action_export
+    )
 
 @auth.requires_login()
 @auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'))
@@ -747,7 +766,7 @@ def course_format_technical_school():
 
     if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project_var.id)
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default','home'))
@@ -1067,7 +1086,7 @@ def general_report_activities_export():
 
     if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
         assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project_var.id)
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             try:
                 academic_var = db(db.academic.carnet==auth.user.username).select().first()
@@ -1090,11 +1109,11 @@ def general_report_activities_export():
         session.flash = T('Not valid Action.')
         redirect(URL('default', 'home'))
 
-    teacher = db(((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))
+    teacher = db(((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))
                 & (db.user_project.project == project_var.id) & (db.user_project.assigned_user == db.auth_user.id)
                 & (db.auth_user.id == db.auth_membership.user_id) & (db.auth_membership.group_id == 3)).select().first()
 
-    practice = db(((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))
+    practice = db(((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))
                 & (db.user_project.project == project_var.id) & (db.user_project.assigned_user == db.auth_user.id)
                 & (db.auth_user.id == db.auth_membership.user_id) & (db.auth_membership.group_id == 2)).select()
     
@@ -1491,7 +1510,7 @@ def control_activity_without_metric():
     #emarquez: adaptacion periodos variables
     if cpfecys.is_semestre(request.vars['year']):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id)
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     else:
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
 
@@ -1558,6 +1577,7 @@ def graphs():
 def courses_list_request():
     #emarquez : seteando por id
     set_periodo = request.vars['period'] or False
+    courses_request_aux = []
     
     period_param = cpfecys.current_year_period()
     if set_periodo:
@@ -1568,19 +1588,23 @@ def courses_list_request():
     if auth.has_membership('Teacher'):
         courses_request = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == db.project.id)
                             & (db.project.area_level == area.id) & ((db.user_project.period <= cpfecys.current_year_period().id) 
-                            & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select()
+                            & ((db.user_project.period.cast('integer') + db.user_project.periods) > cpfecys.current_year_period().id))).select()
 
         if tipo_periodo:
             courses_request = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == db.project.id)
                                 & (db.project.area_level == area.id) & (db.user_project.period == set_periodo)).select()
 
     if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):
+        if auth.has_membership('Teacher'):
+            courses_request_aux = courses_request
+
         courses_request = db(db.project.area_level == area.id).select()
 
     #emarquez: se cambio semestre_id --> semester_id=cpfecys.current_year_period())
     return dict(
         courses_request=courses_request,
         split_name=split_name,
+        courses_request_aux=courses_request_aux,
         split_section=split_section,
         semester_id=period_param
     )
@@ -1599,7 +1623,7 @@ def solve_request_change_weighting():
         course = None
         if auth.has_membership('Teacher'):
             course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == course_check)
-                    & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
 
             if course is None:
                 session.flash = T('You do not have permission to view course requests')
@@ -1820,7 +1844,7 @@ def solve_request_change_activity():
         course = None
         if auth.has_membership('Teacher'):
             course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == course_check)
-                    & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
             if course is None:
                 session.flash = T('You do not have permission to view course requests')
                 redirect(URL('default', 'home'))
@@ -1860,7 +1884,7 @@ def solve_request_change_grades():
         course = None
         if auth.has_membership('Teacher'):
             course = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == course_check)
-                    & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= cpfecys.current_year_period().id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > cpfecys.current_year_period().id))).select(db.user_project.ALL).first()
 
             if course is None:
                 session.flash = T('You do not have permission to view course requests')
@@ -1924,7 +1948,7 @@ def activity_request():
 @auth.requires_membership('Super-Administrator')
 def course_laboratory_exception():
     query = db.course_laboratory_exception
-    grid = SQLFORM.grid(query, maxtextlength=100, csv=False)
+    grid = SQLFORM.grid(query, maxtextlength=100, csv=False, searchable=True, editable=True)
     return dict(grid=grid)
 
 #emarquez: nuevas excepciones por periodo
@@ -1996,11 +2020,11 @@ def control_students_grades():
     #LTZOC: Carga masiva de notas para rol student
     log_carga_html = ''
     archivo_notas = request.vars.csvfile_notas
-    if (archivo_notas != None) & (id_activity != None)& (id_project != None) & (id_year != None):
+    if (archivo_notas is not None) & (id_activity is not None) & (id_project is not None) & (id_year is not None):
         if dame_fecha(id_activity):
             log_carga_csv = cargar_notas_csv(id_project, id_activity, id_year, archivo_notas)
             
-            if log_carga_csv !=  None:
+            if log_carga_csv is not None:
                 log_carga_html = XML(array_to_html_log(log_carga_csv))
         else:
             response.flash = T('La fecha limite de la actividad ha expirado.')
@@ -2046,7 +2070,7 @@ def control_students_grades():
         #emarquez: periodos variables
         if cpfecys.is_semestre(request.vars['year']):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == var_project)
-                        & ((db.user_project.period <= var_period.id) & ((db.user_project.period + db.user_project.periods) > var_period.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= var_period.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > var_period.id))).select(db.user_project.ALL).first()
 
             exception_query = db(db.course_laboratory_exception.project == id_project).select().first()
         else:
@@ -2110,8 +2134,18 @@ def cargar_notas_csv(proyecto_id, actividad_id, periodo, archivo):
         var_activity = db(db.course_activity.id == actividad_id).select().first()
         var_project = db(db.project.id == proyecto_id).select().first()
 
-        cr = csv.reader(file.getvalue().decode('utf-8').splitlines(), dialect=csv.excel_tab, delimiter=',', quotechar='"')
-        header = next(cr)
+        try:
+            content_file = file.read()
+            detection = chardet.detect(content_file)['encoding']
+            content_file = content_file.decode(detection).splitlines()
+        except:
+            content_file = []
+        cr = csv.reader(content_file, dialect=csv.excel_tab, delimiter=',', quotechar='"')
+        try:
+            header = next(cr)
+        except:
+            response.flash = "El archivo contiene errores, verifique la sintaxis. " + str(IndexError)
+            return None
         for row in cr:
             try:
                 row_carnet = row[0]
@@ -2399,7 +2433,7 @@ def grades():
                 check = db((db.user_project.assigned_user==auth.user.id)&\
                             (db.user_project.project == project_id)&\
                             ((db.user_project.period <= var_period.id) & \
-                            ((db.user_project.period + db.user_project.periods) > var_period.id))).select(db.user_project.ALL).first()
+                            ((db.user_project.period.cast('integer') + db.user_project.periods) > var_period.id))).select(db.user_project.ALL).first()
             else:
                 check = db((db.user_project.assigned_user==auth.user.id)&\
                             (db.user_project.project == project_id)).select(db.user_project.ALL).first()
@@ -2414,7 +2448,7 @@ def grades():
                 users2 = db((db.auth_user.id==db.user_project.assigned_user)&\
                             (db.user_project.project == project_id)&\
                             ((db.user_project.period <= var_period.id) & \
-                            ((db.user_project.period + db.user_project.periods) > var_period.id))&\
+                            ((db.user_project.period.cast('integer') + db.user_project.periods) > var_period.id))&\
                             (db.auth_membership.user_id==db.user_project.assigned_user)&\
                             (db.auth_membership.group_id==3)).select().first()
 
@@ -2516,7 +2550,7 @@ def management_activity_without_metric():
             grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Teacher'):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'home'))
@@ -2532,7 +2566,7 @@ def management_activity_without_metric():
                     grid = SQLFORM.grid(query, csv=False, paginate=10, searchable=False)
         elif auth.has_membership('Student'):
             assigantion = db((db.user_project.assigned_user==auth.user.id) & (db.user_project.project == project)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'home'))
@@ -2568,7 +2602,7 @@ def students_control_full():
         #emarquez: adaptacion periodos variables        
         if cpfecys.is_semestre(request.vars['year']):
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project_var)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         else:
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
         #emarquez
@@ -2619,7 +2653,7 @@ def validate_laboratory():
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                                & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                                & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default', 'home'))
@@ -2747,7 +2781,7 @@ def laboratory_replacing():
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                                & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                                & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default', 'home'))
@@ -2868,7 +2902,7 @@ def laboratory_replacing():
 def request_change_activity():
     #Obtener al tutor del proyecto
     check = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == request.vars['project'])
-            & ((db.user_project.period <= int(request.vars['year'])) & ((db.user_project.period + db.user_project.periods) > int(request.vars['year'])))).select(db.user_project.ALL).first()
+            & ((db.user_project.period <= int(request.vars['year'])) & ((db.user_project.period.cast('integer') + db.user_project.periods) > int(request.vars['year'])))).select(db.user_project.ALL).first()
 
     if check is None:
         redirect(URL('default','home'))
@@ -2891,7 +2925,7 @@ def request_change_weighting():
     year_semester = year.period
 
     assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == request.vars['project']) 
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     if assignation is None:
         session.flash = T("Action not allowed")
         redirect(URL('default', 'home'))
@@ -2986,10 +3020,10 @@ def request_change_weighting():
                     #Message
                     try:
                         check = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == request.vars['project'])
-                                & ((db.user_project.period <= int(request.vars['year'])) & ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))).select(db.user_project.ALL).first()
+                                & ((db.user_project.period <= int(request.vars['year'])) & ((db.user_project.period.cast('integer') + db.user_project.periods) > int(request.vars['year']) ))).select(db.user_project.ALL).first()
 
                         users2 = db((db.auth_user.id == db.user_project.assigned_user) & (db.user_project.project == request.vars['project'])
-                                & ((db.user_project.period <= int(request.vars['year']) ) & ((db.user_project.period + db.user_project.periods) > int(request.vars['year']) ))
+                                & ((db.user_project.period <= int(request.vars['year']) ) & ((db.user_project.period.cast('integer') + db.user_project.periods) > int(request.vars['year']) ))
                                 & (db.auth_membership.user_id == db.user_project.assigned_user) & (db.auth_membership.group_id==3)).select().first()
 
                         subject = "Solicitud de cambio de ponderación - {}".format(project_name)
@@ -3032,14 +3066,14 @@ def request_change_weighting():
 @auth.requires_login()
 def weighting():
     project = request.vars['project']
-    rol_log = rol_log()
+    rol_log = get_rol()
     project_var = db(db.project.id == project).select().first()
     year = db(db.period_year.id == request.vars['year']).select().first()
 
     #emarquez: adaptacion periodos variables
     if cpfecys.is_semestre(request.vars['year']):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
     else:
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
 
@@ -3185,7 +3219,7 @@ def course_first_recovery_test():
                 grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_first_recovery_test, onupdate=onupdate_course_first_recovery_test, ondelete=ondelete_course_first_recovery_test, searchable=False)
     elif auth.has_membership('Student'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'home'))
@@ -3202,7 +3236,7 @@ def course_first_recovery_test():
                 grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
     elif auth.has_membership('Teacher'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'home'))
@@ -3307,7 +3341,7 @@ def course_second_recovery_test():
                 grid = SQLFORM.grid(query, csv=False, paginate=50, oncreate=oncreate_course_second_recovery_test, onupdate=onupdate_course_second_recovery_test, ondelete=ondelete_course_second_recovery_test, searchable=False)
     elif auth.has_membership('Student'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'home'))
@@ -3324,7 +3358,7 @@ def course_second_recovery_test():
                 grid = SQLFORM.grid(query, csv=False, create=False, editable=False, deletable=False, paginate=50, searchable=False)
     elif auth.has_membership('Teacher'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'home'))
@@ -3387,7 +3421,7 @@ def course_requirement():
 
     if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project_var.id)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
         if assigantion is None:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'home'))
@@ -3532,7 +3566,7 @@ def request_change_weighting_load():
             change = db((db.request_change_weighting.id == change_id)).select().first()
 
     assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project_id)
-                & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
 
     if (assignation is None) & (not auth.has_membership('Super-Administrator')) & (not auth.has_membership('Ecys-Administrator')):
         session.flash = T("Action not allowed")
@@ -3566,7 +3600,7 @@ def control_assigned_activity():
         project = db(db.project.id==request.vars['project']).select().first()
 
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id) 
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select().first()
 
         if assigantion is None:
             assigned_to_project = False
@@ -3642,7 +3676,7 @@ def management_approval_students_requirement():
 
     if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
         assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project_var.id)
-                    & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                    & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
 
         if assigantion is None:
             session.flash = T('Not valid Action.')
@@ -3728,7 +3762,7 @@ def management_assigned_activity():
             redirect(URL('default', 'home'))
         else:
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id) 
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select().first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'home'))
@@ -3873,7 +3907,7 @@ def rate_assigned_activity():
                 redirect(URL('default', 'home'))
             else:
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select().first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default', 'home'))
@@ -3943,7 +3977,7 @@ def onupdate_assigned_activity(form):
             message_fail = T('Not valid Action.')
         else:
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project) 
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select().first()
             if assigantion is None:
                 fail_check = 2
                 message_fail = T('Not valid Action.')
@@ -4150,7 +4184,7 @@ def ondelete_assigned_activity(table_involved, id_of_the_deleted_record):
             redirect(URL('default', 'home'))
         else:
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project) 
-                        & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                        & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select().first()
             if assigantion is None:
                 session.flash = T('Not valid Action.')
                 redirect(URL('default', 'home'))
@@ -4220,7 +4254,7 @@ def oncreate_assigned_activity(form):
             redirect(URL('default', 'home'))
         else:
             assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project) & ((db.user_project.period <= year.id) 
-                        & ((db.user_project.period + db.user_project.periods) > year.id))).select().first()
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select().first()
             if assigantion is None:
                 db(db.course_assigned_activity.id == form.vars.id).delete()
                 session.flash = T('Not valid Action.')
@@ -4271,7 +4305,7 @@ def oncreate_assigned_activity(form):
         
         listado_correos = None
         email_list_log = None
-        for users_t in db((db.user_project.project == project.id) & (db.user_project.assigned_user != auth.user.id) & ((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id))).select():
+        for users_t in db((db.user_project.project == project.id) & (db.user_project.assigned_user != auth.user.id) & ((db.user_project.period <= period.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select():
             if listado_correos is None:
                 listado_correos = []
                 email_list_log = users_t.assigned_user.email
@@ -4280,7 +4314,7 @@ def oncreate_assigned_activity(form):
             listado_correos.append(users_t.assigned_user.email)
         
         if listado_correos is not None:
-            was_sent = mail.send(to='dtt.ecys@dtt-ecys.org', subject=subject, message=message, bcc=listado_correos)
+            was_sent = mail.send(to='dtt.ecys@dtt-dev.site', subject=subject, message=message, bcc=listado_correos)
             db.mailer_log.insert(
                     sent_message=message,
                     destination=email_list_log,
@@ -4700,7 +4734,7 @@ def oncreate_validate_laboratory(form):
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     db(db.validate_laboratory.id == form.vars.id).delete()
                     session.flash = T('Not valid Action.')
@@ -4842,7 +4876,7 @@ def ondelete_validate_laboratory(table_involved, id_of_the_deleted_record):
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     session.flash = T('Not valid Action.')
                     redirect(URL('default', 'home'))
@@ -4947,7 +4981,7 @@ def onupdate_validate_laboratory(form):
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     fail_check = 2
                     message_fail = T('Not valid Action.')
@@ -5156,7 +5190,7 @@ def oncreate_laboratory_replacing(form):
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     db(db.validate_laboratory.id == form.vars.id).delete()
                     session.flash = T('Not valid Action.')
@@ -5303,7 +5337,7 @@ def onupdate_laboratory_replacing(form):
         else:
             if not auth.has_membership('Super-Administrator') and not auth.has_membership('Ecys-Administrator'):
                 assigantion = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project)
-                            & ((db.user_project.period <= year.id) & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
+                            & ((db.user_project.period <= year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.ALL).first()
                 if assigantion is None:
                     fail_check = 2
                     message_fail = T('Not valid Action.')
@@ -5476,7 +5510,7 @@ def onupdate_laboratory_replacing(form):
 @auth.requires_membership('Student')
 def send_mail_to_students(message, subject, user, check, semester, year):
     control = 0
-    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org', subject=subject, message=message, bcc=user)
+    was_sent = mail.send(to='dtt.ecys@dtt-dev.site', subject=subject, message=message, bcc=user)
     #MAILER LOG
     db.mailer_log.insert(
         sent_message=message,
@@ -5505,29 +5539,31 @@ def start_end_time(year, string_start, string_end):
 def array_to_html_log(log_carga_csv):
     filas_log = ''
     for row in log_carga_csv:
-        filas_log += """
-                    <li class="error">
-                        <pre>{} - </pre>
-                    </li>
-                    """.format(row[2])
+        filas_log += f"""
+            <li class="error">
+                <pre>{row[2]} - </pre>
+            </li>
+        """
 
-    log_html = """<div class="accordion" id="accordion2">
-                    <div class="accordion-group">
-                        <div class="accordion-heading">
-                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-                                <span class="icon-warning-sign"></span>{}
-                                <span class="pull-right">{}{}</span>
-                            </a>
-                        </div>
-                        <div id="collapseTwo" class="accordion-body collapse">
-                            <div class="accordion-inner">
-                                <ul>{}
-                                </ul>
-                            </div>
-                        </div>
+    log_html = f"""
+        <div class="accordion" id="accordion2">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                        <span class="icon-warning-sign"></span>Notificaciones
+                        <span class="pull-right">Total de notificaciones: {len(log_carga_csv)}</span>
+                    </a>
+                </div>
+                <div id="collapseTwo" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        <ul>
+                            {filas_log}
+                        </ul>
                     </div>
                 </div>
-                """.format(T('Notifications'), T('Total Notifications: '), str(len(log_carga_csv)), filas_log)
+            </div>
+        </div>
+    """
     
     return log_html
 
@@ -5584,19 +5620,19 @@ def request_change_var_method(exception_query, var_activity, year_var, var_perio
             if var_activity.laboratory:
                 #emarquez: periodos variables
                 if cpfecys.is_semestre(year_var):
-                    comparacion = "{} {}".format(T(var_period.period.name), str(var_period.yearp))
+                    comparacion = f"{T(var_period.period.name)} {var_period.yearp}"
                     control_p = db((db.student_control_period.period_name == comparacion)).select().first()
                 else:
                     actual_semester = db(db.period_year.id == id_year).select().first()
                     control_p = db((db.period_detail.period == actual_semester.period)).select().first()
 
-                query = 'SELECT DATE_ADD(\'{}\', INTERVAL {} Day) AS fechaMaxGrade;'.format(str(var_activity.date_finish), str(control_p.timeout_income_notes))
+                query = f'SELECT DATE_ADD(\'{var_activity.date_finish}\', INTERVAL {control_p.timeout_income_notes} Day) AS fechaMaxGrade;'
                 maxim_time_grade = db.executesql(query ,as_dict=True)
                 date_grade = ''
                 for date in maxim_time_grade:
                     date_grade = date['fechaMaxGrade']
 
-                if str(datetime.now()) <= str(dateGrade0):
+                if str(datetime.now()) <= str(date_grade):
                     request_change_var = True
             else:
                 request_change_var = True
@@ -5652,3 +5688,66 @@ def split_section(project):
 def tipo_periodo():
     grid = SQLFORM.grid(db.period_type, maxtextlength=100, csv=False)
     return dict(grid=grid)
+
+@auth.requires_login()
+@auth.requires(auth.has_membership('Student') or auth.has_membership('Teacher') or auth.has_membership('Super-Administrator') or auth.has_membership('Academic') or auth.has_membership('Ecys-Administrator'))
+def get_periods_on_change():
+    period_type = request.vars.period_type
+    period_id = request.vars.period_id or 0
+    period_id = int(period_id)
+
+    options = list()
+
+    periods_array = []
+    periods_var = []
+    periodo_cpfecys = cpfecys.current_year_period()
+    academic_var = db.academic(db.academic.id_auth_user == auth.user.id)
+    if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')):
+        periods_array = db(db.period_year).select(orderby=~db.period_year.id)
+    else:
+        periodos_query = db(db.period_year).select(orderby=~db.period_year.id)
+        periods_array = [periodo_cpfecys]
+        periods_var = []
+        for period_temporal in periodos_query:
+            added = False
+            if auth.has_membership('Student') or auth.has_membership('Teacher'):
+                try:
+                    if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == db.period_year.id) 
+                    & (db.user_project.period != db.period_detail.period) & ((db.user_project.period <= period_temporal.id) 
+                    & ((db.user_project.period.cast('integer') + db.user_project.periods) > period_temporal.id))).select(db.user_project.id).first() is not None:
+                        periods_array.append(period_temporal)
+                        added = True
+
+                    if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == db.period_year.id) 
+                    & (db.user_project.period == period_temporal.id) & (db.user_project.period == db.period_detail.period)).select(db.user_project.id).first() is not None:
+                        periods_var.append(period_temporal)
+                except:
+                    ...
+
+            if auth.has_membership('Academic'):
+                try:
+                    if db((db.academic_course_assignation.carnet == academic_var.id) & (db.academic_course_assignation.semester == period_temporal.id)).select(db.academic_course_assignation.id).first() is not None:
+                        if not added:
+                            periods_array.append(period_temporal)
+
+                    if db((db.academic_course_assignation.carnet == academic_var.id) & (db.period_year.id == period_temporal.id)
+                        & (db.academic_course_assignation.semester == period_temporal.id) & (db.period_year.period == db.period_detail.period)).select(db.academic_course_assignation.id).first() is not None:
+                        if not added:
+                            periods_var.append(period_temporal)
+                except:
+                    ...
+
+        if period_type != '1':
+            periods_array = periods_var
+
+    aux_periods = []
+    for period in periods_array:
+        selected_var = False
+        if period_id == period.id:
+            selected_var = True
+            
+        if period.id not in aux_periods:
+            aux_periods.append(period.id)
+            options.append(OPTION(f"{T(period.period.name)} - {period.yearp}", _value=period.id, _selected=selected_var))
+
+    return response.json(options)

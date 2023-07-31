@@ -1,0 +1,649 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+  <div class="col-12">
+    <div class="navbar-inner">
+      <a style="cursor: pointer"></a>
+      <center>
+        <h4>Registro de oferta laboral</h4>
+      </center>
+      </a>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <!-- SmartWizard html -->
+    <div id="smartwizard">
+      <ul>
+        <li>
+          <a href="#step-1">Registro de Oferta Laboral<br /><small>Descripcion</small></a>
+        </li>
+        <li>
+          <a href="#step-2">Paso 1<br /><small>Àreas de Especialidad</small></a>
+        </li>
+        <li>
+          <a href="#step-3">Paso 2<br /><small>Descripcion del puesto</small></a>
+        </li>
+        <li>
+          <a href="#step-4">Paso 3<br /><small>Informacion adicional de la plaza</small></a>
+        </li>
+        <li>
+          <a href="#step-5">Paso 4<br /><small>Caracteristicas del perfil</small></a>
+        </li>
+        <li>
+          <a href="#step-6">Paso 5<br /><small>Banner publicitario para Facebook</small></a>
+        </li>
+      </ul>
+      <div>
+        <div id="step-1">
+          <div id="form-step-0" role="form" data-toggle="validator">
+            <div class="form-group">
+              <center>
+                Registro de oferta laboral
+              </center>
+            </div>
+          </div>
+        </div>
+
+        <!-------- sirve solo para guardar datos -------->
+        <div style="visibility:hidden">
+          <select type="text" value="" id="todas_habilidades" class="form-control">
+            <!-- " ".join([x.encode('ascii') for x in r]) -->
+            {{for habilidad in todas_habilidades:}}
+            <option id="{{=habilidad['id_habilidad']}}" value="{{=habilidad['id_area_especialidad']}}">
+              {{=habilidad['habilidad']}}</option>
+            {{pass}}
+          </select>
+          {{pass}}
+        </div>
+        <div style="visibility:hidden">
+          <input type="text" name="tamanio_imagen" id="tamanio_imagen" value="{{=tamanio_imagen}}" />
+        </div>
+        <!--------------------------------->
+
+        <div id="step-2">
+          <h2>Seleccione areas de especialidad</h2>
+          <div id="form-step-2" role="form" data-toggle="validator">
+            <div class="row">
+              <div class="form-group col-12 col-md-7">
+                <label class="control-label"><b>Areas disponibles</b></label>
+                <select type="text" value="" id="area" class="form-control" onchange="cambiarArea()">
+                  <!-- " ".join([x.encode('ascii') for x in r]) -->
+                  {{for area in areas_es:}}
+                  {{area_es = area['area_especialidad']
+                  id_area = area['id_area_especialidad'] }}
+                  <option value="{{=id_area}}">{{=area_es}}</option>
+                  {{pass}}
+                </select>
+                {{pass}}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="step-3" style="height: 500px; overflow-y: auto">
+          <h2>Descripcion del puesto</h2>
+          <div id="form-step-3" role="form" data-toggle="validator">
+            <form id="frm_datos_puesto" class="mt-3 mb-3">
+              <div class="row">
+                <div class="col-12">
+                  <label for="inp_puesto">Puesto:</label>
+                  <input type="text" class="form-control" name="inp_puesto" id="inp_puesto" value=""
+                    placeholder="Analista desarrollador" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="span5">
+                    <label for="inp_descripcion">Descripcion:</label>
+                    <textarea name="inp_descripcion" id="inp_descripcion" value="" placeholder=""></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="span5">
+                    <label for="inp_requerimientos">Requerimientos:</label>
+                    <textarea name="inp_requerimientos" id="inp_requerimientos" value="" placeholder=""></textarea>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div id="step-4" class="">
+          <h2>Informacion Adicional</h2>
+          <div id="form-step-4" role="form" data-toggle="validator">
+            <form id="frm_info_adicional" class="mt-3 mb-3">
+              <div class="row">
+                <div class="col-6">
+                  <label for="inp_puesto">Salario Aproximado (Q):</label>
+                  <input type="number" class="form-control" name="inp_rango" id="inp_rango" value="" placeholder="" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <label for="inp_puesto">Inicio de vigencia:</label>
+                  <input type="date" class="form-control" name="inp_fecha_inicio" id="inp_fecha_inicio" value=""
+                    placeholder="" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <label for="inp_puesto">Fin de vigencia:</label>
+                  <input type="date" class="form-control" name="inp_fecha_fin" id="inp_fecha_fin" value=""
+                    placeholder="" />
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+        <div id="step-5" style="height: 500px; overflow-y: auto">
+          <h2>Habilidades tecnicas relacionadas al perfil</h2>
+          <div id="form-step-5" role="form" data-toggle="validator">
+            <div class="row">
+              <div class="form-group col-12 col-md-7">
+                <label class="control-label"><b>Seleccione 1 o mas:</b></label>
+                <select type="text" value="" id="habilidades" class="form-control">
+                  <!-- " ".join([x.encode('ascii') for x in r]) -->
+                  <!--
+                  {{for habilidad in habilidades:}}
+                  <option id="{{=habilidad['id_habilidad']}}" value="{{=habilidad['id_habilidad']}}">{{=habilidad['habilidad']}}</option>
+                  {{pass}}
+                  -->
+                </select>
+                <button class="btn btn-primary mt-3" type="button" id="agregarHabilidad">
+                  <i class="icon-ok-sign icon-white"></i> Agregar
+                </button>
+                {{pass}}
+              </div>
+
+              <div class="col-12 col-md-4">
+                <div class="row" id="div_proyectos">
+                  <h3 id="h3_proyectos_dis"></h3>
+                  <table class="table table-striped" id="tb_habilidades">
+                    <thead>
+                      <tr>
+                        <th width="80%" align="left">Habilidad</th>
+                        <th width="20%" align="left"></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="step-6">
+          <h2>Cargar banner publicitario</h2>
+          <div id="form-step-7" role="form" data-toggle="validator">
+            <form id="frm_banner" method="post" enctype="multipart/form-data">
+              <div class="row">
+                <div class="col-12">
+                  <label for="inp_banner">Cargar Banner:</label>
+                  <input id="inp_banner" class="form-control" name="inp_banner" type="file" class="file"
+                    onchange="onChange(event)">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+{{block page_js}}
+<script src="https://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+<script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css" />
+<link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css" />
+<script>
+  jQuery(document).ready(function () {
+    jQuery('textarea').css('width', '100%').css('height', '200px').markItUp(mySettings);
+  });
+</script>
+<!-- Include SmartWizard CSS -->
+<link href="{{=URL('static', 'sources/css/smart_wizard.min.css')}}" rel="stylesheet" type="text/css" />
+<!-- Optional SmartWizard theme -->
+<link href="{{=URL('static', 'sources/css/smart_wizard_theme_arrows.min.css')}}" rel="stylesheet" type="text/css" />
+<link href="{{=URL('static', 'sources/css/validators.css')}}" rel="stylesheet" type="text/css" />
+<!-- Include SmartWizard JavaScript source -->
+<script src="{{=URL('static', 'sources/js/jquery.smartWizard.min.js')}}"></script>
+<!-- Include jQuery Validator plugin -->
+<script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','sources/js/accion.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','sources/js/cv.js')}}"></script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+<script type="text/javascript">
+
+
+
+  var cv, lst;
+  var extension, nombre, documento, dimx, dimy, tamanio;
+
+  //*************************************** VALIDATOR PLUGIN **********************************************
+  jQuery.validator.setDefaults({
+    debug: true,
+    success: "valid",
+  });
+
+  // Validar seccion de datos personales
+  var obj_frm_datos_puesto = $("#frm_datos_puesto");
+  obj_frm_datos_puesto.validate({
+    rules: {
+      inp_puesto: "required",
+      inp_descripcion: "required",
+      inp_requerimientos: "required"
+    },
+    messages: {
+      inp_puesto: "*Este campo es obligatorio",
+      inp_descripcion: "*Este campo es obligatorio",
+      inp_requerimientos: "*Este campo es obligatorio",
+    }
+  });
+
+  $.validator.addMethod('mindate', function (v, el, minDate) {
+    if (this.optional(el)) {
+      return true;
+    }
+    var selectedDate = new Date($(el).val());
+    minDate = new Date(minDate)
+    return minDate <= selectedDate;
+  }, 'La fecha de inicio de vigencia debe ser mayor o igual a la actual {0}.');
+
+  $.validator.addMethod('startdate', function (v, el, startDate) {
+    if (this.optional(el)) {
+      return true;
+    }
+    var selectedDate = new Date($(el).val());
+    startDate = new Date(startDate.value)
+    return startDate <= selectedDate;
+  }, 'La fecha de fin de vigencia debe ser mayor a la fecha de inicio');
+
+  $.validator.addMethod('enddate', function (v, el, endDate) {
+    if (this.optional(el)) {
+      return true;
+    }
+    if (endDate.value == "") {
+      return true;
+    }
+    var selectedDate = new Date($(el).val());
+    endDate = new Date(endDate.value)
+    return endDate >= selectedDate;
+  }, 'La fecha de inicio de vigencia debe ser menor a la fecha de fin');
+
+  $.validator.addMethod('imgdimensions', function (v, el, dimensions) {
+    if (this.optional(el)) {
+      return true;
+    }
+    return dimx >= 1000 && dimy >= 600;
+  }, 'El banner debe tener como minimo las siguientes dimensiones: 1000*600px ');
+
+
+  $.validator.addMethod('imgformat', function (v, el, testExt) {
+    if (this.optional(el)) {
+      return true;
+    }
+    var fileUpload = document.getElementById("inp_banner");
+    var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(.jpg|.png|.jpeg)$");
+    return regex.test(fileUpload.value.toLowerCase());
+  }, 'Los formatos admitidos son .PNG .JPEG .JPG y nombre sin espacios');
+
+  var tamanio_permitido = document.getElementById("tamanio_imagen").value // consultar de la base
+  $.validator.addMethod('imgSize', function (v, el, tamanio_permitido) {
+    if (this.optional(el)) {
+      return true;
+    }
+    return tamanio <= tamanio_permitido;
+  }, 'El tamaño de la imagen debe ser menor a ' + String(Math.round(tamanio_permitido / (1024 * 1024))) + ' MB');
+
+
+  let today = new Date();
+  var obj_frm_info_adicional = $("#frm_info_adicional");
+  obj_frm_info_adicional.validate({
+    rules: {
+      inp_rango: {
+        required: true,
+        range: [1, 100000]
+      },
+      inp_fecha_inicio: {
+        required: true,
+        date: true,
+        mindate: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate()),
+        enddate: document.getElementById("inp_fecha_fin")
+      },
+      inp_fecha_fin: {
+        required: true,
+        date: true,
+        mindate: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate()),
+        startdate: document.getElementById("inp_fecha_inicio")
+      }
+    },
+    messages: {
+      inp_rango: "*Este campo es obligatorio / El salario ingresado debe ser mayor a 0 / No puede exceder los Q 100000",
+      inp_fecha_incio: {
+        required: "*Este campo es obligatorio"
+      },
+      inp_fecha_fin: {
+        required: "*Este campo es obligatorio"
+      }
+    }
+  });
+
+
+  var obj_frm_banner = $("#frm_banner");
+  obj_frm_banner.validate({
+    rules: {
+      inp_banner: {
+        required: true,
+        //imgdimensions: [dimx,dimy],
+        imgformat: "",
+        imgSize: tamanio_permitido
+      }
+    },
+    messages: {
+      inp_banner: {
+        required: "*Subir una imagen de tamaño menor a " + String(Math.round(tamanio_permitido / (1024 * 1024))) + " MB"
+      }
+    }
+  });
+
+
+  function onChange(event) {
+    var reader = new FileReader();
+    var file = event.target.files[0];
+    reader.onload = function (e) {
+      nombre = file.name;
+      documento = e.target.result;
+      tamanio = file.size;
+    }
+    reader.readAsDataURL(event.target.files[0])
+  }
+
+  //********************************** TERMINA VALIDATOR PLUGIN *******************************************
+
+
+  //********************************* EVENTOS SMART WIZARD *************************************************
+  $(document).ready(function () {
+    $("#fixheight").click(function () {
+      $("#wizard").smartWizard("fixHeight");
+    });
+    // Step show event
+    $("#smartwizard").on(
+      "showStep",
+      function (e, anchorObject, stepNumber, stepDirection, stepPosition) {
+        //alert("You are on step "+stepNumber+" now");
+        if (stepPosition === "first") {
+          $("#prev-btn").addClass("disabled");
+          $("#final-btn").attr("disabled", true);
+        } else if (stepPosition === "final") {
+          $("#next-btn").addClass("disabled");
+          $("#final-btn").attr("disabled", false);
+        } else {
+          $("#prev-btn").removeClass("disabled");
+          $("#next-btn").removeClass("disabled");
+          $("#final-btn").attr("disabled", true);
+        }
+      }
+    );
+
+    // Toolbar extra buttons
+    var btnFinish = $('<button id="final-btn"></button>')
+      .text("Finalizar")
+      .addClass("btn btn-success")
+      .on("click", function () {
+        if (obj_frm_banner.valid()) {
+          $('#div_error').hide('slow');
+        }
+        else {
+          $('#div_error').show('slow');
+          return;
+        }
+        var fd = new FormData();
+        fd.append("puesto", quitarAcentos($("#inp_puesto").val()));
+        fd.append("descripcion", quitarAcentos($("#inp_descripcion").val()));
+        fd.append("requerimientos", quitarAcentos($("#inp_requerimientos").val()));
+        fd.append("salario", $("#inp_rango").val());
+        fd.append("fecha_inicio", $("#inp_fecha_inicio").val());
+        fd.append("fecha_fin", $("#inp_fecha_fin").val());
+        const cod_area = $("#area").find(":selected").val();
+        fd.append("area_especialidad", cod_area);
+        fd.append("habilidades_tecnicas", JSON.stringify(all_habilidades));
+        fd.append("nombre_banner", nombre);
+        fd.append("documento_banner", documento);
+
+        $.ajax({
+          url: "guardar_oferta",
+          type: "POST",
+          //dataType: 'json',
+          data: fd,
+          success: function (resp) {
+            resp = JSON.parse(resp)
+            if (resp.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Oferta Laboral Registrada!',
+                text: 'Ingresa a tu panel de ofertas para ver solicitudes de aplicantes'
+              })
+              location.reload();
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al registrar la Oferta Laboral',
+                text: 'Intenta de nuevo mas tarde'
+              })
+            }
+          }, error: function (xhr, status, errorThrown) {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Hubo un problema, intente más tarde',
+              icon: 'error'
+            });
+          },
+          cache: false,
+          contentType: false,
+          processData: false,
+        });
+      });
+
+
+    var btnCancel = $('<button></button>').text('Cancelar')
+      .addClass('btn btn-danger')
+      .on('click', function () { $('#smartwizard').smartWizard("reset"); });
+
+    // Smart Wizard
+    $("#smartwizard").smartWizard({
+      selected: 0,
+      theme: "arrows",
+      keyNavigation: false,
+      autoAdjustHeight: true,
+      transitionEffect: "slide",
+      showStepURLhash: true,
+      useURLhash: false,
+      toolbarSettings: {
+        toolbarPosition: "bottom",
+        toolbarButtonPosition: "left",
+        showPreviousButton: true,
+        toolbarExtraButtons: [btnFinish],
+      },
+      anchorSettings: {
+        anchorClickable: false, // Enable/Disable anchor navigation
+        enableAllAnchors: false, // Activates all anchors clickable all times
+      },
+      lang: { next: "Siguiente", previous: "Anterior" },
+    });
+
+    $("#prev-btn").on("click", function () {
+      // Navigate previous
+      $("#smartwizard").smartWizard("prev");
+      jQuery('textarea').css('width', '100%').css('height', '200px').markItUp(mySettings);
+      return true;
+    });
+
+    $("#next-btn").on("click", function () {
+      // Navigate next
+      $("#smartwizard").smartWizard("next");
+      jQuery('textarea').css('width', '100%').css('height', '200px').markItUp(mySettings);
+      return true;
+    });
+
+    // Triggers when leaving a step.
+    /*$("#smartwizard").on("leaveStep", function(e, anchorObject, stepNumber) {
+        return confirm("Do you want to leave the step "+stepNumber+"?");
+        });*/
+
+    $("#smartwizard").on(
+      "leaveStep",
+      function (e, anchorObject, stepNumber, stepDirection) {
+        if (stepDirection === "forward" && stepNumber == 2) {
+          if (obj_frm_datos_puesto.valid()) {
+            $('#div_error').hide('slow');
+            return true;
+          }
+          else {
+            $('#div_error').show('slow');
+            return false;
+          }
+        } else if (stepDirection === "forward" && stepNumber == 3) {
+          if (obj_frm_info_adicional.valid()) {
+            $('#div_error').hide('slow');
+            return true;
+          }
+          else {
+            $('#div_error').show('slow');
+            return false;
+          }
+        }
+        return true;
+      }
+    );
+
+    // Evento para obtener archivo de certificacion de cursos cargado
+    $("#inp_lis_cursos").on("change", function () {
+      var upload = document.getElementById("inp_lis_cursos");
+      lst = upload.files;
+    });
+
+
+  });
+  //********************************* TERMINA EVENTOS SMART WIZARD *************************************************
+
+  // ------------------------------- JAVASCRIPT --------------------------------
+
+  // ************************************* SECCION AREA DE ESPECIALIDAD **********************************************
+
+  // Array con areas asignadas al usuario
+  let areas = [];
+  // Array con todas las areas (asignadas y por asignar)
+  let all_areas = [];
+
+
+
+  // ********************************* FIN AREAS DE ESPECIALIDAD ****************************
+
+  // ********************************** SECCION DE HABILIDADES TECNICAS ******************************************
+
+  // Array de habilidades asociadas al usuario, registradas en la bd
+  let habilidades = [];
+  // Array con todas las habilidades (asignadas y por asignar)
+  let all_habilidades = [];
+
+  $("#agregarHabilidad").click(function () {
+    const habilidad = $("#habilidades").find(":selected").text(); // Nombre de la habilidad
+    const id_habilidad = $("#habilidades").find(":selected").val(); // Id de la habilidad
+
+    // Validad que la habilidad deseada no ha sido asociada al usuario
+    let flag = true;
+    all_habilidades.forEach((habilidad) => {
+      if (habilidad.id_habilidad == id_habilidad) flag = false;
+    });
+
+
+    if (flag) {
+      // Registrar en el array de habilidades el nuevo objeto
+      let new_obj = {
+        id_habilidad: id_habilidad,
+        habilidad: habilidad
+      };
+      all_habilidades.push(new_obj);
+      // Renderizar nueva habilidad
+      $("#tb_habilidades").append(
+        `<tr id="${id_habilidad}"><td>${habilidad}</td><td><button class="btn btn-primary"  onclick="eliminarr_habilidad(${id_habilidad})"><i class="fa fa-trash"></i></button></td></tr>`
+      );
+    }
+  });
+
+  function eliminarr_habilidad(id_habilidad) {
+    let flag = false;
+    let idx;
+    // Verificar si ya está en la tablita
+    all_habilidades.forEach((element, idx) => {
+      if (element.id_habilidad == id_habilidad) {
+        flag = true;
+        idx = idx;
+      }
+    });
+
+    // eliminar fila de la tabla
+    if (flag) {
+      $('#tb_habilidades tr[id="' + id_habilidad + '"]').remove();
+      const del = all_habilidades.filter(habb => String(habb.id_habilidad) !== String(id_habilidad));
+      all_habilidades = del;
+    }
+
+  }
+
+  cambiarArea();
+  async function cambiarArea() {
+    const cod_area = $("#area").find(":selected").val(); // Id del area
+    //var probar = document.getElementById("todas_habilidades");
+
+    let probar = document.getElementById('todas_habilidades');
+    let opciones = [...probar.options].map(o => ({ "id_habilidad": o.id, "id_area_especialidad": o.value, "text": o.text }));
+
+    //$('#tb_habilidades tr[id="' + id_habilidad + '"]').remove();
+    opciones.forEach((opcioon) => {
+      if (opcioon.id_area_especialidad != cod_area) {
+        $('#habilidades option[id="' + opcioon.id_habilidad + '"]').remove();
+      } else {
+        //$('#habilidades option[id="' + opcioon.id_habilidad + '"]').append();
+        $("#habilidades").append(
+          `<option id="${opcioon.id_habilidad}" value="${opcioon.id_habilidad}">${opcioon.text}</option>`
+        );
+      }
+    });
+
+    all_habilidades.forEach((opcioon) => {
+      $('#tb_habilidades tr[id="' + opcioon.id_habilidad + '"]').remove();
+      //const del = all_habilidades.filter(habb => String(habb.id_habilidad) !== String(id_habilidad));
+      //all_habilidades = del;
+    });
+
+    all_habilidades = []
+
+  }
+
+  function quitarAcentos(cadena) {
+    const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'ñ': 'n', 'Ñ': 'N' };
+    cadena = cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+    return cadena = cadena.replace(/[^\w\s ?,:.!%()-_"@/]/gi, '');
+  }
+
+</script>
+
+
+
+{{end page_js}}

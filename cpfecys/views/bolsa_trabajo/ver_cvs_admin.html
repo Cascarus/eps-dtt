@@ -1,0 +1,98 @@
+{{extend 'dashboard.html'}}
+
+
+<div class='row p-0 m-0' style="overflow: auto;">
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Estudiantes con CV</h1>
+    </div>
+</div>
+
+<div class="row p-3 m-2">
+    <a class="btn btn-primary " href="/home">
+        <i class="fa fa-chevron-left mr-2"></i>Volver
+    </a>
+</div>
+
+<div class='row p-3 m-1'>
+    <table class="table table-hover">
+        <thead style="background-color: #EAEAEA;">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Carnet</th>
+                <th scope="col">Nombre del Estudiante</th>
+                <th scope="col">Creditos Aprobados</th>
+                <th scope="col">Ver</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td scope="row"></td>
+                <td>
+                    <form action='/cpfecys/bolsa_trabajo/ver_cvs_admin' method="GET">
+                        <input type="hidden" name="valoor" value="{{=new_dict['valoor']}}" />
+                        <input type="number" id="carnet" name='carnet' class="form-control" />
+                    </form>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td></td>
+            </tr>
+            {{for cv in new_dict['cvs']:}}
+            <tr>
+                <td scope="row">{{=cv["id_estudiante_cv"]}}</td>
+                <td>{{=cv["carnet"]}}</td>
+                <td scope="row">{{=cv["nombre"]}}</td>
+                <td>{{=cv["creditos_aprobados"]}}</td>
+                <td class="text-center">
+                    <a class="btn btn-primary btn-sm"
+                        href="/cpfecys/bolsa_trabajo/ver_un_cv_admin?id_usuario={{=cv['id_estudiante_cv']}}">
+                        <i class="fa fa-fw fa fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            {{pass}}
+        </tbody>
+        <tfoot style="background-color: #EAEAEA;">
+            <tr>
+                <th scope="col" colspan="4" class="text-right">
+                    {{=new_dict["inicio_cvs"]}} - {{=new_dict["fin_cvs"]}} de
+                    {{=new_dict["cantidad_cvs"]}}
+                </th>
+
+                <th scope="col" class="d-flex justify-content-around">
+                    <a
+                        href='?page=1&&carnet={{=new_dict["carnet"]}}'>
+                        <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                    </a>
+                    {{if new_dict["prev_page"] != 0:}}
+                    <a
+                        href='?page={{=new_dict["prev_page"]}}&carnet={{=new_dict["carnet"]}}'>
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    </a>
+                    {{else:}}
+                    <a
+                        href='?page=1&carnet={{=new_dict["carnet"]}}'>
+                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                    </a>
+                    {{pass}}
+                    {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} <a
+                        href='?page={{=new_dict["next_page"]}}&carnet={{=new_dict["carnet"]}}'>
+                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                        {{else:}}
+                        <a
+                            href='?page={{=new_dict["cantidad_paginas"]}}&carnet={{=new_dict["carnet"]}}'>
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                        </a>
+                        {{pass}}
+                        <a
+                            href='?page={{=new_dict["cantidad_paginas"]}}&carnet={{=new_dict["carnet"]}}'>
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>

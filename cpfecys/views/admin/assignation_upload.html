@@ -1,104 +1,104 @@
 {{extend 'dashboard.html'}}
-<a href="{{=URL('final_practice')}}" class="btn btn-primary"
-  ><i class="icon-arrow-left"></i>{{=T('Back to Assignation')}}</a
->
-<h2>{{=T('Bulk Final Practice Assignation')}}</h2>
-<h3>{{=T(current_period.period.name)}} - {{=current_period.yearp}}</h3>
-<p>
-  {{=T('Any previously non-created project needs to be created first. You can
-  check and update the available projects clicking here.')}}
-</p>
-<p>
-  {{=T('Student must exist in UV database for assignation process to be
-  correctly done.')}}
-</p>
-{{if success:}}
-<div class="accordion" id="accordion2">
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a
-        class="accordion-toggle"
-        data-toggle="collapse"
-        data-parent="#accordion2"
-        href="#collapseOne"
-      >
-        <span class="icon-remove"></span>{{=T('User upload errors')}}
-        <span class="pull-right">{{=T('Total Errors: ') + len(errors)}}</span>
-      </a>
-    </div>
-    <div id="collapseOne" class="accordion-body collapse">
-      <div class="accordion-inner">
-        <ul>
-          {{for error in errors:}}
-          <li class="error">
-            <pre>
-                            {{for row in error:}}{{=row}}--{{pass}}
-                        </pre
-            >
-          </li>
-          {{pass}}
-        </ul>
-      </div>
-    </div>
+<div class="mt-4">
+  <div class="col-12 text-center">
+    <h2>Carga masiva de asignación para práctica final</h2>
+    <h3>{{=T(current_period.period.name)}} - {{=current_period.yearp}}</h3>
+    <p>
+      Cualquier proyecto no creado anteriormente, necesita ser creado primero.
+      <br/>
+      Puedes revisar y actualizar los proyectos haciendo click aquí.
+      <br/>
+      El estudiante debe existir en la base de datos de la UV para que la asignación se haga correctamente
+    </p>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading">
-      <a
-        class="accordion-toggle"
-        data-toggle="collapse"
-        data-parent="#accordion2"
-        href="#collapseTwo"
-      >
-        <span class="icon-warning-sign"></span>{{=T('User upload warnings')}}
-        <span class="pull-right"
-          >{{=T('Total Warnings: ') + len(warnings)}}</span
-        >
-      </a>
-    </div>
-    <div id="collapseTwo" class="accordion-body collapse">
-      <div class="accordion-inner">
-        <ul>
-          {{for warning in warnings:}}
-          <li class="error">
-            <pre>
-                            {{for row in warning:}}{{=row}} -- {{pass}}
-                        </pre
-            >
-          </li>
-          {{pass}}
-        </ul>
+  <div class="col-12">
+    <a href="{{=URL('final_practice')}}" class="btn btn-primary">
+      <i class="icon-arrow-left"></i>
+      Regresar hacia asignación
+    </a>
+    {{if success:}}
+      <div class="accordion mt-4" id="accordion2">
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+              <span class="icon-remove"></span>{{=T('User upload errors')}}
+              <span class="pull-right">{{=T('Total Errors: ') + len(errors)}}</span>
+            </a>
+          </div>
+          <div id="collapseOne" class="accordion-body collapse">
+            <div class="accordion-inner">
+              <ul>
+                {{for error in errors:}}
+                  <li class="error">
+                    <pre>
+                      {{for row in error:}}{{=row}}--{{pass}}
+                    </pre>
+                  </li>
+                {{pass}}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-group">
+          <div class="accordion-heading">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+              <span class="icon-warning-sign"></span>{{=T('User upload warnings')}}
+              <span class="pull-right">
+                {{=T('Total Warnings: ') + len(warnings)}}
+              </span>
+            </a>
+          </div>
+          <div id="collapseTwo" class="accordion-body collapse">
+            <div class="accordion-inner">
+              <ul>
+                {{for warning in warnings:}}
+                  <li class="error">
+                    <pre>
+                      {{for row in warning:}}{{=row}} -- {{pass}}
+                    </pre>
+                  </li>
+                {{pass}}
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    {{else:}}
+      <div class="well mt-4">
+        {{=FORM(
+          INPUT(_type='file',_name='csvfile'),
+          SELECT(
+            OPTION(f'{T(current_period.period.name)} - {current_period.yearp}', _value=0),
+            _name='cmbPeriod',
+            _id='cmbPeriod',
+            _class='form-control mt-2'
+          ),
+          DIV(INPUT(_type='submit', _value='Upload', _class='btn btn-info mt-1'), _class='text-right')
+        )}}
+      </div>
+    {{pass}}
   </div>
 </div>
-{{else:}}
-<div class="well">
-  {{=FORM(INPUT(_type='file',_name='csvfile'),
-  SELECT(OPTION(T(current_period.period.name)+'-'+
-  str(current_period.yearp),_value=0),_name='cmbPeriod',_id='cmbPeriod'),
-  #emarquez: se comentan campos obsoletos #SPAN(T('Force upload without checking
-  on UV')), #INPUT(_type='checkbox', _name='uv_off', value='off'),
-  INPUT(_type='submit',_value='Upload'))}}
-</div>
-{{pass}}
 
+{{block page_js}}
 <!--emarquez: javascript-->
 <script type="text/javascript">
   $(document).ready(function (){
-      if(2=={{reques.vars['type']}}){
-          $.ajax({
-              url: "get_periodos_variables",
-              success: function(result){
-                  var obj = JSON.parse(result);
-                  if(obj){
-                      $("#cmbPeriod").empty();
-                      $.each(obj,function(index, data){
-                          var o = new Option(data.period.name, data.period.id);
-                          $("#cmbPeriod").append(o)
-                      });
-                  }
+    if(2 == {{=request.vars['type']}}){
+      $.ajax({
+          url: "get_periodos_variables",
+          success: function(result){
+              if(result){
+                  $("#cmbPeriod").empty();
+                  $.each(result, function(index, data){
+                      var o = new Option(data.period.name, data.period.id);
+                      $("#cmbPeriod").append(o)
+                  });
               }
-          });
-      }
+          }
+      });
+    }
   });
 </script>
+{{end page_js}}
+

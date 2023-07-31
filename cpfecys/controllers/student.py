@@ -2,6 +2,7 @@
 #******************************************************PHASE 2 DTT******************************************************
 import math
 import datetime
+import collections
 import cpfecys
 import gluon.contenttype as contenttype
 
@@ -127,7 +128,7 @@ def index():
         return period_range
 
     def is_indate_range(report):
-        if report.score_date == None:
+        if report.score_date is None:
             return False
 
         current_date = datetime.datetime.now().date()
@@ -561,36 +562,28 @@ def periods():
             (db.period_year.id ==assignation.user_project.period)).select()
         return period_range
 
-    def is_indate_range(report):
-        if report.score_date == None:
-            return False
-        current_date = datetime.datetime.now().date()
-        next_date = report.score_date + datetime.timedelta(
-                        days=cpfecys.get_custom_parameters().rescore_max_days)
-        return current_date < next_date
-
     def to_be_created(available_report, assignation):
         report = db((db.report.report_restriction==available_report.id)&
             (db.user_project.id==db.report.assignation)&
             (db.user_project.id==assignation.id)&
             (db.user_project.assigned_user==auth.user.id))
         return report.count() < 1
-
-
-    return dict(assignations = assignations,
-                available_reports = available_reports,
-                current_date = current_date,
-                cyear_period = cyear_period,
-                available_item_restriction = available_item_restriction,
-                items_instance = items_instance,
-                restriction_project_exception=restriction_project_exception,
-                is_indate_range=is_indate_range,
-                restriction_in_limit_days=restriction_in_limit_days,
-                assignation_range=assignation_range,
-                get_item=get_item,
-                calculate_last_day=calculate_last_day,
-                has_disabled_items=has_disabled_items,
-                to_be_created=to_be_created)
+    
+    return dict(
+        assignations=assignations,
+        available_reports=available_reports,
+        current_date=current_date,
+        cyear_period=cyear_period,
+        available_item_restriction=available_item_restriction,
+        items_instance=items_instance,
+        restriction_project_exception=restriction_project_exception,
+        restriction_in_limit_days=restriction_in_limit_days,
+        assignation_range=assignation_range,
+        get_item=get_item,
+        calculate_last_day=calculate_last_day,
+        has_disabled_items=has_disabled_items,
+        to_be_created=to_be_created
+    )
 
 @auth.requires_login()
 @auth.requires_membership('Student')
@@ -1397,7 +1390,7 @@ def report():
             teacher = db((db.auth_user.id == db.user_project.assigned_user) & (db.auth_user.id == db.auth_membership.user_id)
                     & (db.auth_membership.group_id == db.auth_group.id) & (db.auth_group.role == 'Teacher')
                     & (db.user_project.project == report.assignation.project) & (db.user_project.period == db.period_year.id)
-                    & ((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.auth_user.ALL).first()
+                    & ((db.user_project.period <= period.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.auth_user.ALL).first()
             student = db(db.auth_user.id == auth.user.id).select().first()
             assignation_reports = db(db.report.assignation == report.assignation).select()
             response.view = 'student/report_view.html'
@@ -1474,7 +1467,6 @@ def report():
                                                 db.course_activity.date_finish,
                                                 db.course_activity.id,
                                                 db.course_activity.name,
-                                                db.course_activity.report_restriction,
                                                 db.course_activity.description,
                                                 db.course_activity.assignation
                                             )
@@ -3303,11 +3295,94 @@ def foros():
     rows_temp = db((db.user_project.assigned_user == auth.user.id) &
                    (db.user_project.period == periodo.id)).select().first()
 
+
+    return dict(
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+        respuesta = 'hola de backend',
+    )
+
+#cascarus -- FOROS_FORMS
+@auth.requires_login()
+@auth.requires_membership('Student')
+def foros_create():
+    periodo = cpfecys.current_year_period()
+    if request.vars['period']:
+        periodo_parametro = request.vars['period']
+        periodo = db(db.period_year.id == periodo_parametro).select().first()
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN user_project uspj ON uspj.period = py.id
+        INNER JOIN period p on p.id = py.period
+        WHERE uspj.ASSIGNED_USER = {0};
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.foro.id_estudiante == auth.user.id).select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select().first()
+
     return dict(
         rows = rows,
         periodo = periodo,
         periods=periods,
     )
+
+#cascarus -- CONFERENCIAS_FORMS
+@auth.requires_login()
+@auth.requires_membership('Student')
+def conferencias_create():
+    periodo = cpfecys.current_year_period()
+    if request.vars['period']:
+        periodo_parametro = request.vars['period']
+        periodo = db(db.period_year.id == periodo_parametro).select().first()
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN user_project uspj ON uspj.period = py.id
+        INNER JOIN period p on p.id = py.period
+        WHERE uspj.ASSIGNED_USER = {0};
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.foro.id_estudiante == auth.user.id).select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select().first()
+
+    return dict(
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+    )
+
+
+
 
 @auth.requires_login()
 @auth.requires_membership('Student')

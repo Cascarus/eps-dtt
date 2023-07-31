@@ -1,0 +1,26 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <div class="row">
+        <div class="col">
+            <center>
+                <h2>
+                    Código de honor
+                    <small>V{{=codigo['id']}}</small>
+                </h2>
+                <h4>
+                    Redactado en <span id="fecha_codigo"></span>
+                </h4>
+            </center>
+            <form class="form-group">
+                <label for="codigo">Código</label>
+                <textarea name="codigo" id="codigo" rows="15" class="form-control" disabled>
+                    {{=codigo['code']}}
+                </textarea>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const fecha = new Date("{{=codigo['date_']}}");
+    $('#fecha_codigo').text(fecha.toLocaleDateString('es-GT', {day: '2-digit', month: '2-digit', year: 'numeric'}))
+</script>

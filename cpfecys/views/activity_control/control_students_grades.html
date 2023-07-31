@@ -114,8 +114,8 @@
 	    <br>200011223,75.55
 	    <br>200011223,75
           </div>
-          {{=FORM(INPUT(_type='file',_name='csvfile_notas'),
-          INPUT(_type='submit',_value=T('Upload')))}}
+          {{=FORM(INPUT(_type='file',_name='csvfile_notas', _class='form-control'),
+          INPUT(_type='submit',_value=T('Upload'), _class='btn btn-primary'))}}
           <br>
           {{if log_carga_html!="":}}
           {{=log_carga_html}}

@@ -1,0 +1,115 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <center>
+        <h2>
+            Reportar copia o plagio
+            <br>
+        </h2>
+    </center>
+    <form action="{{=URL('infringements_and_sanctions', 'report_sanction')}}" method="POST">
+        <div class="form-group">
+            <label for="display_anio">Año</label>
+            <input type="text" id="display_anio" name="display_anio" class="form-control" value="{{=periodo.yearp}}" disabled />
+        </div>
+        <div class="form-group">
+            <label for="display_semestre">Semestre</label>
+            <input type="text" id="display_semestre" class="form-control" name="display_semestre" value="{{=T(periodo.period.name)}}" disabled />
+        </div>
+        <div class="form-group">
+            <label for="display_curso">Curso</label>
+            {{if count_courses>1:}}
+                <select name="display_curso" id="display_curso" class="form-control" onchange="cambiarCursoSancion(this)"
+                    required>
+                    {{for index in range(len(courses)):}}
+                        <option value="{{=index}}">
+                            {{=courses[index][3]}}
+                        </option>
+                    {{pass}}
+                </select>
+            {{pass}}
+            {{if count_courses==1:}}
+                <input type="text" id="display_curso" name="display_curso" class="form-control" value="{{=courses[0][3]}}" disabled />
+            {{pass}}
+        </div>
+        <div class="form-group">
+            <label for="tipo">Tipo</label>
+            <select name="tipo" id="tipo" class="form-control" required>
+                {{for index in range(len(tipo_reportes)):}}
+                    <option value="{{=tipo_reportes[index][0]}}">
+                        {{=tipo_reportes[index][1]}}
+                    </option>
+                {{pass}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="actividad">Actividad</label>
+            <select name="actividad" id="actividad" class="form-control" required>
+                {{for index in range(len(tipo_actividades)):}}
+                    <option value="{{=tipo_actividades[index][0]}}">
+                        {{=tipo_actividades[index][1]}}
+                    </option>
+                {{pass}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="estudiantes">Estudiantes</label>
+            <p>Puede utilizar Ctrl + clic para seleccionar varios estudiantes</p>
+            <select name="estudiantes" id="estudiantes" class="form-control" multiple required></select>
+        </div>
+        <div class="form-group">
+            <label for="causa">Causa</label>
+            <input type="text" name="causa" id="causa" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripción</label>
+            <textarea name="descripcion" id="descripcion" rows="4" class="form-control" maxlength="255"
+                required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="display_catedratico">Catedratico</label>
+            <input type="text" id="display_catedratico" name="display_catedratico" value="{{=courses[0][0]}}"
+                class="form-control" disabled />
+        </div>
+        <div class="form-group">
+            <label for="display_reportante">Reportante</label>
+            <input type="text" id="display_reportante" name="display_reportante"
+                value="{{=user.first_name}} {{=user.last_name}}" class="form-control" disabled />
+        </div>
+        <button type="submit" class="btn btn-info btn-block">Reportar</button>
+        <!-- Valores extras -->
+        <input type="hidden" id="semestre" name="semestre" value="{{=periodo.id}}" />
+        <input type="hidden" id="curso" name="curso" value="{{=courses[0][2]}}" />
+        <input type="hidden" id="catedratico" name="catedratico" value="{{=courses[0][1]}}" />
+        <input type="hidden" id="reportante" name="reportante" value="{{=user.id}}" />
+
+    </form>
+    <script>
+        {{from gluon.serializers import json}}
+
+        const cursos = {{=XML(json(courses))}};
+        console.log(cursos)
+        const estudiantes = {{=XML(json(estudiantes))}};
+        console.log(estudiantes)
+        const $selectEstudiantes = $('#estudiantes');
+        $.each(estudiantes[0], (index, estudiante) => {
+            $selectEstudiantes.append($('<option></option>')
+                .attr("value", estudiante[0])
+                .text(estudiante[2] + " - " + estudiante[1]));
+        })
+
+        cambiarCursoSancion = (curso) => {
+            $('#curso').val(cursos[curso.value][2]);
+            $('#catedratico').val(cursos[curso.value][1]);
+            $('#display_catedratico').val(cursos[curso.value][0]);
+
+            const nuevosEstudiantes = estudiantes[curso.value];
+            $selectEstudiantes.empty();
+            $.each(nuevosEstudiantes, (index, estudiante) => {
+                $selectEstudiantes.append($('<option></option>')
+                    .attr("value", estudiante[0])
+                    .text(estudiante[2] + " - " + estudiante[1]));
+            })
+
+        }
+    </script>
+</div>

@@ -1,0 +1,94 @@
+{{extend 'dashboard.html'}}
+{{step_count = 0}}
+
+<div class="row-fluid">
+    <div style="overflow:auto;" class="well">
+        <center>
+            {{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator')):}}
+
+            <h2>{{=T('Evaluation academic results')}}<br>
+            <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small></h2>{{pass}}
+        </center>
+
+        <table class="table-responsive">
+            <tr>
+                <td>
+                    <div data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
+                        <form class="form-inline" action="{{=URL('evaluation','graph')}}" method='get'>
+                            <select name="period" class="form-control">
+							{{for period in periods:}}
+								{{if str(period.id) == str(periodo.id):}}
+									{{var_sel="selected='selected'"}}
+								{{else:}}
+									{{var_sel=''}}
+								{{pass}}
+							  <option value="{{=period.id}}" {{=var_sel}}>
+							  {{=T(period.period.name)}}-{{=period.yearp}}
+							  </option>
+							{{pass}}
+							</select>
+							<select name="group" class="form-control">
+							{{for group in groups:}}
+								{{if str(group.id) == str(grupo.id):}}
+									{{var_sel_g="selected='selected'"}}
+								{{else:}}
+									{{var_sel_g=''}}
+								{{pass}}
+							  <option value="{{=group.id}}" {{=var_sel_g}}>
+								{{if group.role == 'Student':}}
+									{{=T('Rol Student')}}
+								{{else:}}
+									{{=T(group.role)}}
+								{{pass}}
+							  </option>
+							{{pass}}
+							</select>
+                            <input class="btn btn-primary" type="submit" value="{{=T('Go')}}">
+                        </form>
+                    </div>
+                </td>
+				</tr>
+        </table>
+				
+		<table>
+			<tr>
+				<td>
+				<div id="body">
+					<div id="chart"></div>
+				</div>
+				</td>
+				<td>
+					<small>
+                        <table id="answ" class="table table-condensed table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>{{=T('Nota')}}</th>
+                                    <th>{{=T('Respuesta')}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for ans in grid_answer:}}
+                                    <tr>
+                                        <td>{{=ans.grade}}</td>
+                                        <td>{{=T(ans.answer)}}</td>
+                                    </tr>
+                                {{pass}}		
+                            </tbody>
+                        </table>
+                    </small>
+				</td>
+			</tr>
+		</table>	
+	</div>
+</div>
+
+{{block page_js}}
+<script type="text/javascript" src="{{=URL('static','js/d3/d3.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','js/d3/d3.js')}}"></script>
+<script src="{{=URL('static','js/RadarChart.js')}}"></script>
+<script src="{{=URL('static','js/Pruebas360.js')}}"></script>
+<script type="text/javascript">
+	graphPruebas360.draw("{{=res_graph}}");
+</script>
+{{end page_js}}
+

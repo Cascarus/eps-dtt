@@ -1,0 +1,57 @@
+{{extend 'dashboard.html'}}
+
+<div class="col-12 mt-4">
+    <center>
+        <h1>Reporte de incidente</h1>
+        <h4>Curso: {{=curso.name}}</h4>
+    </center>
+    <p>Ingrese información para que se le de seguimiento a su caso, las denuncias son totalmente anonimas.</p>
+    <form action="{{=URL('iso_reporte_incidente', 'guardar_reporte')}}" method="POST">
+        <input type="hidden" id="project" name="project" value="{{=project}}" />
+        <input type="hidden" id="periodo" name="periodo" value="{{=periodo2}}" />
+        <div class="mb-4 row">
+            <label for="tipo_incidente" class="col-sm-2">Tipo de Incidente:</label>
+            <div class="col-sm-4">
+                <select id="tipo_incidente" name="tipo_incidente" class="generic-widget">
+                    {{for tipo in tipo_incidente:}}
+                        <option value="{{=tipo.id}}">{{=tipo.descripcion}}</option>
+                    {{pass}}
+                </select>
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <label for="fecha_incidente" class="col-sm-2">Fecha del Incidente: </label>
+            <div class="col-sm-6">
+                <input required class="generic-widget" type="date" name="fecha_incidente" id="fecha_incidente" />
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <label for="correo" class="col-sm-2">Correo(opcional): </label>
+            <div class="col-sm-4">
+                <input type="email" name="correo" id="correo" />
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <label for="descripcion" class="col-sm-2">Descripción: </label>
+            <div class="col-sm-4">
+                <textarea class="text" required name="descripcion" id="descripcion" cols="40" rows="10"></textarea>
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <label for="tutor" class="col-sm-2">Tutor Académico</label>
+            <div class="col-sm-4">
+                <select id="tutor" name="tutor" class="generic-widget">
+                    {{for tutor in tutores:}}
+                        <option value="{{=tutor[0]}}">{{=tutor[1]}} {{=tutor[2]}}</option>
+                    {{pass}}
+                </select>
+            </div>
+        </div>
+        <div class="mb-4 row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-6">
+                <input class="btn btn-primary" type="submit" value="Continuar" />
+            </div>
+        </div>
+    </form>
+</div>

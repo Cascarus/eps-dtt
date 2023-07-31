@@ -1,0 +1,155 @@
+{{extend 'dashboard.html'}}
+{{step_count = 0}}
+<div class="dttContainer">
+    {{if count_periodos > 0:}}
+        <center>
+            <h2>
+                Sanciones por copias y plagio
+                <br>
+                <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+            </h2>
+        </center>
+        <div class="row mt-3">
+            <div class="col-12 col-md-6 mb-3">
+                <div data-step="{{step_count+=1}}{{=step_count}}"
+                    data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
+                    <form class="form-inline" action="{{=URL('infringements_and_sanctions','sanction_list',type_list)}}"
+                        method='get'>
+                        <select name="periodo" id="periodo" class="form-control">
+                            {{for period_ in periodos:}}
+                                {{var_sel = ''}}
+                                {{if str(period_.id) == str(periodo.id):}}
+                                    {{var_sel="selected='selected'"}}
+                                {{else:}}
+                                    {{var_sel=''}}
+                                {{pass}}
+                                <option value="{{=period_.id}}" {{=var_sel}}>
+                                    {{=T(period_.period.name)}}-{{=period_.yearp}}
+                                </option>
+                            {{pass}}
+                        </select>
+                        <input class="btn btn-outline-primary" type="submit" value="{{=T('Go')}}">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div>
+            {{for i in range(len(cursos)):}}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="navbar">
+                            <div class="heading">
+                                <a style="cursor:pointer;" onclick="click_project_{{=cursos[i][1]}}()">
+                                    <h4>{{=cursos[i][0]}}</h4>
+                                </a>
+                                <script type="text/javascript">
+                                    function click_project_{ {=cursos[i][1] } } (){
+                                        $("#div_course_{{=cursos[i][1]}}").toggle(300);
+                                    }
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-striped" id="div_course_{{=cursos[i][1]}}">
+                    <colgroup>
+                        <col style="width:30%">
+                        <col style="width:60%">
+                        <col style="width:10%">
+                    </colgroup>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Causa</th>
+                            <th scope="col">Razón</th>
+                            <th scope="col">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for sancion in sanciones[i]:}}
+                            <tr>
+                                <td>
+                                    <a href="{{=URL('infringements_and_sanctions','sanction_detail',type_list+'/'+str(sancion[0]))}}">{{=sancion[1]}}</a>
+                                </td>
+                                <td>{{=sancion[2]}} en {{=sancion[3]}}</td>
+                                <td>
+                                    <center>
+                                        <span class="badge badge-{{=help_status[sancion[4]][1]}}">{{=help_status[sancion[4]][0]}}</span>
+                                    </center>
+                                </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            {{pass}}
+        </div>
+    {{else:}}
+        {{if "Ecys-Administrator" in session.auth.user_groups.values():}}
+            <center>
+                <h2>Administrador de faltas</h2>
+            </center>
+            <div class="row">
+                <div class="col-4 mx-auto">
+                    <form action="{{=URL('infringements_and_sanctions','sanction_list','admin')}}" method="GET"
+                        class="form-inline">
+                        <div class="form-group">
+                            <label class="sr-only" for="carnet">Carnet</label>
+                            <input style="width: 95%" type="number" name="carnet" id="carnet" class="form-control" placeholder="Carnet" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Buscar</button>
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{if carnet_buscado is not None:}}
+                        <h5>Busqueda para: {{=carnet_buscado}}</h5>
+                    {{pass}}
+                    {{if len(sanciones) > 0:}}
+                        <table class="table table-striped">
+                            <colgroup>
+                                <col style="width:30%">
+                                <col style="width:40%">
+                                <col style="width:20%">
+                                <col style="width:10%">
+                            </colgroup>
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>Causa</th>
+                                    <th>Razón</th>
+                                    <th>Curso</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for sancion in sanciones:}}
+                                    <tr>
+                                        <td>
+                                            <a href="{{=URL('infringements_and_sanctions','sanction_detail',type_list+'/'+str(sancion[0]))}}">
+                                                {{=sancion[1]}}
+                                            </a>
+                                        </td>
+                                        <td>{{=sancion[2]}} en {{=sancion[3]}}</td>
+                                        <td>{{=sancion[4]}}</td>
+                                        <td>
+                                            <center>
+                                                <span class="badge badge-{{=help_status[sancion[5]][1]}}">
+                                                    {{=help_status[sancion[5]][0]}}
+                                                </span>
+                                            </center>
+                                        </td>
+                                    </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    {{else:}}
+                        <h6>Realiza una busqueda para ver las sanciones</h6>
+                    {{pass}}
+                </div>
+            </div>
+        {{else:}}
+            <center>
+                <h1>No hay sanciones</h1>
+            </center>
+        {{pass}}
+    {{pass}}
+</div>

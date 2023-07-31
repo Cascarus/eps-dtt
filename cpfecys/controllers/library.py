@@ -14,7 +14,7 @@ def file_managers():
                 periods = []
         else:
             #hacer distincion entre periodos variables y semestres   
-            periods = db(((db.user_project.period <= db.period_year.id) & ((db.user_project.period + db.user_project.periods) > db.period_year.id)) 
+            periods = db(((db.user_project.period <= db.period_year.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > db.period_year.id)) 
                         & (db.user_project.assigned_user == auth.user.id)).select(db.period_year.id, db.period_year.yearp, db.period_year.period, distinct=True)
 
         return periods
@@ -29,14 +29,14 @@ def file_managers():
                 rproject = []
         else:
             rproject = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= period) 
-                        & ((db.user_project.period + db.user_project.periods) > period))).select(db.user_project.id, db.user_project.project, db.user_project.period)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > period))).select(db.user_project.id, db.user_project.project, db.user_project.period)
 
         return rproject
     
     #The list of the final students
     def obtain_students(project):
         persons = db((db.user_project.project == project.project) & ((db.user_project.period <= project.period) 
-                    & ((db.user_project.period + db.user_project.periods) > project.period)) & (db.auth_membership.user_id == db.user_project.assigned_user)
+                    & ((db.user_project.period.cast('integer') + db.user_project.periods) > project.period)) & (db.auth_membership.user_id == db.user_project.assigned_user)
                     & (db.auth_membership.group_id == 2)).select(db.user_project.id, db.user_project.assigned_user)
 
         return persons
@@ -114,7 +114,7 @@ def file_managers():
             name_year = year.yearp
             
             rproject = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= year.id) 
-                        & ((db.user_project.period + db.user_project.periods) > year.id))).select(db.user_project.project)
+                        & ((db.user_project.period.cast('integer') + db.user_project.periods) > year.id))).select(db.user_project.project)
             this_project = db((db.user_project.id == pro)).select().first()
             none_access = False
             for var_project in rproject:
@@ -199,7 +199,7 @@ def change_period():
         if total == 0:
             count2 = db.user_project.id.count()
             project2 = db((db.user_project.project == file.project) & (db.user_project.assigned_user == file.owner_file)
-                        & ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select(count2)
+                        & ((db.user_project.period <= period) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period))).select(count2)
             total2 = 2
             for s2 in project2:
                 total2 = s2[count2]

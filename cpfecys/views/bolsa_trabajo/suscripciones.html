@@ -1,0 +1,298 @@
+{{extend 'dashboard.html'}}
+
+<div>
+    <div class='row p-0 m-0'>
+        <div class='d-flex w-100 justify-content-center py-3 px-0'>
+            <h1 class='p-0 m-0'>Suscripciones empresariales</h1>
+            &nbsp;&nbsp;
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                <span class="fa fa-question-circle"></span>
+            </button>
+        </div>
+    </div>
+
+    <div class='row p-3 m-3' id="div1">
+        <table class="table table-hover">
+            <thead style="background-color: #EAEAEA;">
+                <tr>
+                    <th scope="col">
+                        #
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=id_empresa&status={{=new_dict["status"]}}&ordertype=asc'>
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=id_empresa&status={{=new_dict["status"]}}&ordertype=desc'>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                    <th scope="col">
+                        Nombre Empresa
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=nombre_empresa&status={{=new_dict["status"]}}&ordertype=asc'>
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=nombre_empresa&status={{=new_dict["status"]}}&ordertype=desc'>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                    <th scope="col">
+                        Correo
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=correo&status={{=new_dict["status"]}}&ordertype=asc'>
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=correo&status={{=new_dict["status"]}}&ordertype=desc'>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                    <th scope="col">
+                        Persona Encargada
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=persona_encargada&status={{=new_dict["status"]}}&ordertype=asc'>
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=persona_encargada&status={{=new_dict["status"]}}&ordertype=desc'>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                    <th scope="col">Telefono</th>
+                    <th scope="col"> Periodo </th>
+                    <th scope="col">
+                        Estado
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=id_estado_registro&status={{=new_dict["status"]}}&ordertype=asc'>
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
+                        <a href='?page={{=new_dict["page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby=id_estado_registro&status={{=new_dict["status"]}}&ordertype=desc'>
+                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                    <th scope="col"></th>
+                </tr>
+                <tr>
+                    <td scope="row"></td>
+                    <td><h6>Busqueda rapida</h6>
+                        <input type="text" class="form-control" id="myInput" onkeyup="myFunction()" placeholder="Bucar por empresa..." title="Type in a name">
+                    </td>
+                    <td><h6>Busqueda rapida</h6>
+                        <input type="text" class="form-control" id="myInput2" onkeyup="myFunction2()" placeholder="Bucar por Correo..." title="Type in a name">
+                    </td>
+                    <td colspan="2"><h5>Busqueda especifica</h5>
+                        <form action='/cpfecys/bolsa_trabajo/suscripciones' method="GET">
+                                <input type="text" id="name" name='name' class="form-control"  placeholder="Nombre de empresa" onsubmit="this.form.submit()"/>
+                                <input type="text" id="email" name="email" class="mt-2 form-control" placeholder="Correo de empresa" onsubmit="this.form.submit()"/>
+                                <input type="text" id="incharge" name="incharge" class="mt-2 form-control" placeholder="Encargado de empresa" onsubmit="this.form.submit()"/>
+                    </td>
+                    <td colspan="1">
+                        <select class="form-control" id="periodo" name='periodo'>
+                            {{for periodo in new_dict["periodos"]:}}
+                                <option value="{{=periodo['id']}}">{{=periodo['yearp']}} - {{=periodo['period']}}</option>
+                            {{pass}}
+                            <option value="0">Todos</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="form-control" id="status" name='status'>
+                            <option value="0">Todos</option>
+                            {{for estado in new_dict["estados_registro"]:}}
+                                <option value="{{=estado['id_estado_registro']}}">{{=estado['estado_registro']}}</option>
+                            {{pass}}
+                        </select>
+                    </td>
+                    <td><button type="submit" class="btn btn-primary mb-3">Aplicar filtro</button></td>
+                        </form>
+                </tr>
+            </thead>
+            <tbody id="myTable">
+                {{for empresa in new_dict['empresas']:}}
+                    <tr>
+                        <td scope="row">{{=empresa["id_empresa"]}}</td>
+                        <td id="td1">{{=empresa["nombre_empresa"]}}</td>
+                        <td id="td2">{{=empresa["correo"]}}</td>
+                        <td id="td3">{{=empresa["persona_encargada"]}}</td>
+                        <td>{{=empresa["telefono"]}}</td>
+                        <td>Año {{=empresa["yearp"]}} - Semestre {{=empresa["period"]}}</td>
+                        <td class="text-center">
+                            {{if empresa["id_estado_registro"] == 1:}}
+                                <span class="badge badge-info">
+                            {{elif empresa["id_estado_registro"] == 2:}}
+                                <span class="badge badge-success">
+                            {{elif empresa["id_estado_registro"] == 3:}}
+                                <span class="badge badge-danger">
+                            {{elif empresa["id_estado_registro"] == 4:}}
+                                <span class="badge badge-secondary">
+                            {{elif empresa["id_estado_registro"] == 5:}}
+                                <span class="badge badge-warning">
+                            {{else:}}
+                                <span>
+                            {{pass}}
+                            {{=empresa["estado_registro"]}}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a class="btn btn-default btn" href="/cpfecys/bolsa_trabajo/view?id={{=empresa['id_empresa']}}">
+                                <i class="fa fa-fw fa fa-eye" > </i> Ver
+                            </a>
+                            <a class="btn btn-default btn" href="/cpfecys/bolsa_trabajo/edit?id={{=empresa['id_empresa']}}">
+                                <i class="fa fa-fw fa fa-edit"></i> Editar
+                            </a>
+                            <a class="btn btn-danger" href="#" onclick="eliminar({{=empresa['id_empresa']}}, '{{=empresa['nombre_empresa']}}')">
+                                <i class="fa fa-trash-o fa-lg"> </i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                {{pass}}
+            </tbody>
+            <tfoot style="background-color: #EAEAEA;">
+                <tr>
+                    <th scope="col" colspan="7" class="text-right">
+                        {{=new_dict["inicio_empresas"]}} - {{=new_dict["fin_empresas"]}} de {{=new_dict["cantidad_empresas"]}}
+                    </th>
+                    <th scope="col" class="d-flex justify-content-around">
+                        <a href='?page=1&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby={{=new_dict["orderby"]}}&status={{=new_dict["status"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                        </a>
+                        {{if new_dict["prev_page"] != 0:}}
+                            <a href='?page={{=new_dict["prev_page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby={{=new_dict["orderby"]}}&status={{=new_dict["status"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                            </a>
+                        {{else:}}
+                            <a href='?page=1&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby={{=new_dict["orderby"]}}&status={{=new_dict["status"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                            </a>
+                        {{pass}}
+                        {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}}
+                            <a href='?page={{=new_dict["next_page"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby={{=new_dict["orderby"]}}&status={{=new_dict["status"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                            </a>
+                        {{else:}}
+                            <a href='?page={{=new_dict["cantidad_paginas"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby={{=new_dict["orderby"]}}&status={{=new_dict["status"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                            </a>
+                        {{pass}}
+                        <a href='?page={{=new_dict["cantidad_paginas"]}}&name={{=new_dict["name"]}}&email={{=new_dict["email"]}}&periodo={{=new_dict["periodo"]}}&incharge={{=new_dict["incharge"]}}&orderby={{=new_dict["orderby"]}}&status={{=new_dict["status"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                        </a>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Módulo de suscripciones de la empresa</h5>
+                </div>
+                <div class="modal-body">
+                    Este módulo es para empresas que envían sus suscripciones a través de esta plataforma. Esto es para obtener un usuario como empresa y poder publicar ofertas de trabajo.   
+                    <br/><br/>
+                    Hay 4 botones, en ellos puedes:
+                    <br/>
+                    Buscando: bolsa de trabajo para empresas
+                    Hay 2 tipos, en ellos puedes encontrar la bolsa de trabajo.
+                    <br/>
+                    En ellos usted puede hacer la busqueda rapida en la parte donde asi se llaman, la cual hara una busqueda de lo que se esta desplegando en el cuadro en esa ventana y en esas columna. En la parte de Busqueda especifica tenemos varios parametros especificados por su nombre donde soleccionandolos o escribiendo en ellos, para luego aplicar el filtro, de esta manera podemos hacer una consulta mas especificas sin importas si se muestra o no en ese momento en la pantalla esa informacion.'
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{=T('Close')}}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #div1 {
+        display: block;
+        overflow:auto;
+        width:auto;
+    }
+</style>
+
+<script>
+    function eliminar(id, nombre) {
+        Swal.fire({
+            title: 'Eliminar',
+            text: `Seguro que desea eliminar a la empresa: ${nombre}`,
+            icon: 'question',
+            showDenyButton: true,
+            confirmButtonText: 'Eliminar',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    "id_empresa": Number(id)
+                }
+                $.ajax({
+                    type: 'post',
+                    url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/eliminar_empresa`,
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Eliminado!',
+                                text: res.msg,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/suscripciones`;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log(xhr, status, errorThrown);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+</script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function myFunction() {
+      var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+            txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                tr[i].style.display = "none";
+                }
+            }       
+        }
+    }
+
+    function myFunction2() {
+      var input2, filter2, table, tr, td2, i, txtValue2;
+        input2 = document.getElementById("myInput2");
+        filter2 = input2.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2];
+            if (td) {
+            txtValue2 = td.textContent || td.innerText;
+                if (txtValue2.toUpperCase().indexOf(filter2) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }       
+        }
+    }
+</script>
+

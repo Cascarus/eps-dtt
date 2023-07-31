@@ -1,0 +1,12 @@
+{{extend 'layout.html'}}
+
+<div class="row-fluid mt-2">
+    <div style="overflow:auto;" class="well col-12 text-center">
+        <h1>{{=front_notification.name}}</h1>
+        {{=MARKMIN(front_notification.content_text, markmin_settings)}}
+        {{if front_notification.image_file is None or front_notification.image_file == '': }}
+        {{else:}}
+			<img class="img-rounded" src="{{= URL('default/download', front_notification.image_file)}}" alt="Sample image" title="Sample image">
+		{{pass}}
+    </div>
+</div>

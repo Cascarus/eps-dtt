@@ -1,0 +1,62 @@
+{{extend 'dashboard.html'}}
+<link rel="stylesheet" type="text/css" href="/static/css/iso_estilos.css">
+<h1>
+    Activar Evaluación
+</h1>
+<form method="POST">
+    <input name="id_ev" id="id_ev" type="hidden" value="{{=id_ev}}" />
+    <div class="web2py_grid">
+        <div class="web2py_table">
+            <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                <table>
+                    <thead>
+                        <th><a href="#">#</a></th>
+                        <th><a href="#">Proyecto</a></th>
+                        <th><a href="#">Carnet</a></th>
+                        <th><a href="#">Nombre</a></th>
+                        <th><a href="#">Activar</a></th>
+                    </thead>
+                    <tbody>
+                        {{for tutor in tutores:}}
+                            <tr>
+                                <td>{{=tutor.user_project.id}}</td>
+                                <td>{{=tutor.project.name}}</td>
+                                <td>{{=tutor.auth_user.username}}</td>
+                                <td>{{=tutor.auth_user.first_name}} {{=tutor.auth_user.last_name}}</td>
+                                <td>
+                                    <input type="checkbox" name="curso{{=tutor.user_project.id}}"
+                                        value="{{=tutor.user_project.id}}" {{if tutor.project.area_level == 1:}}checked{{pass}} />
+                                </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="menup" class="flotante">
+        <button class="btn btn-primary btn_circle">
+            <span class="fa fa-envelope" aria-hidden="true" />
+        </button>
+        <br />
+        <button id="btn_check_uncheck" class="btn btn-success btn_circle" onclick="check_uncheck()">
+            <span class="fa fa-pencil-square-o" aria-hidden="true" />
+        </button>
+    </div>
+</form>
+
+
+<script type="text/javascript">
+    let activado = true;
+    document.getElementById("btn_check_uncheck").addEventListener("click", function (event) {
+        event.preventDefault()
+    });
+    function check_uncheck() {
+        let checkbox = $(':checkbox');
+        activado = !activado;
+        for (let i = 0; i < checkbox.length; i++) {
+            check = checkbox[i];
+            check.checked = activado;
+        }
+    }
+</script>

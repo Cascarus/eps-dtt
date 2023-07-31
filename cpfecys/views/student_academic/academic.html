@@ -1,0 +1,65 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>Estudiantes en el sistema</h1>
+    </div>
+    {{if auth.has_membership('Super-Administrator'):}}
+        <div class="alert alert-primary" role="alert">
+            <b>Nota:</b>
+            Los estudiantes que agregue como "Super Administrator" no realizan la validación con el webservice y se les crea automáticamente un perfil de usuario con membresía "Academic".
+        </div>
+        <div align="right" width="100%">
+            <table class="table-bordered" width="100%">
+                <tr>		
+                    <td>
+                        <small>
+                            <center>
+                                <font style="white-space:nowrap;"> 
+                                    <span class="badge badge-info">{{=XML('&nbsp;' * 3)}}</span>													
+                                    No se ha cargado la foto ó La foto no ha sido revisada
+                                </font>{{=XML('&nbsp;' * 6)}}
+                                <font style="white-space:nowrap;"> 
+                                    <span class="badge badge-success">{{=XML('&nbsp;' * 3)}}</span> 
+                                    La foto fue aceptada
+                                </font>{{=XML('&nbsp;' * 6)}}
+                                <font style="white-space:nowrap;">
+                                    <span class="badge badge-important">{{=XML('&nbsp;' * 3)}}</span> 
+                                    La foto fue rechazada
+                                </font>
+                            </center>
+                        </small>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {{pass}}
+    {{=grid}}
+</div>
+
+<div id="picModal" class="modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <h5 class="modal-title">Ver foto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <span class="icon-picture"></span>
+                <div id="img_div" class="text-center"></div>
+            </div>
+        </div>
+	</div>
+</div>
+
+<script>
+    function set_values(var_id){
+		if(var_id != "None"){
+			$("#img_div").show(1000);
+			$("#img_div").load(`{{=URL('student_academic', 'photo.load')}}?id_user=${var_id}`);
+		}else{
+			$("#img_div").hide();
+		}
+	}
+</script>

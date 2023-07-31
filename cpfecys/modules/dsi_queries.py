@@ -1,20 +1,30 @@
-def getCoursesByTutorIdAndPeriodId(tutorId, periodId):
-    return ("SELECT"
-            " p.id, p.project_id, p.name, up.id"
-            " FROM user_project as up"
-            " JOIN project as p ON(up.project=p.id)"
-            " WHERE up.assigned_user = {}"
-            " AND up.period = {};".format(tutorId, periodId))
+def get_courses_by_tutor_id_and_period_id(tutor_id, period_id):
+    return (f"""
+        SELECT
+            p.id,
+            p.project_id,
+            p.name,
+            up.id
+        FROM user_project AS up
+            JOIN project AS p ON up.project = p.id
+        WHERE up.assigned_user = {tutor_id}
+            AND up.period = {period_id};
+    """)
 
-
-def getTutorScheduleByCourseId(assignationId):
-    return ("SELECT"
-            " ds.id, ds.starting_hour, ds.ending_hour, ds.week_day, das.classroom, ds.assistance_type_id"
-            " FROM dsi_assignation_schedule as das"
-            " join dsi_schedule as ds"
-            " WHERE das.isEnabled = 1"
-            " AND das.tutor_id = {};".format(assignationId))
-
+def get_tutor_schedule_by_course_id(assignation_id):
+    return (f"""
+        SELECT
+            ds.id,
+            ds.starting_hour,
+            ds.ending_hour,
+            ds.week_day,
+            das.classroom,
+            ds.assistance_type_id
+        FROM dsi_assignation_schedule AS das
+            JOIN dsi_schedule AS ds
+        WHERE das.isEnabled = 1
+            AND das.tutor_id = {assignation_id};
+    """)
 
 def get_tutors_active_in_current_period(period_id):
     return (f"""
@@ -159,18 +169,24 @@ def get_assistance_type(type_id):
     """)
 
 
-def getSpecificSchedule(tutorId, typeId, dayId, periodId):
-    return (
-        "select"
-        " ds.id, ds.week_day, ds.starting_hour, ds.ending_hour, ds.assistance_type_id, das.tutor_id, das.project_assignation"
-        " from dsi_assignation_schedule as das"
-        " join dsi_schedule as ds on (das.schedule_id = ds.id)"
-        " where das.tutor_id = {}"
-        " and das.isEnabled = 1"
-        " and ds.period = {}"
-        " and ds.assistance_type_id = {}"
-        " and ds.week_day = {};".format(tutorId, periodId, typeId, dayId))
-
+def get_specific_schedule(tutor_id, type_id, day_id, period_id):
+    return (f"""
+        SELECT
+            ds.id,
+            ds.week_day,
+            ds.starting_hour,
+            ds.ending_hour,
+            ds.assistance_type_id,
+            das.tutor_id,
+            das.project_assignation
+        FROM dsi_assignation_schedule AS das
+            JOIN dsi_schedule AS ds ON das.schedule_id = ds.id
+        WHERE das.tutor_id = {tutor_id}
+            AND das.isEnabled = 1
+            AND ds.period = {period_id}
+            AND ds.assistance_type_id = {type_id}
+            AND ds.week_day = {day_id};
+    """)
 
 def get_assistance_parameters_by_id(parameter_id):
     return (f"""
@@ -214,17 +230,21 @@ def get_assistance_parameters_by_type_id_and_period(assistance_type_id, period_i
             AND period = {period_id}
     """)
 
-def getStartingAssistance(tutorId, typeId, date):
-    return (
-        "select"
-        " da.id, da.starting_score, da.finishing_score, da.schedule, da.tutor"
-        " from dsi_assistance as da"
-        " join dsi_schedule as ds on (da.schedule = ds.id)"
-        " where tutor = {}"
-        " and ds.assistance_type_id = {}"
-        " and cast(da.starting_hour as date) = '{}'"
-        " and finishing_score is Null;".format(tutorId, typeId, date)
-    )
+def get_starting_assistance(tutor_id, type_id, date):
+    return (f"""
+        SELECT
+            da.id,
+            da.starting_score,
+            da.finishing_score,
+            da.schedule,
+            da.tutor
+        FROM dsi_assistance AS da
+            JOIN dsi_schedule AS ds ON da.schedule = ds.id
+        WHERE tutor = {tutor_id}
+            AND ds.assistance_type_id = {type_id}
+            AND CAST(da.starting_hour AS DATE) = '{date}'
+            AND finishing_score IS NULL;
+    """)
 
 def getAssistanceTypeById(assistance_type_id):
     return (f"""
@@ -306,30 +326,44 @@ def getAssistanceCompleted(tutorId, scheduleId):
             " and schedule = {}"
             " and finishing_score is not null;".format(tutorId, scheduleId))
 
+def get_schedule_by_id(schedule_id):
+    return (f"""
+        SELECT
+            ds.id,
+            ds.week_day,
+            ds.starting_hour,
+            ds.ending_hour,
+            ds.assistance_type_id,
+            ds.period
+        FROM dsi_schedule AS ds
+        WHERE id = {schedule_id};
+    """)
 
-def getScheduleById(scheduleId):
-    return ("select"
-            " ds.id, ds.week_day, ds.starting_hour, ds.ending_hour, ds.assistance_type_id, ds.period"
-            " from dsi_schedule as ds"
-            " where id = {}".format(scheduleId))
+def get_assistance_parameters_by_type_and_class_and_period(type_id, class_id, period_id):
+    return (f"""
+        SELECT
+            dap.id,
+            dap.name,
+            dap.parameter_message,
+            dap.percentage,
+            dap.range_start,
+            dap.range_finish,
+            dap.assistance_type,
+            dap.assistance_class,
+            dap.image
+        FROM dsi_assistance_parameter AS dap
+        WHERE assistance_type = {type_id}
+            AND assistance_class = {class_id}
+            AND dap.period = {period_id};
+    """)
 
-
-def getAssistanceParametersByTypeAndClassAndPeriod(typeId, classId, periodId):
-    return (
-        "select"
-        " dap.id, dap.name, dap.parameter_message, dap.percentage, dap.range_start, dap.range_finish, dap.assistance_type, dap.assistance_class, dap.image"
-        " from dsi_assistance_parameter as dap"
-        " where assistance_type = {}"
-        " and assistance_class = {}"
-        " and dap.period = {};".format(typeId, classId, periodId))
-
-
-def getFingerPrints():
-    return (
-        "select"
-        " fp.tutor_id, fp.fingerprint"
-        " from dsi_fingerprint as fp"
-    )
+def get_finger_prints():
+    return ("""
+        SELECT
+            fp.tutor_id,
+            fp.fingerprint
+        FROM dsi_fingerprint AS fp
+    """)
 
 def get_fingerprint_parameter(parameter):
     return (f"""

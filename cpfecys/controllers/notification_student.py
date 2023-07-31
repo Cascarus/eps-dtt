@@ -18,7 +18,7 @@ def notification_calculation(username):
 def send_mail():        
     cperiod = cpfecys.current_year_period()
     assigned = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= cperiod.id) 
-                & ((db.user_project.period + db.user_project.periods + 1) > cperiod.id)) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
+                & ((db.user_project.period.cast('integer') + db.user_project.periods + 1) > cperiod.id)) & (db.user_project.project == request.vars['project'])).select(db.user_project.ALL).first()
 
     try:
         if assigned is None:
@@ -135,7 +135,7 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
             redirect(URL('default', 'home'))
         else:
             courses_admin = db((db.user_project.assigned_user == auth.user.id) & ((db.user_project.period <= semester.id) 
-                            & ((db.user_project.period + db.user_project.periods) > semester.id)) & (db.user_project.project == db.project.id)).select(db.user_project.id)
+                            & ((db.user_project.period.cast('integer') + db.user_project.periods) > semester.id)) & (db.user_project.project == db.project.id)).select(db.user_project.id)
     
     message_c = '<html>' + message 
     if ((courses_admin is None) and auth.has_membership('Academic')):
@@ -149,7 +149,7 @@ def reply_mail_with_email(email, message, remessage, retime, resub ,subject, sem
     message_c += f"{project_name}<br>{str(period)}<br>Sistema de Seguimiento de La Escuela de Ciencias y Sistemas<br> Facultad de Ingeniería - Universidad de San Carlos de Guatemala"
     message_c += f'<br><br><hr style="width:100%;"><b><i>Respuesta al mensaje enviado el {retime}:</i></b><br><table><tr><td><i><b>Asunto:</b></td><td>{resub}</td></tr></table></i></html>'
     control = 0
-    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org', subject=subject, message=message_c, bcc=email)
+    was_sent = mail.send(to='dtt.ecys@dtt-dev.site', subject=subject, message=message_c, bcc=email)
 
     if ((courses_admin is None) and auth.has_membership('Academic')):
         row = db.academic_send_mail_log.insert(
@@ -218,7 +218,7 @@ def send_mail_to_users(users, message, subject, semester,year, project_name):
                     email_list.append(user.email)
                     email_list_log = f"{email_list_log},{str(user.email)}"
 
-    was_sent = mail.send(to='dtt.ecys@dtt-ecys.org', subject=subject, message=messageC, bcc=email_list)
+    was_sent = mail.send(to='dtt.ecys@dtt-dev.site', subject=subject, message=messageC, bcc=email_list)
     row = db.academic_send_mail_log.insert(
         subject=subject,
         sent_message=message,
@@ -328,7 +328,7 @@ def inbox():
 
     if (auth.has_membership('Student') or auth.has_membership('Teacher')):
         courses_admin = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == db.project.id)
-                        & ((db.user_project.period <= period_id) & ((db.user_project.period + db.user_project.periods) > period_id))).select(db.user_project.project)          
+                        & ((db.user_project.period <= period_id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period_id))).select(db.user_project.project)          
 
         years = db(db.period_year).select(db.period_year.id)
         t = years[len(years) - 1]
@@ -340,7 +340,7 @@ def inbox():
         if auth.has_membership('Student') or auth.has_membership('Teacher'):
             try:
                 if db((db.user_project.assigned_user == auth.user.id) & (db.user_project.period == db.period_year.id)
-                    & ((db.user_project.period <= t.id) & ((db.user_project.period + db.user_project.periods) > period_temp.id))).select(db.user_project.id).first() is not None:
+                    & ((db.user_project.period <= t.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period_temp.id))).select(db.user_project.id).first() is not None:
                     periods.append(period_temp)
                     added = True
             except:

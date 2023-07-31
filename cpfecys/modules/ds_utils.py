@@ -2,9 +2,19 @@
 import os
 import shutil
 import uuid
+import qrcode
+import base64
+import datetime
+import zipfile
+import string
+import random
+
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import cm
+from PyPDF2 import PdfWriter, PdfReader
 
 # ************************************** FUNCTIONS **************************************
-
 def serialize_value(value):
     if isinstance(value, str):
         return "'" + value + "'"
@@ -32,7 +42,6 @@ def is_decimal(value):
 
 
 def is_datetime(value):
-    import datetime
     try:
         str_datetime =  datetime.datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
     except ValueError:
@@ -77,11 +86,8 @@ def remove_file(filename, path):
             os.remove(file_path)
             return True
         except Exception as ex:
-            print('********** Error deleting file **********')
-            print(str(ex))
             return False
     else:
-        print('No existe el archivo')
         return True
 
 
@@ -103,8 +109,6 @@ def save_file(file, filename, path, name, file_name_old=None):
         shutil.copyfileobj(file, d_file)
     except Exception as e:
         result = None
-        print('********** Error saving file **********')
-        print(str(e))
     finally:
         d_file.close()
 
@@ -125,7 +129,7 @@ def is_valid_extension(l_extensions):
 
 
 def retrieve_zip_file(path, list_files, user):
-    import zipfile
+    
     uploads_path = os.path.join(path, 'uploads')
     file_zip_name = 'download_deliverables_' + user + '.zip'
     file_zip_path = os.path.join(uploads_path, file_zip_name)
@@ -139,7 +143,6 @@ def retrieve_zip_file(path, list_files, user):
 
     except Exception as e:
         file_zip_name = None
-        print(str(e))
     finally:
         temp_archive.close()
 
@@ -169,11 +172,6 @@ def sign_file(path, filename, url_, signatures, username, signed_file=None, carn
     if extension.strip().upper() != '.PDF':
         return 'Extensión del archivo no es PDF', 0
 
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import cm
-    from PyPDF2 import PdfFileWriter, PdfFileReader
-
     # obteniendo el carnet de usuario
     if carnet is None:
         user = filename.split("-")[1]
@@ -200,12 +198,12 @@ def sign_file(path, filename, url_, signatures, username, signed_file=None, carn
 
     # ===== Modificación Documentos Rechazados (Juan Pablo Ardón López - Prácticas Finales) =====
     try:
-        input_file = PdfFileReader(open(source_path_file, "rb"))
+        input_file = PdfReader(open(source_path_file, "rb"))
     except Exception as ex:
         return ex,0
     # ===== Termina Modificación Documentos Rechazados (Juan Pablo Ardón López - Prácticas Finales) =====
 
-    page_count = input_file.getNumPages()
+    page_count = len(input_file.pages)
 
     qrcode_img = None
     actual_page = 1
@@ -214,13 +212,11 @@ def sign_file(path, filename, url_, signatures, username, signed_file=None, carn
 
     for signature in signatures:
         if signature['signature_page'] > page_count:
-            print('Número de paǵina fuera de rango({}), archivo: {}').format(signature['signature_page'], filename)
             return 'Número de página fuera de rango', 0
 
         if actual_page < signature['signature_page']:
             if cont_signature > 0:
                 c.showPage()
-                print('Se guardaron {} firmas en la página {}').format(cont_signature, actual_page)
                 actual_page = actual_page + 1
                 cont_signature = 0
 
@@ -237,7 +233,6 @@ def sign_file(path, filename, url_, signatures, username, signed_file=None, carn
 
         else:
             if signature['image'] is None:
-                print('Firma no tiene asociada una imagen, archivo: {}').format(filename)
                 return 'Firma no tiene asociada una imagen', 0
 
             path_image = os.path.join(uploads_path, signature['image'])
@@ -247,24 +242,20 @@ def sign_file(path, filename, url_, signatures, username, signed_file=None, carn
         cont_signature = cont_signature + 1
 
     # agregando las ultimas hojas, en caso que la última firma agregada este al inicio
-    print('Se guardaron {} firmas en la página {}').format(cont_signature, actual_page)
     c.save()
-
 
     try:
         # ===== Modificación Documentos Rechazados (Juan Pablo Ardón López - Prácticas Finales) =====
-        output_file = PdfFileWriter()
-        image_temp = PdfFileReader(open(temp_path_file, "rb"))
-        page_count_temp = image_temp.getNumPages()
+        output_file = PdfWriter()
+        image_temp = PdfReader(open(temp_path_file, "rb"))
+        page_count_temp = len(image_temp.pages)
         # ===== Termina Modificación Documentos Rechazados (Juan Pablo Ardón López - Prácticas Finales) =====
         for actual in range(0, page_count):
-            input_page = input_file.getPage(actual)
+            input_page = input_file.pages[actual]
             if actual < page_count_temp:
-                input_page.mergePage(image_temp.getPage(actual))
-            output_file.addPage(input_page)
+                input_page.merge_page(image_temp.pages[actual])
+            output_file.add_page(input_page)
     except Exception as ex:
-        print('No es posible firmar el documento')
-        print(ex)
         return 'No es posible firmar el documento', 0
 
     try:
@@ -272,14 +263,13 @@ def sign_file(path, filename, url_, signatures, username, signed_file=None, carn
         output_file.write(output_stream)
         output_stream.close()
     except Exception as e:
-        print(e)
         return str(e), 0
 
     return dest_filename, 1
 
 
 def generate_qrcode(path, url_, username):
-    import qrcode
+    
     filename = 'qrcode_image_' + username + '.png'
     uploads_path = os.path.join(path, 'uploads')
     dest_path = os.path.join(uploads_path, filename)
@@ -299,8 +289,6 @@ def generate_qrcode(path, url_, username):
 
 
 def encode_delivered_id(delivered):
-    import string
-    import random
     values = {'0': 'e5', '1': 'f0', '2': 'k4', '3': '4W', '4': 'N7', '5': 'h9', '6': 'bk',
               '7': '4G', '8': 'ld', '9': 'r4'}
     id_temp = str(delivered)
@@ -338,12 +326,11 @@ def encode_delivered_id(delivered):
 def decode_delivered_id(cad_base64):
 
     if len(cad_base64) < 68:
-        import base64
+        
 
         try:
             base64_cad = base64.b64decode(cad_base64)
         except Exception as e:
-            print(str(e))
             base64_cad = 'nada'
     else:
         values = {'e5': '0', 'f0': '1', 'k4': '2', '4W': '3', 'N7': '4', 'h9': '5', 'bk': '6',
@@ -512,7 +499,6 @@ def get_last_document():
 
 
 def validate_form_document(vars_form):
-    import datetime
     is_valid = True
     name = vars_form.inputName.strip()
     description = vars_form.inputDescription.strip()
@@ -586,7 +572,6 @@ def validate_form_document(vars_form):
 
 
 def change_dates_form_document(date_start_old, date_finish_old, date_start, date_finish):
-    import datetime
     change = False
 
     # fechas anteriores

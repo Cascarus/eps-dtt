@@ -1,0 +1,104 @@
+{{extend 'layout.html'}}
+<style>
+    /* Estilos CSS para las animaciones */
+    .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateY(100%);
+        }
+        to {
+            transform: translateY(0);
+        }
+    }
+
+    /* Aplicar animaciones a los elementos */
+    .fadeIn {
+        animation-name: fadeIn;
+    }
+
+    .slideIn {
+        animation-name: slideIn;
+    }
+
+    /* Estilos para los enlaces */
+    .link-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .link-item {
+        margin-bottom: 10px;
+        animation-duration: 0.5s;
+        animation-fill-mode: both;
+        animation-name: fadeIn;
+    }
+
+    .link-item a {
+        display: inline-block;
+        color: #000;
+        text-decoration: none;
+        padding: 5px 10px;
+        background-color: #eaeaea;
+        border-radius: 5px;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1 style="color: orange; font-size: 32px">Enlaces </h1>
+            <hr style="border-color: gray;"> 
+        </div>
+        <div class="col-6">
+            <table class="table-responsive-md animated slideIn" style="width: 100%;"> 
+                <tr>
+                    <td class="text-center" style="color: orange; font-size: 18px;">
+                        <p>EPS</p>
+                        <p>Revista</p>
+                        <p>Practica Final</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="text-center">
+                        <ul class="link-list">
+                            {{for link in links:}}
+                                {{if link.visible:}}
+                                <li class="link-item animated fadeIn"><a href="//{{=link.url}}" {{if link.blank:}}target="_blank" {{pass}}>{{=link.url_text}}</a></li>
+                                {{pass}}
+                            {{pass}}
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-6">
+            <table class="table-responsive-md animated slideIn" style="width: 100%;"> 
+               
+                <tr>
+                    <td class="text-center">
+                        <ul class="link-list">
+                            {{for link in public_links:}}
+                                {{if link.visible:}}
+                                <li class="link-item animated fadeIn"><a href="{{=link.url}}" {{if link.blank:}}target="_blank" {{pass}}>{{=link.url_text}}</a></li>
+                                {{pass}}
+                            {{pass}}
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+

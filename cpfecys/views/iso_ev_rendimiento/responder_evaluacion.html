@@ -1,0 +1,75 @@
+{{extend 'dashboard.html'}}
+<style>
+    .loader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        border: 16px solid #f3f3f3;
+        /* Light grey */
+        border-top: 16px solid #3498db;
+        /* Blue */
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+<h2>Evaluación de Rendimiento {{=nombre_curso}}</h2>
+<h3>Tutor Académico: {{=nombre_tutor}} {{=apellido_tutor}}</h3>
+<form id="preguntas">
+</form>
+<div style="text-align: center;" id="divBtn">
+    <button class="btn btn-success" onclick="siguienteGrupo()">Siguiente</button>
+</div>
+<div id='divloader'>
+    <div class="loader"></div>
+</div>
+<div id="finalizada" style="display: none;" class="card text-center">
+    <div class="card-header alert-success">
+        <h5>¡Ha finalizado la Evaluación de Rendimiento!</h5>
+    </div>
+</div>
+
+</div>
+<div class="modal fade" role="dialog" id="advertencia">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Advertencia</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Debes contestar todas las preguntas</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" type="text/css" href="/static/css/iso_estilos.css">
+<script>
+    let id_ev = {{=id_ev }}
+    let id_user_project = {{=id_user_project }}
+    let id_evr_curso = {{=id_ev_curso }}
+    document.getElementById("divBtn").style.display = 'none';
+    document.getElementById("preguntas").style.display = 'none';
+    $(document).ready(function () {
+        getPreguntas();
+    }) 
+</script>
+<script type="text/javascript" src="/static/js/iso_respuesta_evaluacion.js">
+</script>

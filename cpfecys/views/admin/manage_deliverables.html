@@ -2,7 +2,7 @@
 
 <br />
 <div class="text-center">
-    <h1>Gestión de Entregables</h1>
+    <h1>Gestión de entregables</h1>
 </div>
 {{if action['type'] == 'deliverable_type' or action['type'] == 'deliverables' or action['type'] == 'items':}}
     <div class="text-center">
@@ -541,7 +541,7 @@
                 },
                 function(result, status){
                     if(status == 'success'){
-                        data = JSON.parse(result);
+                        data = result//JSON.parse(result);
                         if (data.ok == 0){
                             alert(data.message);
                         }
@@ -599,7 +599,7 @@
             },
             function(result, status){
                 if(status == 'success'){
-                    data = JSON.parse(result);
+                    data = result//JSON.parse(result);
                     if (data.ok == 0){
                         alert(data.message);
                     }

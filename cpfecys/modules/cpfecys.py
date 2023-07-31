@@ -479,3 +479,14 @@ def student_validation_report_status(report):
         or (report.status.name == 'Recheck' and current_date <= next_date)):
         return True
     return False
+
+def teacher_validation_report_access(report):
+    db = _db
+    auth = _auth
+    report = db(db.report.id == report).select(db.report.assignation).first()
+    if report is None or report.assignation.project is None:
+        return False
+    
+    project = report.assignation.project
+    assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id)).select(db.user_project.id).first()
+    return assignation is not None

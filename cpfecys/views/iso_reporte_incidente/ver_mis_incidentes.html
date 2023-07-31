@@ -1,0 +1,56 @@
+{{extend 'dashboard.html'}}
+<div class="col-12 mt-4">
+    <center>
+        <h1>Mis incidentes</h1>
+    </center>
+    <div>
+        <form class="form-inline" action="{{=URL('iso_reporte_incidente', 'ver_mis_incidentes')}}">
+            <label for="periodo">Seleccione un periódo: </label>
+            <select name="periodo" class="form-control">
+                {{for period in periodos:}}
+                    <option {{if period.id==id_periodo:}} selected {{pass}} value="{{=period.id}}">
+                        {{='' +str(period.yearp) +'-' + str(period.period)}}
+                    </option>
+                {{pass}}
+            </select>
+            <input type="submit" value="ir" class="btn btn-outline-primary" />
+        </form>
+        {{if len(incidentes) > 0:}}
+            <div class="web2py_grid">
+                <div class="web2py_table">
+                    <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class=""><a href="#">Curso</a></th>
+                                    <th class=""><a href="#">Descripción</a></th>
+                                    <th class=""><a href="#">Fecha</a></th>
+                                    <th class=""></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{for incidente in incidentes:}}
+                                    <tr>
+                                        <td>{{=incidente.project.name}}</td>
+                                        <td>{{=incidente.iso_incidente.descripcion}}</td>
+                                        <td>{{=incidente.iso_incidente.fecha_reporte}}</td>
+                                        <td>
+                                            <!--TODO editable si es el semestre actual-->
+                                            <a class="button btn btn-default"
+                                                href="{{=URL('iso_reporte_incidente', 'editar_incidente', args=(incidente.iso_incidente.id))}}">
+                                                <span class="icon pen icon-pencil glyphico glyphico-arrow pencil" /></span>
+                                                <span class="buttontext button" title="Editar">Editar</span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {{else:}}
+            <h4>No se encontraron incidentes</h4>
+        {{pass}}
+    </div>
+</div>

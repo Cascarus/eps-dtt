@@ -1,7 +1,7 @@
 import csv
 import cpfecys
-import io
 import datetime
+import chardet
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -10,7 +10,7 @@ def course_schedule_upload():
 
     cursos_error = list()
     errors = list()
-    if request.vars.csvfile != None:
+    if request.vars.csvfile is not None:
         try:
             file = request.vars.csvfile.file
         except:
@@ -42,7 +42,13 @@ def course_schedule_upload():
         try:
             db(db.dsi_schedule_course.period == current_period.id).delete()
             db.commit()
-            cr = csv.reader(file.getvalue().decode('utf-8').splitlines(), delimiter=',', quotechar='"')
+            try:
+                content_file = file.read()
+                detection = chardet.detect(content_file)['encoding']
+                content_file = content_file.decode(detection).splitlines()
+            except:
+                content_file = []
+            cr = csv.reader(content_file, delimiter=',', quotechar='"')
             cont = 1
             for row in cr:
                 insert = False

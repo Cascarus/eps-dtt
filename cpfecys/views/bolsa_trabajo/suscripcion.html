@@ -1,0 +1,286 @@
+{{extend 'layout.html'}}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: #343A40;
+    }
+
+</style>
+
+<div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-sm-12 mt-4">
+    <div class="card">
+        <div class="card-header justify-content-center">
+            <h5 class="text-center">Registro de Empresa</h5>
+        </div>
+        <div class="card-body">
+            {{if not new_dict['continue']:}}
+                <form id="formEmpresa" class="m-0 p-0">
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="nameInput" class="form-label">Nombre de la empresa <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nameInput" required
+                                placeholder="Nombre de la empresa" />
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="emailInput" class="form-label">Correo <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="email" class="form-control" id="emailInput" required
+                                placeholder="ejemplo@ejemplo.com" />
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="personInput" class="form-label">Persona Encargada <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="personInput" required
+                                placeholder="Nombre de la persona encargada" />
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="phoneInput" class="form-label">Teléfono <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="phoneInput" required
+                                placeholder="Numero de telefono" onkeyup="Card(event, this)"/>
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-12">
+                            <label for="addressInput" class="form-label">Dirección <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addressInput" required
+                                placeholder="Direccion de oficina" />
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-12">
+                            <label for="webInput" class="form-label">Página web <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="webInput" required
+                                placeholder="http://dominio.com" />
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-12">
+                            <label for="descInput" class="form-label">Descripción <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <textarea class="form-control" id="descInput" rows="3" required
+                                placeholder="Descripción de a lo que se dedique la empresa"></textarea>
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="passInput" class="form-label">Password <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="password" class="form-control" id="passInput" autocomplete="off" required
+                                placeholder="Contraseña" />
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="passConfirm" class="form-label">Confirmar contraseña <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="password" class="form-control" id="passConfirm" autocomplete="off" required
+                                placeholder="Confirmar contraseña" />
+                        </div>
+                    </div>
+                    <div class='row w-100 m-0 p-0 pe-3 justify-content-end'>
+                        <button type="submit" class="btn btn-primary w-auto me-3">Solicitar
+                            Suscripción</button>
+                        <button type="button" class="btn btn-danger w-auto" onclick="cancelSuscription()">Cancelar</button>
+                    </div>
+                </form>
+            {{else:}}
+                <form id="formEmpresa" class="m-0 p-0">
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="nameInput1" class="form-label">Nombre de la empresa <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="nameInput1"
+                                value="{{=new_dict['empresa']['nombre_empresa']}}" required
+                                placeholder="Nombre de la empresa" />
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="emailInput" class="form-label">Correo <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="email" class="form-control" id="emailInput"
+                                value="{{=new_dict['empresa']['correo']}}" required placeholder="ejemplo@ejemplo.com" />
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="personInput1" class="form-label">Persona Encargada <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="personInput"
+                                value="{{=new_dict['empresa']['persona_encargada']}}" required
+                                placeholder="Nombre de la persona encargada" />
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="phoneInput1" class="form-label">Teléfono <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="phoneInput1"
+                                value="{{=new_dict['empresa']['telefono']}}" required placeholder="Numero de telefono" 
+                                onkeyup="Card(event, this)"/>
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-12">
+                            <label for="addressInput1" class="form-label">Dirección <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addressInput1"
+                                value="{{=new_dict['empresa']['direccion']}}" required placeholder="Direccion de oficina" />
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-12">
+                            <label for="webInput1" class="form-label">Página web <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="text" class="form-control" id="webInput1"
+                                value="{{=new_dict['empresa']['pagina_web']}}" required placeholder="http://dominio.com" />
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-12">
+                            <label for="descInput1" class="form-label">Descripción <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <textarea class="form-control" id="descInput1" rows="3" required
+                                placeholder="Descripción de a lo que se dedique la empresa">{{=new_dict['empresa']['descripcion']}}</textarea>
+                        </div>
+                    </div>
+                    <div class="row m-0 p-0 mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="passInput1" class="form-label">Password <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="password" class="form-control" id="passInput1" disabled
+                                value="{{=new_dict['empresa']['password']}}" autocomplete="off" required
+                                placeholder="Contraseña" />
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <label for="passConfirm1" class="form-label">Confirmar contraseña <span
+                                    class="m-0 p-0 text-danger">*</span></label>
+                            <input type="password" class="form-control" id="passConfirm1" autocomplete="off" required
+                                placeholder="Confirmar contraseña" />
+                        </div>
+                    </div>
+                    <div class='row w-100 m-0 p-0 pe-3 justify-content-end'>
+                        <button type="submit" class="btn btn-primary w-auto me-3">Solicitar
+                            Suscripción</button>
+                        <button type="button" class="btn btn-danger w-auto" onclick="cancelSuscription()">Cancelar</button>
+                    </div>
+                </form>
+            {{pass}}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('formEmpresa').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if ("{{=new_dict['continue']}}" == "False" && e.target[7].value !== e.target[8].value) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Contraseñas no coinciden',
+                icon: 'error'
+            });
+            return;
+        }
+        const data = {
+            nombre_empresa: quitarAcentos(e.target[0].value),
+            correo: e.target[1].value,
+            persona_encargada: quitarAcentos(e.target[2].value),
+            telefono: e.target[3].value,
+            direccion: quitarAcentos(e.target[4].value),
+            pagina_web: e.target[5].value,
+            descripcion: quitarAcentos(e.target[6].value),
+            password: e.target[7].value,
+        }
+        if ("{{=new_dict['continue']}}" == "True") {
+            data.confirm = e.target[8].value;
+            data.correo_registrado = "{{=new_dict['empresa']['correo']}}";
+            data.id_usuario = parseInt("{{=new_dict['empresa']['id']}}");
+            data.id_empresa = parseInt("{{=new_dict['empresa']['id_empresa']}}");
+        }
+        let url = `${location.protocol}//${location.hostname}:${location.port}`
+        url += "{{=new_dict['continue']}}" == "True" ? '/bolsa_trabajo/updatesuscripcion' : '/bolsa_trabajo/suscripcion';
+        $.ajax({
+            type: 'post',
+            url: url,
+            data: `array=${JSON.stringify(data)}`,
+            success: function (res) {
+                res = JSON.parse(res);
+                if (res.success) {
+                    Swal.fire({
+                        title: 'Registrado!',
+                        text: res.msg,
+                        icon: 'success'
+                    }).then(() => {
+                        if ("{{=new_dict['continue']}}" == "False") {
+                            window.location = '/';
+                        }
+                    });
+                    $('#formEmpresa').trigger('reset');
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: res.msg,
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function (xhr, status, errorThrown) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Hubo un problema, intente más tarde',
+                    icon: 'error'
+                });
+            }
+        });
+    });
+
+    function cancelSuscription() {
+        window.location = '/';
+    }
+
+    function quitarAcentos(cadena) {
+        const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'ñ': 'n', 'Ñ': 'N' };
+        cadena = cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+        return cadena = cadena.replace(/[^\w\s ?,:.!%()-_"@/]/gi, '');
+    }
+
+    // fuente: https://devlaz.com/restringir-caracteres-en-campos-con-javascript
+    function Card(event, el) {//Validar nombre	
+        //Obteniendo posicion del cursor 
+        var val = el.value;//Valor de la caja de texto
+        var pos = val.slice(0, el.selectionStart).length;
+
+        var out = '';//Salida
+        var filtro = '1234567890(+-) ';
+        var v = 0;//Contador de caracteres validos
+
+        //Filtar solo los numeros
+        for (var i = 0; i < val.length; i++) {
+            if (filtro.indexOf(val.charAt(i)) != -1) {
+                v++;
+                out += val.charAt(i);
+            }
+        }
+        //Reemplazando el valor
+        el.value = out;
+
+        //En caso de modificar un numero reposicionar el cursor
+        if (event.keyCode == 8) {//Tecla borrar precionada
+            el.selectionStart = pos;
+            el.selectionEnd = pos;
+        }
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+    crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+    crossorigin="anonymous"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

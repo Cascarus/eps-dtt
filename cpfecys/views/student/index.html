@@ -112,7 +112,8 @@
                                                                     db.report.teacher_comment,
                                                                     db.report.id,
                                                                     db.report.dtt_approval,
-                                                                    db.report.report_restriction
+                                                                    db.report.report_restriction,
+                                                                    db.report.score_date
                                                                 )
                                                     }}
                                                     {{average_report_count = len(reports)}}
@@ -519,7 +520,7 @@
                                                                             {{pass}}
                                                                         {{else:}}
                                                                             <tr>
-                                                                                <td>{{=item_restriction.item_restriction.name}}</td>
+                                                                                <td>{{=item_restriction.name}}</td>
                                                                                 <td>
                                                                                     <div class='badge badge-danger'>
                                                                                         Entregable fallido

@@ -1,124 +1,118 @@
-
 {{extend 'dashboard.html'}}
 {{import cpfecys}}
 {{step_count = 0}}
 <div class="col-12">
-	{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var == True):}}
-		<div class="dttContainer">
-	{{else:}}
-		<div class="dttContainer">
-	{{pass}}
-
+	<div class="dttContainer">
 		<center>
-			{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var == True):}}
-				<h2>Control Academico</h2>
-				<h5>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</h5>
+			{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var):}}
+				<h2>Control academico</h2>
+				<h5>{{=T(periodo.period.name)}} {{=periodo.yearp}}</h5>
 			{{else:}}
-				<h2>Mis Cursos
+				<h1>Mis cursos
 					<br>
-					<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
-				</h2>
+					<small>{{=T(periodo.period.name)}} {{=periodo.yearp}}</small>
+				</h1>
 			{{pass}}
 		</center>
 		
-		<div class="row mt-3">
-			{{if (auth.has_membership('Teacher') and ecys_var == False) and (str(periodo.id) == str(currentyear_period.id)):}}
-				<div class="col-12 mb-5">
-					<a class="btn btn-primary" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Reportes</a>
-					<div class="row">
-						<div class="col">
-							<div class="collapse multi-collapse" id="multiCollapseExample1">
-								<div class="card card-body">
-									<ul class="list-group">
-										<li class="list-group-item">
-											<a href="{{=URL('teacher_reports', 'grades_management')}}" type="button"
-												class="btn btn-secondary" id="menu_create_activity">{{=T('Report management grades')}}</a>
-										</li>
-										<li class="list-group-item">
-											<a href="{{=URL('teacher_reports','validate_laboratory_management')}}"
-												type="button" class="btn btn-secondary">{{=T('Management Reports Laboratory Revalidations')}}</a>
-										</li>
-										<li class="list-group-item">
-											<a href="{{=URL('teacher_reports','laboratory_replacing_management')}}"
-												type="button" class="btn btn-secondary">{{=T('Report Equivalence Management Laboratory')}}</a>
-										</li>
-									</ul>
-								</div>
+	<div class="row mt-3">
+		{{if (auth.has_membership('Teacher') and not ecys_var) and (str(periodo.id) == str(currentyear_period.id)):}}
+			<div class="col-12 mb-5">
+				<a class="btn btn-primary" data-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Reportes</a>
+				<div class="row">
+					<div class="col">
+						<div class="collapse multi-collapse" id="multiCollapseExample1">
+							<div class="card card-body">
+								<ul class="list-group">
+									<li class="list-group-item">
+										<a href="{{=URL('teacher_reports', 'grades_management')}}" type="button"
+											class="btn btn-secondary" id="menu_create_activity">{{=T('Report management grades')}}</a>
+									</li>
+									<li class="list-group-item">
+										<a href="{{=URL('teacher_reports','validate_laboratory_management')}}"
+											type="button" class="btn btn-secondary">{{=T('Management Reports Laboratory Revalidations')}}</a>
+									</li>
+									<li class="list-group-item">
+										<a href="{{=URL('teacher_reports','laboratory_replacing_management')}}"
+											type="button" class="btn btn-secondary">{{=T('Report Equivalence Management Laboratory')}}</a>
+									</li>
+								</ul>
 							</div>
 						</div>
 					</div>
 				</div>
-			{{pass}}
-			<div class="col-12 col-md-6 mb-3">
-				<div data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
-					<form class="form-inline" action="{{=URL('activity_control','courses_list')}}" method='get'>
-						<select name="period" id="period" class="form-control">
-							<!--emarquez: id periodo-->
-							{{var_sel = ''}}
-							{{for period in periods:}}
-								{{if str(period.id) == str(periodo.id):}}
-									{{var_sel = "selected='selected'"}}
-								{{else:}}
-									{{var_sel = ''}}
-								{{pass}}
-								<option value="{{=period.id}}" {{=var_sel}}>
-									{{=T(period.period.name)}}-{{=period.yearp}}
-								</option>
-							{{pass}}
-						</select>
-						<input class="btn btn-outline-primary" type="submit" value="{{=T('Go')}}">
-						<!--emarquez: control de periodo , -->
-						<input id="chkTipoCursoA" type="checkbox" checked data-toggle="toggle" data-on="Semestres" data-off="Periodos" data-size="mini" class="d-none">
-					</form>
-				</div>
 			</div>
-			<div class="col-12 col-md-6 border p-1 mb-3">
-				<div class="text-right row">
-					<div class="col-4">
-						<span class="dtt__label badge badge-success">&nbsp;&nbsp;&nbsp;</span>
-						<span>{{=T('Notes above average')}}</span>
-					</div>
-					<div class="col-4">
-						<span class="dtt__label badge badge-warning">&nbsp;&nbsp;&nbsp;</span>
-						<span>{{=T('Notes on the average')}}</span>
-					</div>
-					<div class="col-4">
-						<span class="dtt__label badge badge-danger">&nbsp;&nbsp;&nbsp;</span>
-						<span>{{=T('Notes Below Average')}}</span>
-					</div>
+		{{pass}}
+		<div class="col-12 col-md-6 mb-3">
+			<div data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
+				<form class="form-inline" action="{{=URL('activity_control', 'courses_list')}}" method='get'>
+					<select name="period" id="period-courses" class="form-control">
+						<!--emarquez: id periodo-->
+						{{var_sel = ''}}
+						{{for period in periods:}}
+							{{if period.id == periodo.id:}}
+								{{var_sel = "selected='selected'"}}
+							{{else:}}
+								{{var_sel = ''}}
+							{{pass}}
+							<option value="{{=period.id}}" {{=var_sel}}>
+								{{=T(period.period.name)}} - {{=period.yearp}}
+							</option>
+						{{pass}}
+					</select>
+					<input class="btn btn-outline-primary" type="submit" value="{{=T('Go')}}">
+					<!--emarquez: control de periodo , -->
+					<input id="chkTipoCursoA" type="checkbox" checked data-toggle="toggle" data-on="Semestres" data-off="Periodos" data-size="mini" class="d-none">
+				</form>
+			</div>
+		</div>
+		<div class="col-12 col-md-6 border p-1 mb-3">
+			<div class="text-right row">
+				<div class="col-4">
+					<span class="dtt__label badge badge-success">&nbsp;&nbsp;&nbsp;</span>
+					<span>{{=T('Notes above average')}}</span>
+				</div>
+				<div class="col-4">
+					<span class="dtt__label badge badge-warning">&nbsp;&nbsp;&nbsp;</span>
+					<span>{{=T('Notes on the average')}}</span>
+				</div>
+				<div class="col-4">
+					<span class="dtt__label badge badge-danger">&nbsp;&nbsp;&nbsp;</span>
+					<span>{{=T('Notes Below Average')}}</span>
 				</div>
 			</div>
 		</div>
+	</div>
 
-		{{if (auth.has_membership('Teacher') and ecys_var == False) or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
-			{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var == True):}}
-				<div class="dttcourses mt-4 first">
-					<div class="row">
-						<div class="col-12">
-							<div id="table-first" class="table-responsive">
-								<table class="table table-striped table-bordered">
-									<thead>
-										<tr>
-											<th width="50%">{{=T('Course')}}</th>
-											<th width="20%"><center>{{=T('Section')}}<br><br></center></th>
-											<th width="10%" style="white-space:inherit;"><center>{{=T('Course Average')}}</center></th>
-											<th width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
-											<th width="10%"><center>{{=T('Grades Management')}}<br><br></center></th>
-											{{if periodo == period:}}
-												<th width="10%"><center>{{=T('Asignación de estudiantes')}}<br><br></center></th>
-											{{pass}}
-										</tr>
-									</thead>
-			{{pass}}
-				<tbody>
-					{{var_do = True}}
-					{{var_admin = False}}
-					{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
-						{{comparation = T(period.period.name)+" "+str(period.yearp)}}
-						{{controlP = db((db.student_control_period.period_name==comparation)).select().first()}}
-						{{var_admin = True}}
-					{{pass}}
-					{{for course in coursesAdmin:}}
+	{{if (auth.has_membership('Teacher') and not ecys_var) or auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
+		{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator') & ecys_var):}}
+			<div class="dttcourses mt-4 first">
+				<div class="row">
+					<div class="col-12">
+						<div id="table-first" class="table-responsive">
+							<table class="table table-striped table-bordered">
+								<thead>
+									<tr>
+										<th width="50%">{{=T('Course')}}</th>
+										<th width="20%"><center>{{=T('Section')}}<br><br></center></th>
+										<th width="10%" style="white-space:inherit;"><center>{{=T('Course Average')}}</center></th>
+										<th width="10%" style="white-space:inherit;"><center>{{=T('Laboratory Average')}}</center></th>
+										<th width="10%"><center>{{=T('Grades Management')}}<br><br></center></th>
+										{{if periodo == period:}}
+											<th width="10%"><center>{{=T('Asignación de estudiantes')}}<br><br></center></th>
+										{{pass}}
+									</tr>
+								</thead>
+		{{pass}}
+			<tbody>
+				{{var_do = True}}
+				{{var_admin = False}}
+				{{if auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator'):}}
+					{{comparation = T(period.period.name)+" "+str(period.yearp)}}
+					{{controlP = db((db.student_control_period.period_name==comparation)).select().first()}}
+					{{var_admin = True}}
+				{{pass}}
+				{{for course in coursesAdmin:}}
 						<tr>
 							{{if var_admin == False:}}
 								<div class="row">
@@ -186,8 +180,8 @@
 											{{pass}}
 										</div>
 									</td>
-								{{except Exception as e:}}
-									{{=e}}
+								{{except:}}
+									{{...}}
 								{{pass}}
 							{{pass}}
 							{{if var_admin == True:}}
@@ -592,13 +586,13 @@
 				{{pass}}
 
 				{{if countcoursesAdminT==0 and coursesStudentT==0:}}
-				<div class="dttcourses mt-4">
-					<div class="row">
-						<div class="col-12 text-center">
-							<h3>No tiene asignaciones</h3>
+					<div class="dttcourses mt-4">
+						<div class="row">
+							<div class="col-12 text-center">
+								<h3>No tiene asignaciones</h3>
+							</div>
 						</div>
 					</div>
-				</div>
 				{{pass}}
 				{{pass}}
 			</div>
@@ -622,61 +616,36 @@
 	var coursesAdminAnterior = {{=XML(json(coursesAdminAnterior))}};
 	
 	$(document).ready(function () {
-		var tipoPeriodo = "SEMESTRE";
-		//si son periodos variables, obtener ID de periodo, en base al parametro
-		var ID_period = 0;
-		$.each(periodo_year, function (i, value) {
-			if (value.id == periodo_parametro) {
-				ID_period = value.period;
+		$("#chkTipoCursoA").change(function() {
+			if($(this).prop('checked')) {
+				$.ajax({
+					url: "{{=URL('activity_control', 'get_periods_on_change', vars=dict(period_type='1', period_id=periodo.id))}}",
+					type: 'GET',
+					success: function(resp) {
+						$("#period-courses").empty();
+						for (let element of resp){
+							$("#period-courses").append(element)
+						}
+					},
+					cache: false,
+					contentType: false,
+					processData: false
+            	});
+			} else {
+				$.ajax({
+					url: "{{=URL('activity_control', 'get_periods_on_change', vars=dict(period_type='2', period_id=periodo.id))}}",
+					type: 'GET',
+					success: function(resp) {
+						$("#period-courses").empty();
+						for (let element of resp){
+							$("#period-courses").append(element)
+						}
+					},
+					cache: false,
+					contentType: false,
+					processData: false
+            	});
 			}
-		});
-		$.each(period_detail, function (i, value) {
-			if (value.period == parseInt(ID_period)) // si lo encuentra aqui, significa que es semestre
-				tipoPeriodo = "VARIABLE";
-		});
-		if (ID_period != 0) {
-			if (tipoPeriodo == "VARIABLE") {
-				llenaComboPeriodosVariablesAjax("period", periodo_parametro); //llama asincronamente a los periodos existentes, y setea con el valor enviado
-				$("#chkTipoCursoA").removeAttr("checked");
-			} else { llenaComboPeriodosSemestresAjax("period", periodo_parametro); }
-			$('#chkTipoCursoA').change(function () {
-				if ($(this).prop('checked')) { llenaComboPeriodosSemestresAjax("period"); }
-				else { llenaComboPeriodosVariablesAjax("period"); }
-			});
-		}
+		})
 	});
-
-	function setearNombresPeriodos() {
-		$.each(period_all, function (index, d1) {
-			$.each(periodos_s, function (index2, d2) {
-				if (d1.id == d2.period) {
-					d2.name = d1.name + '-' + d2.yearp;
-				}
-			});
-			$.each(periodos_v, function (index3, d3) {
-				if (d1.id == d3.period) {
-					d3.name = d1.name + '-' + d3.yearp;
-				}
-			});
-		});
-	}
-
-	function obtenerSemestres() {
-		$("#period").empty();
-		$.each(periodos_s, function (index, data) {
-			var o = new Option(data.name, data.id);
-			$(o).html(data.name);
-			$("#period").append(o);
-		});
-	}
-
-	function obtenerPeriodosVariables() {
-		$("#period").empty();
-		//llenar combo unicamente con los periodos variables
-		$.each(periodos_v, function (index, data) {
-			var o = new Option(data.name, data.id);
-			$(o).html(data.name);
-			$("#period").append(o);
-		});
-	}
 </script>

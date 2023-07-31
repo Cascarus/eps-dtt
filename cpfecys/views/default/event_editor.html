@@ -1,0 +1,12 @@
+{{extend 'dashboard.html'}}
+<h1>{{=T('Events')}}: {{=name}}
+  <br/>
+    <small>{{=T(semester)}}, {{=year}}</small>
+</h1>
+{{
+  import click
+  lst = grid.components
+  click.echo(type(lst[0]))
+}}
+
+{{=grid}}

@@ -1,0 +1,49 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>Asignación de temas de tesis</h1>
+    </div>
+    <div class="col-12 mt-4">
+        {{=grid}}
+    </div>
+</div>
+
+
+<script type='text/javascript'>
+    function setSelectValue (id, val) {
+        document.getElementById(id).value = val;
+    }
+</script>
+
+{{if request.args:}}
+    {{if ((request.args[0] == 'new') & (request.args[1] == 'tesis_asigned_topics')):}}
+        <script>
+            setSelectValue('tesis_asigned_topics_status', 1);
+        </script>
+    {{pass}}
+{{pass}}
+
+<script type='text/javascript'>
+    $(function(){
+        $("#tesis_asigned_topics_student").blur(function() {
+            jQuery.ajax({
+                type:'POST',
+                url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/tesis/get_name_student`,
+                data:{
+                    num_carnet: document.getElementById("tesis_asigned_topics_student").value
+                },
+                timeout: 20000,
+                success: function(msg) {
+                    var lbl_carnet = "Carnet: ";
+                    var txt_carnet = document.getElementById("tesis_asigned_topics_student").value;
+                    var lbl_student = "Estudiante: ";
+                    var space = "\n";
+                    if (msg === '') { msg = 'No encontrado'; }
+                    console.log(msg)
+                    var res = lbl_carnet.concat(txt_carnet, space, space, lbl_student, msg);
+                    alert(res);
+                }
+            });
+        });
+    })
+</script>

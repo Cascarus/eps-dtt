@@ -1,0 +1,623 @@
+{{extend 'dashboard.html'}}
+
+<div class='row p-0 m-0'>
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Reportes</h1>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Empresas Registradas</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="registroEmpresa"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Ofertas Laborales Registradas</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="registroOferta"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Cantidad de Ofertas Aceptadas por Empresa</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="empresasPropuestas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Promedio de Rangos Salariales por Area</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div class="col-12 col-md-6 col-xl-4">
+                <table class="table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Exportar Promedio de Rangos Salariales por Area</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tb-salarios">
+                        <tr>
+                            <td><a class="col-sm-12 btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/SalarioPromedio.csv" target="_blank">Top 10</a></td>
+                        </tr>
+                        <tr>
+                            <td><a class="col-sm-12 btn btn-primary btn mt-1 text-justify" href="/cpfecys/static/bolsa_trabajo/reportes/SalarioPromedio.csv" target="_blank">Ver Todo</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-12 col-md-6 col-xl-8" style="position: relative; width: 70%;">
+                <canvas id="promedioSalarios"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Ofertas con más visitas</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 100%;">
+                <canvas id="visitaPropuestas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Ofertas con menos visitas</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 100%;">
+                <canvas id="visitaPropuestasMenos"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Propuestas con Mayor Cantidad de Aplicantes</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 60%;">
+                <canvas id="aplicantesPropuestas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Solicitudes Recibidas por Empresa</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="ofertasRecibidas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Solicitudes Revisadas por Empresa</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="ofertasRevisadas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class='row p-0 m-0'>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Estudiantes Contactados por Empresa</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="ofertasContactadas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class='col-lg-6 col-md-6 col-sm-12'>
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-2 px-0'>
+                <h3 class='p-0 m-0'>Estudiantes Contratados por empresa</h3>
+            </div>
+        </div>
+        <div class='row p-0 m-0 d-flex w-100 justify-content-center' style="position: relative;">
+            <div style="position: relative; width: 70%;">
+                <canvas id="ofertasContratadas"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"
+    integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+    let new_dict = {}
+    function fillTbSalarios(data){
+        let tb = document.getElementById("tb-salarios");
+        let i = 0;
+        data.data.forEach(element => {
+            $('#tb-salarios').append(`<tr><td>${data.labels[i]}</td><td>${Math.round(element)}</td></tr>`)
+            i++;
+        });
+    }
+    
+    $.ajax({
+        type: 'post',
+        url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/reportes_data`,
+        async: false,
+        success: function (res) {
+            new_dict = JSON.parse(res)
+        },
+        error: function (xhr, status, errorThrown) {
+        }
+    });
+    /* creacion de canvas para reporte de registro de empresas */
+    const registroEmpresa = document.getElementById('registroEmpresa').getContext('2d');
+    const chartRegistroEmpresa = new Chart(registroEmpresa, {
+        type: 'pie',
+        data: {
+            labels: new_dict.registroEmpresa.labels,
+            datasets: [{
+                label: 'Estado de Empresas en el Sistema',
+                data: new_dict.registroEmpresa.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+    /* creacion de canvas para reporte de registro de ofertas laborales */
+    const registroOferta = document.getElementById('registroOferta').getContext('2d');
+    const chartRegistroOferta = new Chart(registroOferta, {
+        type: 'pie',
+        data: {
+            labels: new_dict.registroOferta.labels,
+            datasets: [{
+                label: 'Estado de Empresas en el Sistema',
+                data: new_dict.registroOferta.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+    /* creacion de canvas para reporte de registro de ofertas laborales */
+    const empresasPropuestas = document.getElementById('empresasPropuestas').getContext('2d');
+    const chartEmpresasPropuestas = new Chart(empresasPropuestas, {
+        type: 'bar',
+        data: {
+            labels: new_dict.empresasPropuestas.labels,
+            datasets: [{
+                label: 'Cantidad de Ofertas Aceptadas por Empresa',
+                data: new_dict.empresasPropuestas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const visitaPropuestas = document.getElementById('visitaPropuestas').getContext('2d');
+    const chartVisitaPropuestas = new Chart(visitaPropuestas, {
+        type: 'bar',
+        data: {
+            labels: new_dict.visitaPropuestas.labels,
+            datasets: [{
+                label: 'Cantidad visitas a oferta laboral',
+                data: new_dict.visitaPropuestas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const visitaPropuestasMenos = document.getElementById('visitaPropuestasMenos').getContext('2d');
+    const chartVisitaPropuestasMenos = new Chart(visitaPropuestasMenos, {
+        type: 'bar',
+        data: {
+            labels: new_dict.visitaPropuestasMenos.labels,
+            datasets: [{
+                label: 'Cantidad visitas a oferta laboral',
+                data: new_dict.visitaPropuestasMenos.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const promedioSalarios = document.getElementById('promedioSalarios').getContext('2d');
+    const chartPromedioSalarios = new Chart(promedioSalarios, {
+        type: 'bar',
+        data: {
+            labels: new_dict.promedioSalarios.labels,
+            datasets: [{
+                label: 'Promedio de salarios por area de especialidad',
+                data: new_dict.promedioSalarios.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const aplicantesPropuestas = document.getElementById('aplicantesPropuestas').getContext('2d');
+    const chartaplicantesPropuestas = new Chart(aplicantesPropuestas, {
+        type: 'polarArea',
+        data: {
+            labels: new_dict.aplicantesPropuestas.labels,
+            datasets: [{
+                label: 'Cantidad de aplicantes por oferta laboral',
+                data: new_dict.aplicantesPropuestas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const ofertasRecibidas = document.getElementById('ofertasRecibidas').getContext('2d');
+    const chartofertasRecibidas = new Chart(ofertasRecibidas, {
+        type: 'bar',
+        data: {
+            labels: new_dict.ofertasRecibidas.labels,
+            datasets: [{
+                label: 'Cantidad de Ofertas Recibidas por Empresa',
+                data: new_dict.ofertasRecibidas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const ofertasRevisadas = document.getElementById('ofertasRevisadas').getContext('2d');
+    const chartofertasRevisadas = new Chart(ofertasRevisadas, {
+        type: 'bar',
+        data: {
+            labels: new_dict.ofertasRevisadas.labels,
+            datasets: [{
+                label: 'Cantidad de Ofertas Revisadas por Empresa',
+                data: new_dict.ofertasRevisadas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const ofertasContactadas = document.getElementById('ofertasContactadas').getContext('2d');
+    const chartofertasContactadas = new Chart(ofertasContactadas, {
+        type: 'bar',
+        data: {
+            labels: new_dict.ofertasContactadas.labels,
+            datasets: [{
+                label: 'Cantidad de Estudiantes Contactados por Empresa',
+                data: new_dict.ofertasContactadas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+
+    const ofertasContratadas = document.getElementById('ofertasContratadas').getContext('2d');
+    const chartofertasContratadas = new Chart(ofertasContratadas, {
+        type: 'bar',
+        data: {
+            labels: new_dict.ofertasContratadas.labels,
+            datasets: [{
+                label: 'Cantidad de Estudiantes Contratados por Empresa',
+                data: new_dict.ofertasContratadas.data,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1,
+                hoverOffset: 4
+            }]
+        },
+    });
+</script>

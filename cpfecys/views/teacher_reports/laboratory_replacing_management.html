@@ -1,0 +1,353 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row-fluid container">
+        <!--Search in report-->
+        <div class="navbar navbar-fixed-bottom pull-right">
+            <div class="navbar-inner">
+                {{if request.vars['level'] is None or request.vars['level'] == "1":}}
+                    <form action="{{=URL('teacher_reports', 'laboratory_replacing_management')}}" method="post">
+                {{elif request.vars['level'] == "2":}}
+                    <form action="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level=2, project=request.vars['project'], type_l=request.vars['type_l']))}}" method="post">
+                {{elif request.vars['level'] == "3":}}
+                    <form action="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level=3, project=request.vars['project'], month=request.vars['month'], type_l=request.vars['type_l'], type_u=request.vars['type_u']))}}" method="post">
+                {{elif request.vars['level'] == "4":}}
+                    <form action="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level=4, project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], type_l=request.vars['type_l'], type_u=request.vars['type_u']))}}" method="post">
+                {{elif request.vars['level'] == "5":}}
+                    <form action="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level=5, project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], user_p=request.vars['user_p'], type_l=request.vars['type_l'], type_u=request.vars['type_u']))}}" method="post">
+                {{pass}}
+                    <table>
+                        <tr>
+                            <td>
+                                <input type="text" id="query_search" class="form-control" placeholder="Carnet..." name="query_search" value="{{=personal_query}}"/>
+                            </td>
+                            <td>
+                                <button type="submit"  class="btn btn-primary">Buscar</button>
+                                <a id="cancelSearch" class="btn btn-secondary">Borrar</a>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+        <br><br><br>
+        <!--Search in report-->
+
+        <!--REPORT CONTENTS-->
+        <div class="mt-4">
+            <!--HEADER OF REPORT-->
+            {{if request.vars['level'] is not None and str(request.vars['level'])!="1":}}
+                <div class="pull-left">
+                    <a style="white-space:nowrap; cursor:pointer; align:right;" class="btn btn-primary" onclick="levelUP();">
+                        <span class="icon-black icon-arrow-up"></span><b>Subir un nivel</b>
+                    </a>
+                </div>
+            {{pass}}
+            <div class="pull-right">
+                <a class="btn btn-success btn-sm" onclick="exportCSV();"><img src="{{=URL('static','images')}}/icono_CSV.png"></a>
+            </div>
+            <center><h1>Resumen de reporte</h1></center>
+            <hr>
+            <img class="pull-right" src="{{=URL('static','images')}}/escudo.png">
+            <center><strong>Universidad de San Carlos de Guatemala</strong><br/>
+            <strong>Facultad de Ingeniería</strong><br/>
+            <strong>Escuela de Ingeniería en Ciencias y Sistemas</strong></center><br/>
+            <strong>Tipo: </strong> Reporte de gestión de equivalencias de laboratorio<br/>
+            <strong>Periodo: </strong> {{=T(period.period.name)}} {{=period.yearp}}
+            <!--HEADER OF REPORT-->
+            {{if request.vars['level'] is None or request.vars['level'] == "1":}}
+                <!--REPORT IN TABLE-->
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th><center>Curso</center></th>
+                        <th><center>Total inserciones</center></th>
+                        <th><center>Total actualizaciones</center></th>
+                        <th><center>Total eliminaciones</center></th>
+                    </tr>
+                    {{for project in info_level:}}
+                        <tr>
+                            <td>
+                                <a style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=project[0], level='2', type_l='all', query_search=personal_query))}}">
+                                    {{=project[1]}}
+                                </a>
+                            </td>
+                            <td>
+                                <center>
+                                    <a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=project[0], level='2', type_l='i', query_search=personal_query))}}">
+                                        {{=project[2]}}
+                                    </a>
+                                </center>
+                            </td>
+                            <td>
+                                <center>
+                                    <a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=project[0], level='2', type_l='u', query_search=personal_query))}}">
+                                        {{=project[3]}}
+                                    </a>
+                                </center>
+                            </td>
+                            <td>
+                                <center>
+                                    <a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=project[0], level='2', type_l='d', query_search=personal_query))}}">
+                                        {{=project[4]}}
+                                    </a>
+                                </center>
+                            </td>
+                        </tr>
+                    {{pass}}
+                </table>
+                <!--REPORT IN TABLE-->
+            {{elif request.vars['level'] == "2":}}
+                <br/><strong>Curso: </strong> {{=project.name}}
+                <!--REPORT IN TABLE-->
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th><center>Mes</center></th>
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "i":}}
+                            <th><center>Total inserciones</center></th>
+                        {{pass}}
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "u":}}
+                            <th><center>Total actualizaciones</center></th>
+                        {{pass}}
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "d":}}
+                            <th><center>Total eliminaciones</center></th>
+                        {{pass}}
+                    </tr>
+                    {{for month in info_level:}}
+                        <tr>
+                            <td>
+                                <a style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=request.vars['project'], month=month[0], level='3', type_u=request.vars['type_l'], type_l='all', query_search=personal_query))}}">
+                                    {{=month[1]}}
+                                </a>
+                            </td>
+                            {{if request.vars['type_l'] =="all" or request.vars['type_l'] == "i":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=request.vars['project'], month=month[0], level='3', type_u=request.vars['type_l'], type_l='i', query_search=personal_query))}}">
+                                            {{=month[2]}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "u":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=request.vars['project'], month=month[0], level='3', type_u=request.vars['type_l'], type_l='u', query_search=personal_query))}}">
+                                            {{if request.vars['type_l'] == "all":
+                                                =month[3]
+                                            else:
+                                                =month[2]
+                                            pass}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "d":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(project=request.vars['project'], month=month[0], level='3', type_u=request.vars['type_l'], type_l='d', query_search=personal_query))}}">
+                                            {{if request.vars['type_l'] == "all":
+                                                =month[4]
+                                            else:
+                                                =month[2]
+                                            pass}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                        </tr>
+                    {{pass}}
+                </table>
+                <!--REPORT IN TABLE-->
+            {{elif request.vars['level'] == "3":}}
+                <br/><strong>Curso: </strong> {{=project.name}}
+                <br/><strong>Mes: </strong> {{=month[0]}}
+                
+                <!--REPORT IN TABLE-->
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th><center>Rol</center></th>
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "i":}}
+                            <th><center>Total inserciones</center></th>
+                        {{pass}}
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "u":}}
+                            <th><center>Total actualizaciones</center></th>
+                        {{pass}}
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "d":}}
+                            <th><center>Total eliminaciones</center></th>
+                        {{pass}}
+                    </tr>
+                    {{for roll in info_level:}}
+                        <tr>
+                            <td>
+                                <a style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=roll[0], level='4', type_u=request.vars['type_l'], type_l='all', query_search=personal_query))}}">
+                                    {{=roll[1]}}
+                                </a>
+                            </td>
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "i":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=roll[0], level='4', type_u=request.vars['type_l'], type_l='i', query_search=personal_query))}}">
+                                            {{=roll[2]}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "u":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=roll[0], level='4', type_u=request.vars['type_l'], type_l='u', query_search=personal_query))}}">
+                                            {{if request.vars['type_l'] == "all":
+                                                =roll[3]
+                                            else:
+                                                =roll[2]
+                                            pass}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "d":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=roll[0], level='4', type_u=request.vars['type_l'], type_l='d', query_search=personal_query))}}">
+                                            {{if request.vars['type_l'] == "all":
+                                                =roll[4]
+                                            else:
+                                                =roll[2]
+                                            pass}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                        </tr>
+                    {{pass}}
+                </table>
+                <!--REPORT IN TABLE-->
+            {{elif request.vars['level'] == "4":}}
+                <br/><strong>Curso: </strong> {{=project.name}}
+                <br/><strong>Mes: </strong> {{=month[0]}}
+                <br/><strong>Rol: </strong> {{=T(f'Rol {roll}')}}
+                
+                <!--REPORT IN TABLE-->
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th><center>Usuario</center></th>
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "i":}}
+                            <th><center>Total inserciones</center></th>
+                        {{pass}}
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "u":}}
+                            <th><center>Total actualizaciones</center></th>
+                        {{pass}}
+                        {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "d":}}
+                            <th><center>Total eliminaciones</center></th>
+                        {{pass}}
+                    </tr>
+                    {{for user_p in info_level:}}
+                        <tr>
+                            <td>
+                                <center>
+                                    <a style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=request.vars['roll'], user_p=user_p[0], level='5', type_u=request.vars['type_l'], type_l='all', query_search=personal_query))}}">
+                                        {{=user_p[0]}}
+                                    </a>
+                                </center>
+                            </td>
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "i":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-success" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=request.vars['roll'], user_p=user_p[0], level='5', type_u=request.vars['type_l'], type_l='i', query_search=personal_query))}}">
+                                            {{=user_p[1]}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "u":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-info" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=request.vars['roll'], user_p=user_p[0], level='5', type_u=request.vars['type_l'], type_l='u', query_search=personal_query))}}">
+                                            {{if request.vars['type_l'] == "all":
+                                                =user_p[2]
+                                            else:
+                                                =user_p[1]
+                                            pass}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                            {{if request.vars['type_l'] == "all" or request.vars['type_l'] == "d":}}
+                                <td>
+                                    <center>
+                                        <a class="badge badge-important" style="white-space:nowrap;" href="{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(month=request.vars['month'], project=request.vars['project'], roll=request.vars['roll'], user_p=user_p[0], level='5', type_u=request.vars['type_l'], type_l='d', query_search=personal_query))}}">
+                                            {{if request.vars['type_l'] == "all":
+                                                =user_p[3]
+                                            else:
+                                                =user_p[1]
+                                            pass}}
+                                        </a>
+                                    </center>
+                                </td>
+                            {{pass}}
+                        </tr>
+                    {{pass}}
+                </table>
+                <!--REPORT IN TABLE-->
+            {{elif request.vars['level'] == "5":}}
+                <br/><strong>Curso: </strong> {{=project.name}}
+                <br/><strong>Mes: </strong> {{=month[0]}}
+                <br/><strong>Rol: </strong> {{=T(f'Rol {roll}')}}
+                <br/><strong>Usuario: </strong> {{=user_p}}
+                <div class="mt-4">
+                    {{=grid}}
+                </div>
+            {{pass}}
+        </div>
+        <!--REPORT CONTENTS-->
+    </div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		$("#cancelSearch").click(function(){
+			{{if request.vars['level'] is None or request.vars['level'] == "1":}}
+				window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management')}}";
+			{{elif request.vars['level'] == "2":}}
+				window.location.href = "{{=URL(vars=dict(level=2, project=request.vars['project'], type_l=request.vars['type_l']))}}";
+			{{elif request.vars['level'] == "3":}}
+				window.location.href = "{{=URL(vars=dict(level=3, project=request.vars['project'], month=request.vars['month'], type_l=request.vars['type_l'], type_u=request.vars['type_u']))}}";
+			{{elif request.vars['level'] == "4":}}
+				window.location.href = "{{=URL(vars=dict(level=4, project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], type_l=request.vars['type_l'], type_u=request.vars['type_u']))}}";
+			{{elif request.vars['level'] == "5":}}
+				window.location.href = "{{=URL(vars=dict(level=5, project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], user_p=request.vars['user_p'], type_l=request.vars['type_l'], type_u=request.vars['type_u']))}}";
+			{{pass}}
+		});
+	});
+
+	//INIT LEVEL UP REPORT
+	{{if request.vars['level'] is not None and request.vars['level'] != "1":}}
+		function levelUP(){
+			{{if request.vars['level'] == "2":}}
+				window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(query_search=personal_query))}}";
+			{{elif request.vars['level'] == "3":}}
+				window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level='2',project=request.vars['project'], type_l=request.vars['type_u'], query_search=personal_query))}}";
+			{{elif request.vars['level'] == "4":}}
+				window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level='3', project=request.vars['project'], month=request.vars['month'], type_l=request.vars['type_u'], type_u=request.vars['type_u'], query_search=personal_query))}}";
+			{{elif request.vars['level'] == "5":}}
+				window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management', vars=dict(level='4', project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], type_l=request.vars['type_u'], type_u=request.vars['type_u'], query_search=personal_query))}}";
+			{{pass}}
+		}
+	{{pass}}
+	//END LEVEL UP REPORT
+
+	//INIT EXPORT REPORT TO CSV FILE
+	function exportCSV(){
+		{{if request.vars['level'] is None or request.vars['level'] == "1":}}
+			window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management_export', vars=dict(list_type='csv', level=1, query_search=personal_query))}}";
+		{{elif request.vars['level'] == "2":}}
+			window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management_export', vars=dict(list_type='csv', level=2, project=request.vars['project'], type_l=request.vars['type_l'], query_search=personal_query))}}";
+		{{elif request.vars['level'] == "3":}}
+			window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management_export', vars=dict(list_type='csv', level=3, project=request.vars['project'], month=request.vars['month'], type_l=request.vars['type_l'], type_u=request.vars['type_u'], query_search=personal_query))}}";
+		{{elif request.vars['level'] == "4":}}
+			window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management_export', vars=dict(list_type='csv', level=4, project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], type_l=request.vars['type_l'], type_u=request.vars['type_u'], query_search=personal_query))}}";
+		{{elif request.vars['level'] == "5":}}
+			window.location.href = "{{=URL('teacher_reports', 'laboratory_replacing_management_export', vars=dict(list_type='csv', level=5, project=request.vars['project'], month=request.vars['month'], roll=request.vars['roll'], user_p=request.vars['user_p'], type_l=request.vars['type_l'], type_u=request.vars['type_u'], query_search=personal_query))}}";
+		{{pass}}
+	}
+	//END EXPORT REPORT TO CSV FILE
+</script>

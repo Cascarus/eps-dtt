@@ -885,11 +885,10 @@ def fingerprint_parameters_admin():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def fingerprint_report_admin():
-    fingerprint_grid_query = (
-        (db.dsi_fingerprint.tutor_id == db.auth_user.id)
-    )
+    fingerprint_grid_query = ((db.dsi_fingerprint.tutor_id == db.auth_user.id))
 
     fingerprint_grid_fields = [
+        db.dsi_fingerprint.tutor_id,
         db.auth_user.username,
         db.auth_user.first_name,
         db.auth_user.last_name,
@@ -1058,7 +1057,7 @@ def item_detail():
                     & (db.auth_user.id == user) & (db.auth_membership.group_id == db.auth_group.id)
                     & (db.auth_group.role == 'Student') & (db.user_project.project == project)
                     & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
-                    & ((db.user_project.period + db.user_project.periods) > period.id)))
+                    & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id)))
 
         if assignations.count() != 1:
             session.flash = T('Not permited action.')
@@ -1130,7 +1129,7 @@ def item_detail():
         return db((db.auth_user.id == db.user_project.assigned_user) & (db.auth_user.id == db.auth_membership.user_id)
             & (db.auth_membership.group_id == db.auth_group.id) & (db.auth_group.role == 'Student')
             & (db.user_project.project == project.id) & (db.user_project.period == db.period_year.id)
-            & ((db.user_project.period <= period.id) & ((db.user_project.period + db.user_project.periods) > period.id))).select(db.user_project.ALL)
+            & ((db.user_project.period <= period.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(db.user_project.ALL)
 
     def get_item(restriction, assignation):
         return db((db.item.assignation == assignation.id) & (db.item.item_restriction == restriction.id)
@@ -2091,6 +2090,7 @@ def get_project_select():
     return SELECT(options, _name='project', requires=IS_INT_IN_RANGE(1, None), _class="form-control")
 
 def remove_finger_print(row):
+    print(row)
     table = TABLE(
         TR(
             TD(
@@ -2100,7 +2100,7 @@ def remove_finger_print(row):
                         SPAN('Borrar'),
                         _class="btn btn-danger"
                     ),
-                    _href=URL('dsi', 'remove_fingerprint', args=[row.auth_user.id])
+                    _href=URL('dsi', 'remove_fingerprint', args=[row.dsi_fingerprint.tutor_id])
                 )
             )
         )
@@ -2139,7 +2139,7 @@ def grade_all(restriction, period):
                 assignations = db((db.auth_user.id == db.user_project.assigned_user) & (db.auth_user.id == db.auth_membership.user_id)
                             & (db.auth_membership.group_id == db.auth_group.id) & (db.auth_group.role == 'Student')
                             & (db.user_project.project == project.id) & (db.user_project.period == db.period_year.id)
-                            & ((db.user_project.period <= period) & ((db.user_project.period + db.user_project.periods) > period))).select(db.user_project.id)
+                            & ((db.user_project.period <= period) & ((db.user_project.period.cast('integer') + db.user_project.periods) > period))).select(db.user_project.id)
                 for assignation in assignations:
                     item = db((db.item.assignation == assignation.id) & (db.item.item_restriction == restriction)
                         & (db.item.item_restriction == db.item_restriction.id) & (db.item_restriction.is_enabled == True)

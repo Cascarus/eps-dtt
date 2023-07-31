@@ -1,0 +1,56 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <div class="row">
+        <div class="col">
+            <center>
+                <h2>Administrar Código de Honor</h2>
+            </center>
+            <br>
+            <a href="{{=URL('infringements_and_sanctions','create_honor_code')}}" class="btn btn-success btn-block">Crear/Actualizar Código de Honor</a>
+            {{if len(codigos) > 0:}}
+                <table class="table table-striped">
+                    <colgroup>
+                        <col style="width: 40%;">
+                        <col style="width: 50%;">
+                        <col style="width: 10%;">
+                    </colgroup>
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Ver</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for codigo in codigos:}}
+                            <tr>
+                                <td>{{=codigo['id']}}</td>
+                                <td><span id="fecha_{{=codigo['id']}}"></span></td>
+                                <td>
+                                    <center>
+                                        <a class="btn btn-info btn-sm" href="{{=URL('infringements_and_sanctions','detail_honor_code',str(codigo['id']))}}">Ver Código</a>
+                                    </center>
+                                </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                </table>
+            {{else:}}
+                <br>
+                <br>
+                <center>
+                    <h5>No hay codigos de honor</h5>
+                </center>
+            {{pass}}
+        </div>
+    </div>
+</div>
+<script>
+    {{from gluon.serializers import json}}
+    const codigos = {{=XML(json(codigos))}};
+    codigos.forEach(codigo => {
+        let fecha = new Date(codigo.date_);
+        const current = '#fecha_'+ codigo.id;
+        $(current).text(fecha.toLocaleDateString('es-GT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    });
+</script>

@@ -130,8 +130,8 @@
                                 {{entries = count_log_entries(report['id'])}}
                                 {{metrics = count_metrics_report(report['id'])}}
                                 <!-- TODO -->
-                                <!-- {{anomalies = count_anomalies(report['id'])[0]['_extra']['COUNT(`log_entry`.`id`)']}} -->
-                                {{anomalies = count_anomalies(report['id'])[0]['COUNT(log_entry.id)']}}
+                                {{anomalies = count_anomalies(report['id'])[0]['_extra']['COUNT(`log_entry`.`id`)']}}
+                 
                                 <td>
                                     <b>{{=T('Activity logs')}}:</b>
                                     {{=entries}}

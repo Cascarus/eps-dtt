@@ -1,0 +1,63 @@
+{{extend 'dashboard.html'}}
+{{import cpfecys}}
+
+
+<div class="col-12 mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>
+                Carga de conferencias
+                <br>
+                <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+            </h2>
+        </div>
+    </div>
+</div>
+
+
+<br>
+
+
+<div class="col-6 offset-3">
+    <div class="row-fluid">
+        <div class="well span11">
+            <form>
+                <div class="col">
+                    <div class="card" style="width: 100%;">
+                        <div class="card-body">
+                            <div class="row-fluid reports">
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Nombre conferencia</label>
+                                    <input type="text" class="form-control" id="exampleInputEmail1" maxlength="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputPassword1">Fecha de realizacion</label>
+                                    <input type="date" class="form-control" id="exampleInputPassword1" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="floatingTextarea">Descripcion</label>
+                                    <textarea class="form-control" id="floatingTextarea"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="url_video">URL Video</label>
+                                    <input type="text" class="form-control" id="url_video" maxlength="20">
+                                </div>
+                                <div class="form-group">
+                                    <label for="archivo">Reporte (pdf)</label>
+                                    <br>
+                                    <input type="file" id="archivo" name="archivo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-success">Cargar foro</button>
+                    <a type="button" class="btn btn-danger" href="/student/conferencias">Regresar</a>
+                </div>
+                
+            </form>
+
+
+        </div>
+    </div>
+</div>

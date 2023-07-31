@@ -1,0 +1,49 @@
+{{extend 'dashboard.html'}}
+<h1>Top {{=top}} de Tutores Académicos en la Evaluación: {{=encuesta[0].nombre}}</h1>
+<hr />
+<form>
+    <input type="hidden" value="{{=iso_encuesta_id}}" id='iso_encuesta_id' name='iso_encuesta_id'>
+    <div class="row">
+        <label for="top" class="col-md-2 control-label">Ingrese el rango a mostrar:</label><br>
+        <div class="col-md-2">
+            <input class="form-control" type="number" id="top" name="top" value='{{=top}}'>
+        </div>
+        <label for="orden" class="col-md-2 control-label">Seleccione el orden:</label>
+        <div class="col-md-2">
+            <select name="orden" id="orden" class="form-control">
+                <option value="Asc" {{if orden=="Asc" :}} selected{{pass}}>ASCENDENTE</option>
+                <option value="Desc" {{if orden=="Desc" :}} selected{{pass}}>DESCENDENTE</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type='submit' value='Consultar' class='btn bnt-lg btn-primary'>
+        </div>
+    </div>
+</form>
+<hr />
+<div class="web2py_grid">
+    <div class="web2py_table">
+        <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+            <table>
+                <thead>
+                    <th><a href="#">#</a></th>
+                    <th><a href="#">Nombre Curso</a></th>
+                    <th><a href="#">Registro Académico</a></th>
+                    <th><a href="#">Nombre Completo</a></th>
+                    <th><a href="#">Punteo</a></th>
+                </thead>
+                <tbody>
+                    {{for dato in resultados:}}
+                        <tr>
+                            <td>{{=dato[0]}}</td>
+                            <td>{{=dato[1]}}</td>
+                            <td>{{=dato[2]}}</td>
+                            <td>{{=dato[3]}} {{=dato[4]}}</td>
+                            <td>{{if dato[5]:}}{{=dato[5]}} {{else:}}No calificado{{pass}}</td>
+                        </tr>
+                    {{pass}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,182 @@
+<!-- Inicio - Practicas Finales(DSA) - Jose Carlos I Alonzo Colocho -->
+
+{{extend 'dashboard.html'}}
+
+<br />
+<div class="text-center">
+    <h1>Documentos por estudiante</h1>
+    {{ if 'documentName' in action: }}
+        <h4>{{=action['role'].encode("utf-8")}} - {{=action['documentName'].encode("utf-8")}}</h4>
+    {{ pass }}
+</div>
+
+{{ if 'form' in action: }}
+    <div class="col-12 mt-4">
+        <div class="row">
+            <div class="col-2"></div>
+            <div class="col-8">
+                <div class="card">
+                    <h5 class="card-header">Datos del Estudiante</h5>
+                    <div class="card-body">
+                        <div class="ml-3">
+                            <ul>
+                                <li><span class="font-weight-bold">{{=T('Student')}}</span>: {{=action['carnet']}}</li>
+                                <li><span class="font-weight-bold">{{=T('First Name')}}</span>: {{=action['nombre']}}</li>
+                                <li><span class="font-weight-bold">{{=T('Last Name')}}</span>: {{=action['apellidos']}}</li>
+                                <li><span class="font-weight-bold">Correo</span>: {{ if action['correo'] != "": }}{{=action['correo']}}{{else:}}Sin registro{{pass}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 mt-4">
+        <div class="row">
+            <div class="col-2"></div>
+                <div class="col-8 well">
+                    {{=form}}
+                    <br />
+                    {{ if 'message' in action: }}
+                        <div class="alert alert-danger alert-dismissible" role="alert">
+                            <strong>¡Error!</strong>&nbsp;{{=action['message']}}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {{pass}}
+                </div>
+                <div class="col-2"></div>
+            </div>
+        </div>
+    </div>
+{{ else: }}
+    <div class="mt-4">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12 col-md-6 mb-3">
+                    <form  action="{{=URL('documents_ecys', 'documents_view_individual', args=['search'])}}" method="POST" enctype="multipart/form-data" >
+                        <div class="form-inline">
+                            <div class="col-sm-9">
+                                <input class="form-control mr-lg-3" style="width:65%;" type="number" placeholder="Ingrese el carnet ..." aria-label="Search" name="inputStudent" required>
+                                <button type="submit" class="btn btn-primary">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <div class="row-fluid">
+        <div class="well span12">
+            <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" colspan="3">Documento cargado</th>
+                            <th class="text-center" colspan="3">Estudiante asociado</th>
+                            <th class="text-center" colspan="4">Documento revisado</th>
+                        </tr>
+                        <tr>
+                            <th style="width:200px;">Nombre</th>
+                            <th style="width:310px;">Descripción</th>
+                            <th style="width:250px;">Fecha de carga</th>
+                            <th style="width:250px;">Nombres</th>
+                            <th style="width:250px;">Apellidos</th>
+                            <th style="width:150px;">Carnet</th>
+                            <th style="width:115px;">Estado</th>
+                            <th style="width:180px;">Última modificación</th>
+                            <th style="width:135px;">Comentario</th>
+                            <th style="width:165px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ if 'documents' in action: }}
+                            {{ for document in action["documents"]: }}
+                                <tr>
+                                    <td>{{=document['document_name']}}</td>
+                                    <td>{{=document['document_description']}}</td>
+                                    <td>{{=document['uploaded_at'].strftime('%A, %d %b %Y, %H:%M:%S')}}</td>
+                                    <td>{{=document['student_first_name']}}</td>
+                                    <td>{{=document['student_last_name']}}</td>
+                                    <td>{{=document['carnet']}}</td>
+                                    <td>
+                                        {{if document['status'] == "entregado":}}
+                                            <span class="badge badge-primary">Entregado</span>
+                                        {{pass}}
+                                        {{if document['status'] == "firmado":}}
+                                            <span class="badge badge-success">Firmado</span>
+                                        {{pass}}
+                                        {{if document['status'] == "rechazado":}}
+                                            <span class="badge badge-danger">Rechazado</span>
+                                        {{pass}}
+                                    </td>
+                                    <td>
+                                        {{if document['signed_at'] is not None:}}
+                                            {{=document['signed_at'].strftime('%A, %d %b %Y, %H:%M:%S')}}
+                                        {{pass}}
+                                    </td>
+                                    <td>
+                                        {{if document['comment'] is not None:}}
+                                            {{=document['comment']}}
+                                        {{pass}}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a 
+                                            href="{{=URL('documents_ecys', 'documents_view_individual', args=['download_individual_uploaded'], vars={'documentId': document['id']})}}">
+                                                <button class="btn btn-secondary btn-sm">
+                                                    <i class="fa fa-fw fa fa-download"></i>
+                                                    &nbsp;Descargar subidos
+                                                </button>
+                                            </a>
+
+                                            {{ if document['status'] == "firmado": }}
+                                                <br />
+                                                <a href="{{=URL('documents_ecys', 'documents_view_individual', args=['download_individual'], vars={'documentId': document['id']})}}">
+                                                    <button class="btn btn-primary btn-sm">
+                                                        <i class="fa fa-fw fa fa-download"></i>
+                                                        &nbsp;Descargar firmado
+                                                    </button>
+                                                </a>
+                                            {{ pass }}
+                                            {{ if document['status'] == "rechazado": }}
+                                                <br />    
+                                                <a
+                                                href="{{=URL('documents_ecys', 'documents_view_individual', args=['update'], vars={'documentId': document['id'], 'username': document['carnet'], 'update': 1})}}">
+                                                    <button class="btn btn-danger btn-sm">
+                                                        <i class="fa fa-fw fa fa-upload"></i>
+                                                        &nbsp;Actualizar
+                                                    </button>
+                                                </a>
+                                            {{ pass }}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{pass}}
+                        {{pass}}
+                    </tbody>
+                </table>
+                {{ if 'student' in action: }}
+                    <a href="{{=URL('documents_ecys', 'documents_view_individual', args=['download_report'], vars={'student': action['student']})}}">
+                        <button class="btn btn-primary btn-sm" type="button" id="reportDownload">
+                            <i class="fa fa-fw fa fa-download"></i>
+                            &nbsp;Exportar a CSV
+                        </button>
+                    </a>
+                {{ pass }}
+            </div>
+        </div>
+    </div>
+{{ pass }}
+<style>
+    .btn-group, .btn-group-vertical {
+        display: inline-block;
+    }
+    .table td, .table th{
+        vertical-align: middle;
+    }
+</style>
+<!-- Fin - Practicas Finales(DSA) - Jose Carlos I Alonzo Colocho -->

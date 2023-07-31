@@ -1,0 +1,86 @@
+<center>
+    <table>
+        <tr>
+            <td align="left">
+                <div align="left" id="div_categoria" value="div_categoria" class="well span10"
+                    style="overflow:auto; width:300px;">
+                    {{=T('Loading')}}...
+                </div>
+                <div align="right">
+                    <a id="btn_categoria" href="#information_text" role="button" class="btn btn-success"
+                        title="{{=T('Add category to weighting')}}">
+                        <span class="icon-plus-sign"></span>
+                        {{=T('Add Category')}}
+                    </a>
+                </div>
+            </td>
+            <td align="left">
+                <div id="div_parametros" class="well span14" style="overflow:auto;  width:600px;">
+                    {{=T('Loading')}}...
+                </div>
+                <div align="right">
+                    <a href="{{=URL('activity_control', 'students_control', vars=dict(project = request.vars['project'], period = request.vars['year']))}}"
+                        role="button" class="btn btn-info">
+                        <span class="icon-ok-circle"></span>
+                        {{=T('Finalize')}}
+                    </a>
+                </div>
+            </td>
+        </tr>
+    </table>
+</center>
+
+<script type="text/javascript">
+    var project = {{=request.vars['project']}};
+    var activity = {{=request.vars['activity']}};
+    var actname = "{{=request.vars['actname']}}";
+    var acttype = "{{=request.vars['acttype']}}";
+    var year = {{=request.vars['year']}};
+
+    $(document).ready(function () {
+        $("#div_categoria").load("{{=URL('cpn_gestion', 'categoria.html')}}");
+        $("#div_parametros").load("{{=URL('cpn_gestion', 'parametros.html')}}" +
+            "?project=" + encodeURIComponent(project) +
+            "&activity=" + encodeURIComponent(activity) +
+            "&actname=" + encodeURIComponent(actname) +
+            "&acttype=" + encodeURIComponent(acttype) +
+            "&year=" + encodeURIComponent(year) +
+            "&update=0");
+
+        $("#btn_categoria").click(function () {
+            var categoria = $("#inp_categoria").val();
+            var nota = $("#inp_nota").val();
+
+            if (categoria != "" && nota != "") {
+                var regex = /^\d+(?:\.\d{0})$/;
+                var regex2 = /^([0-9])*$/;
+                if (parseInt(nota) != 0 && (regex.test(nota) || regex2.test(nota))) {
+                    //alert("listo para guardar: Cat:"+categoria+" Nota: "+nota+" check: "+promediar+ " project: "+project + " tipo: "+acttype+" activity: "+activity+ " actname: "+actname+" year: "+year);
+                    $("#div_parametros").load("{{=URL('cpn_gestion', 'parametros.html')}}" +
+                        "?project=" + encodeURIComponent(project) +
+                        "&activity=" + encodeURIComponent(activity) +
+                        "&actname=" + encodeURIComponent(actname) +
+                        "&acttype=" + encodeURIComponent(acttype) +
+                        "&year=" + encodeURIComponent(year) +
+                        "&value=" + encodeURIComponent(getHoja()) +
+                        "&update=1");
+                    $("#div_categoria").load("{{=URL('cpn_gestion', 'categoria.html')}}");
+                } else {
+                    alert("La cantidad ingresada en la nota no es válida.");
+                }
+            } else {
+                alert("Debe completar todos los campos.");
+            }
+        });
+    });
+
+    function getHoja() {
+        var categoria = $("#inp_categoria").val();
+        var nota = $("#inp_nota").val();
+        var promediar = ($("#SG_check").prop('checked') == true) ? "True" : "False";
+        var agregar = '"categoria":"' + categoria + '", "nota":"' + nota + '", "avg":"' + promediar + '", "indice":"0", "estado":"False", "parametros":[]}';
+
+        return agregar;
+    }
+
+</script>

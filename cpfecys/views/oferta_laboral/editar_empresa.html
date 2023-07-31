@@ -1,0 +1,167 @@
+{{extend 'dashboard.html'}}
+
+<div class='row p-0 m-0'>
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Actualizar Empresa</h1>
+    </div>
+</div>
+
+<form id="formEmpresa" class="m-0 p-0" action='/cpfecys/oferta_laboral/editar_empresa' method="POST">
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="nameInput" class="form-label">Nombre de la empresa</label>
+            <input type="text" class="form-control" id="nameInput" required
+                value="{{=new_dict['empresa']['nombre_empresa']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="emailInput" class="form-label">Correo</label>
+            <input type="email" class="form-control" id="emailInput" required
+                value="{{=new_dict['empresa']['correo']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="personInput" class="form-label">Persona Encargada</label>
+            <input type="text" class="form-control" id="personInput" required
+                value="{{=new_dict['empresa']['persona_encargada']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="phoneInput" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="phoneInput" required
+                value="{{=new_dict['empresa']['telefono']}}" onkeyup="Card(event, this)" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="addressInput" class="form-label">Dirección</label>
+            <input type="text" class="form-control" id="addressInput" required
+                value="{{=new_dict['empresa']['direccion']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="webInput" class="form-label">Página web</label>
+            <input type="text" class="form-control" id="webInput" required
+                value="{{=new_dict['empresa']['pagina_web']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="descInput" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descInput" rows="3"
+                required>{{=new_dict['empresa']['descripcion']}}</textarea>
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="passInput" class="form-label">Password</label>
+            <input type="password" class="form-control" id="passInput" autocomplete="off" required
+                value="{{=new_dict['empresa']['password']}}" />
+        </div>
+    </div>
+    <div class='row m-0 p-0 mb-3'>
+        <div class='col-12 d-flex justify-content-end'>
+            <button type="button" class="btn btn-primary w-auto mr-3" onclick="submitt()">Actualizar</button>
+            <button type="button" class="btn btn-danger w-auto" onclick="cancelUpdate()">Cancelar</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    function quitarAcentos(cadena) {
+        const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'ñ': 'n', 'Ñ': 'N' };
+        cadena = cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+        return cadena = cadena.replace(/[^\w\s ?,:.!%()-_"@/]/gi, '');
+    }
+    async function modal() {
+
+        return text;
+    }
+
+    async function submitt() {
+        var form = $('#formEmpresa')[0]
+        const data = {
+            nombre_empresa: quitarAcentos(form[0].value),
+            correo: form[1].value,
+            persona_encargada: quitarAcentos(form[2].value),
+            telefono: form[3].value,
+            direccion: quitarAcentos(form[4].value),
+            pagina_web: form[5].value,
+            descripcion: quitarAcentos(form[6].value),
+            password: form[7].value,
+            motivo: ""
+        }
+        enviarForm(data);
+    }
+
+    async function enviarForm(data) {
+        enviarAjax(data);
+    }
+
+    // fuente: https://devlaz.com/restringir-caracteres-en-campos-con-javascript
+    function Card(event, el) {//Validar nombre	
+        //Obteniendo posicion del cursor 
+        var val = el.value;//Valor de la caja de texto
+        var pos = val.slice(0, el.selectionStart).length;
+
+        var out = '';//Salida
+        var filtro = '1234567890(+-) ';
+        var v = 0;//Contador de caracteres validos
+
+        //Filtar solo los numeros
+        for (var i = 0; i < val.length; i++) {
+            if (filtro.indexOf(val.charAt(i)) != -1) {
+                v++;
+                out += val.charAt(i);
+            }
+        }
+        //Reemplazando el valor
+        el.value = out;
+
+        //En caso de modificar un numero reposicionar el cursor
+        if (event.keyCode == 8) {//Tecla borrar precionada
+            el.selectionStart = pos;
+            el.selectionEnd = pos;
+        }
+    }
+
+    function enviarAjax(data) {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        data.id_empresa = "{{=new_dict['empresa']['id_empresa']}}"
+        $.ajax({
+            type: 'post',
+            url: '/cpfecys/oferta_laboral/actualizar_empresa',
+            data: `array=${JSON.stringify(data)}`,
+            success: function (res) {
+                res = JSON.parse(res);
+                if (res.success) {
+                    Swal.fire({
+                        title: 'Actualizado!',
+                        text: res.msg,
+                        icon: 'success'
+                    }).then(() => window.location = '/home');
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: res.msg,
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function (xhr, status, errorThrown) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Hubo un problema, intente más tarde',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function cancelUpdate() {
+        window.location = '/home'
+    }
+</script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

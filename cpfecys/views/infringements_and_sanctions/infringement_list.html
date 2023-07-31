@@ -1,0 +1,382 @@
+{{extend 'dashboard.html'}}
+{{step_count = 0}}
+<div class="dttContainer">
+    <center>
+        <h2>Faltas de practicas finales<br></h2>
+    </center>
+    <br>
+    <div class="row">
+        <div class="col">
+            {{if vista == 'student':}}
+                <div class="row">
+                    <div class="col-12">
+                        <center>
+                            <h3>Sanciones de control</h3>
+                        </center>
+                        {{if len(faltas) > 0:}}
+                            <table class="table table-striped">
+                                <colgroup>
+                                    <col style="width:30%">
+                                    <col style="width:30%">
+                                    <col style="width:30%">
+                                    <col style="width:10%">
+                                </colgroup>
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Curso</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Ver</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{for falta in faltas:}}
+                                        <tr id="falta_{{=falta['id']}}">
+                                            <td>{{=falta['curso']}}</td>
+                                            <td>{{=falta['tipo']}}</td>
+                                            <td>
+                                                <span id="fecha_{{=falta['id']}}"></span>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                    <small>
+                                                        <a href="{{=URL('infringements_and_sanctions','infringement_detail',vista+'/'+str(falta['id']))}}" class="btn btn-sm btn-primary">
+                                                            Ver Falta
+                                                        </a>
+                                                    </small>
+                                                </center>
+                                            </td>
+                                        </tr>
+                                    {{pass}}
+                                </tbody>
+                            </table>
+                        {{else:}}
+                            <center>
+                                <h4>No tienes sanciones</h4>
+                            </center>
+                        {{pass}}
+                    </div>
+                    <div class="col-12">
+                        <center>
+                            <h3>Sanciones de proceso</h3>
+                        </center>
+                        {{if len(faltas_graves) > 0:}}
+                            <table class="table table-striped">
+                                <colgroup>
+                                    <col style="width:30%">
+                                    <col style="width:30%">
+                                    <col style="width:15%">
+                                    <col style="width:15%;">
+                                    <col style="width:10%">
+                                </colgroup>
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Curso</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Penalización</th>
+                                        <th>Ver</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{for falta in faltas_graves:}}
+                                        <tr id="faltagrave_{{=falta['id']}}">
+                                            <td>{{=falta['curso']}}</td>
+                                            <td>{{=falta['tipo']}}</td>
+                                            <td>
+                                                <span id="fechagrave_{{=falta['id']}}"></span>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                    <h5>
+                                                        {{if falta['penalizacion'] == 0:}}
+                                                            <span class="badge badge-warning">Seguimiento</span>
+                                                        {{else:}}
+                                                            <span class="badge badge-danger">Expulsado</span>
+                                                        {{pass}}
+                                                    </h5>
+                                                </center>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                    <small>
+                                                        <a ahref="{{=URL('infringements_and_sanctions','infringement_process_detail',vista+'/'+str(falta['id']))}}" class="btn btn-sm btn-primary">
+                                                            Ver Falta
+                                                        </a>
+                                                    </small>
+                                                </center>
+                                            </td>
+                                        </tr>
+                                    {{pass}}
+                                </tbody>
+                            </table>
+                        {{else:}}
+                            <center>
+                                <h4>No tienes sanciones</h4>
+                            </center>
+                        {{pass}}    
+                    </div>
+                </div>
+            {{elif vista == 'admin':}}
+                <div class="row mt-3">
+                    <div class="col-12 col-md-6 mb-3">
+                        <div data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
+                            <form class="form-inline" action="{{=URL('infringements_and_sanctions','infringement_list',vista)}}" method='get'>
+                                <select name="periodo" id="periodo" class="form-control">
+                                    {{for period_ in periodos:}}
+                                        {{var_sel = ''}}
+                                        {{if str(period_.id) == str(periodo.id):}}
+                                            {{var_sel="selected='selected'"}}
+                                        {{else:}}
+                                            {{var_sel=''}}
+                                        {{pass}}
+                                        <option value="{{=period_.id}}" {{=var_sel}}>
+                                            {{=T(period_.period.name)}}-{{=period_.yearp}}
+                                        </option>
+                                    {{pass}}
+                                </select>
+                                <input class="btn btn-outline-primary" type="submit" value="{{=T('Go')}}">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <center>
+                            <h3>Sanciones de control</h3>
+                        </center>
+                        {{if len(faltas) > 0:}}
+                            <table class="table table-striped">
+                                <colgroup>
+                                    <col style="width:10%">
+                                    <col style="width:30%">
+                                    <col style="width:30%">
+                                    <col style="width:15%">
+                                    <col style="width:10%">
+                                    <col style="width:5%">
+                                </colgroup>
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Carnet</th>
+                                        <th>Curso</th>
+                                        <th>Tipo</th>
+                                        <th>Fecha</th>
+                                        <th>Ver</th>
+                                        <th>Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{for falta in faltas:}}
+                                        <tr id="falta_{{=falta['id']}}">
+                                            <td>{{=falta['carnet']}}</td>
+                                            <td>{{=falta['curso']}}</td>
+                                            <td>{{=falta['tipo']}}</td>
+                                            <td>
+                                                <span id="fecha_{{=falta['id']}}"></span>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                    <small>
+                                                        <a href="{{=URL('infringements_and_sanctions','infringement_detail',vista+'/'+str(falta['id']))}}" class="btn btn-sm btn-primary">
+                                                            Ver Falta
+                                                        </a>
+                                                    </small>
+                                                </center>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                <small>
+                                                    <form action="{{=URL('infringements_and_sanctions','infringement_list',vista+'/delete/'+str(falta['id']))}}" method="post">
+                                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                                    </form>
+                                                </small>
+                                                </center>
+                                            </td>
+                                        </tr>
+                                    {{pass}}
+                                </tbody>
+                            </table>
+                        {{else:}}
+                            <center>
+                                <h4>No hay sanciones</h4>
+                            </center>
+                        {{pass}}
+                    </div>
+                    <div class="col-12">
+                        <center>
+                            <h3>Sanciones de proceso</h3>
+                        </center>
+                        {{if len(faltas_graves) > 0:}}
+                            <table class="table table-striped">
+                                <colgroup>
+                                    <col style="width:10%">
+                                    <col style="width:30%">
+                                    <col style="width:15%">
+                                    <col style="width:15%">
+                                    <col style="width:15%">
+                                    <col style="width:10%">
+                                    <col style="width:5%">
+                                </colgroup>
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Carnet</th>
+                                        <th>Curso</th>
+                                        <th>Tipo</th>
+                                        <th>Penalización</th>
+                                        <th>Fecha</th>
+                                        <th>Ver</th>
+                                        <th>Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{for falta in faltas_graves:}}
+                                        <tr id="falta_{{=falta['id']}}">
+                                            <td>{{=falta['carnet']}}</td>
+                                            <td>{{=falta['curso']}}</td>
+                                            <td>{{=falta['tipo']}}</td>
+                                            <td>
+                                                <center>
+                                                    <h5>
+                                                        {{if falta['penalizacion'] == 0:}}
+                                                            <span class="badge badge-warning">Seguimiento</span>
+                                                        {{else:}}
+                                                            <span class="badge badge-danger">Expulsado</span>
+                                                        {{pass}}
+                                                    </h5>
+                                                </center>
+                                            </td>
+                                            <td>
+                                                <span id="fechagrave_{{=falta['id']}}"></span>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                    <small>
+                                                        <a href="{{=URL('infringements_and_sanctions','infringement_process_detail',vista+'/'+str(falta['id']))}}" class="btn btn-sm btn-primary">
+                                                            Ver Falta
+                                                        </a>
+                                                    </small>
+                                                </center>
+                                            </td>
+                                            <td>
+                                                <center>
+                                                    <small>
+                                                        <form action="{{=URL('infringements_and_sanctions','infringement_list',vista+'/delete_heavy/'+str(falta['id']))}}" method="post">
+                                                            <button type="submit"class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                                        </form>
+                                                    </small>
+                                                </center>
+                                            </td>
+                                        </tr>
+                                    {{pass}}
+                                </tbody>
+                            </table>
+                        {{else:}}
+                            <center>
+                                <h4>No hay sanciones</h4>
+                            </center>
+                        {{pass}}
+                    </div>
+                </div>
+            {{else:}}
+                <div class="row">
+                    <div class="col-4 mx-auto">
+                        <form method="get" class="form-inline">
+                            <div class="form-group">
+                                <label for="carnet" class="sr-only">Carnet</label>
+                                <input placeholder="Carnet" type="number" name="carnet" id="carnet" class="form-control" style="width: 85%;" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Buscar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <center>
+                    {{if busqueda is not None:}}
+                        <h4>Resultados para {{=busqueda}}</h4>
+                        {{if len(faltas) == 0:}}
+                            <br>
+                            <h6>No se han encontrado resultados</h6>
+                        {{pass}}
+                    {{else:}}
+                        <h4>Todas las faltas reportadas en {{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</h4>
+                        <h6>Para buscar un practicante coloca el carnet en el buscador</h6>
+                    {{pass}}
+                </center>
+                {{if len(faltas) > 0:}}
+                    <table class="table table-striped">
+                        <colgroup>
+                            {{if busqueda is not None:}}
+                                <col style="width:30%">
+                                <col style="width:40%">
+                                <col style="width:20%">
+                                <col style="width:10%">
+                            {{else:}}
+                                <col style="width:15%">
+                                <col style="width:25%">
+                                <col style="width:30%">
+                                <col style="width:20%">
+                                <col style="width:10%">
+                            {{pass}}
+                        </colgroup>
+                        <thead class="thead-dark">
+                            <tr>
+                                {{if busqueda is None:}}
+                                    <th>Carnet</th>
+                                {{pass}}
+                                    <th>Curso</th>
+                                    <th>Tipo</th>
+                                    <th>Fecha</th>
+                                    <th>Ver</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{for falta in faltas:}}
+                                <tr>
+                                    {{if busqueda is None:}}
+                                        <td>{{=falta['carnet']}}</td>
+                                    {{pass}}
+                                    <td>{{=falta['curso']}}</td>
+                                    <td>{{=falta['tipo']}}</td>
+                                    <td>
+                                        <span id="fecha_{{=falta['id']}}"></span>
+                                    </td>
+                                    <td>
+                                        <center>
+                                            <small>
+                                                <a href="{{=URL('infringements_and_sanctions','infringement_detail',vista+'/'+str(falta['id']))}}" class="btn btn-sm btn-primary">
+                                                    Ver Falta
+                                                </a>
+                                            </small>
+                                        </center>
+                                    </td>
+                                </tr>
+                            {{pass}}
+                        </tbody>
+                    </table>
+                {{pass}}
+            {{pass}}
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+<script>
+    {{from gluon.serializers import json}}
+
+    const faltas = {{=XML(json(faltas))}};
+    faltas.forEach(falta => {
+        let date_ = new Date(falta.fecha);
+        const current = `#fecha_${falta.id}`;
+        $(current).append("<td></td>").text(date_.toLocaleDateString('es-GT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    });
+    
+    const faltasGraves = {{=XML(json(faltas_graves))}};
+    faltasGraves.forEach(falta => {
+        let date_ = new Date(falta.fecha);
+        const current = '#fechagrave_'+ falta.id;
+        $(current).append("<td></td>").text(date_.toLocaleDateString('es-GT', { day: '2-digit', month: '2-digit', year: 'numeric' }));
+    });
+</script>
+{{end page_js}}

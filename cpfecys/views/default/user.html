@@ -1,138 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>DTT Admin - Dashboard</title>
-    <link rel="stylesheet" href="/static/build/css/admin-{{=school}}.css" type="text/css" />
-    <style>
-        [type="text"], [type="password"], select { margin-right: 5px; width: 300px;}
-        div.w2p_flash{left: 41%;}
-    </style>
-    {{include 'web2py_ajax.html'}}
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <title>DTT | Ingreso DTT</title>
+        <link rel="icon" type="image/x-icon" href="/static/build/images/{{=school}}/favicon.ico">
+        <link rel="stylesheet" href="/static/build/css/admin-{{=school}}.css"/>
+        <link rel="stylesheet" href="/static/build/css/{{=school}}.css"/>
+        <style>
+            [type="text"], [type="password"], select { margin-right: 5px; width: 300px;}
+            div.w2p_flash{left: 41%;}
+        </style>
+        {{include 'web2py_ajax.html'}}
+    </head>
 
-<body class="bg-dark">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="w2p_flash">{{=response.flash or ''}}</div>
+    {{if school == 'ecys':}}
+        {{include 'schools/ecys/header.html'}}      
+    {{elif school == 'emi':}}
+        {{include 'schools/emi/header.html'}}         
+    {{pass}}
+
+    <body class="bg-dark" style="min-height: 120vh; display: flex; flex-direction: column;">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="w2p_flash">{{=response.flash or ''}}</div>
+                </div>
             </div>
-        </div>
-        <div id="web2py_user_form" class="card mt-5 mx-auto dttLogin">
-            <div class="card-header text-center">Inicio de sesión</div>
-            <div class="card-body">
-                {{
-                #CERODAS: Dependiendo del encabezado se le da el comportamiento
-                if ((request.args(0) == 'request_reset_password') and (
-                        (request.vars['message']=='NOT_RESULT') or
-                        (request.vars['message']=='NOT_DATA') or
-                        (request.vars['message'] is None)
-                        )) :
-                    Tittle = 'PASO 1: Verificación de usuario'
-                    else:
-                    if ( (request.args(0) == 'request_reset_password') and (request.vars['message']=='UPDATED')):
-                        Tittle = 'PASO 2: ' + T(request.args(0).replace('_',' ').capitalize())
-                    else:
-                        Tittle = T(request.args(0).replace('_',' ').capitalize())
-                    pass
-                pass
-                }}
-                <div>
-                {{
-                #CERODAS 1: Si es recuperacion de pass con data actualizada entonces el formulario normal
-                if ( (request.args(0) == 'request_reset_password') and
-                        (request.vars['message']=='UPDATED')
-                    ):
-                    =form
-                    }}
-                    <script language="javascript">
-                        var text = "{{=session.username}}";
-                        $( "#auth_user_username" ).val(text);
-                    </script>
+            <div id="web2py_user_form" class="card mt-5 mx-auto dttLogin">
+                <div class="card-header text-center">Inicio de sesión</div>
+                <div class="card-body">
                     {{
-                    pass
-                #CERODAS 1: Si no es solicitud de recuperacion de pass se toma el form default del controlador.
-                if (request.args(0) != 'request_reset_password'):
-                    if request.args(0)=='login':
-                        if not 'register' in auth.settings.actions_disabled:
-                            form.add_button(T('Register'),URL(args='register', vars={'_next': request.vars._next} if request.vars._next else None),_class='btn')
+                    #CERODAS: Dependiendo del encabezado se le da el comportamiento
+                    if ((request.args(0) == 'request_reset_password') and ((request.vars['message'] == 'NOT_RESULT')
+                    or (request.vars['message'] == 'NOT_DATA') or (request.vars['message'] is None))):
+                        Tittle = 'PASO 1: Verificación de usuario'
+                    else:
+                        if ((request.args(0) == 'request_reset_password') and (request.vars['message'] == 'UPDATED')):
+                            Tittle = 'PASO 2: ' + T(request.args(0).replace('_',' ').capitalize())
+                        else:
+                            Tittle = T(request.args(0).replace('_',' ').capitalize())
                         pass
-                        if not 'request_reset_password' in auth.settings.actions_disabled:
-                            form.add_button(T('Lost Password'),URL(args='request_reset_password'),_class='btn btn btn-success')
-                        pass
                     pass
+                    }}
+                    <div>
+                    {{
+                    #CERODAS 1: Si es recuperacion de pass con data actualizada entonces el formulario normal
+                    if ( (request.args(0) == 'request_reset_password') and
+                            (request.vars['message']=='UPDATED')
+                        ):
+                        =form
+                        }}
+                        <script language="javascript">
+                            var text = "{{=session.username}}";
+                            $( "#auth_user_username" ).val(text);
+                        </script>
+                        {{
+                        pass
+                    #CERODAS 1: Si no es solicitud de recuperacion de pass se toma el form default del controlador.
+                    if (request.args(0) != 'request_reset_password'):
+                        if request.args(0)=='login':
+                            if not 'register' in auth.settings.actions_disabled:
+                                form.add_button(T('Register'),URL(args='register', vars={'_next': request.vars._next} if request.vars._next else None),_class='btn')
+                            pass
+                            if not 'request_reset_password' in auth.settings.actions_disabled:
+                                form.add_button(T('Lost Password'),URL(args='request_reset_password'),_class='btn btn btn-success')
+                            pass
+                        pass
 
-                    if request.args(0) == 'profile':
-                        if auth.has_membership('Academic') or auth.has_membership('Student'):}}
-                        <div class="alert"  style="width:90%;" id="notice_1">
+                        if request.args(0) == 'profile':
+                            if auth.has_membership('Academic') or auth.has_membership('Student'):}}
+                            <div class="alert"  style="width:90%;" id="notice_1">
 
-                                    {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
-                                    if review is None:
-                                        }}<div class="text-center"><label color="blue"> {{=T('Pending Photo')}}</label><br>
-                                        {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
-                                        </div>
-                                    {{else:
-                                        if review.accepted == True:
-                                            }}<div class="text-center"><label color="green">{{=T('Photo Accepted')}}</label></div>
-                                        {{else:
-                                            }}<div class="text-center"><strong>¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!</strong><br>
+                                        {{review = db((db.photo_review.user_id == auth.user.id)).select().first()
+                                        if review is None:
+                                            }}<div class="text-center"><label color="blue"> {{=T('Pending Photo')}}</label><br>
                                             {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
                                             </div>
-                                        {{pass
-                                    pass
-                                    }}
+                                        {{else:
+                                            if review.accepted == True:
+                                                }}<div class="text-center"><label color="green">{{=T('Photo Accepted')}}</label></div>
+                                            {{else:
+                                                }}<div class="text-center"><strong>¡{{=T('Photo Rejected')}}, {{=T('please enter a new photo')}}!</strong><br>
+                                                {{=T('Remember that photography is for academic use; therefore must be commensurate with the seriousness of the case, otherwise it will be blocked.')}}
+                                                </div>
+                                            {{pass
+                                        pass
+                                        }}
 
-                            </div>
-                        {{pass
+                                </div>
+                            {{pass
+                        pass
+
+                        =form
+
+                        if (request.args(0) == 'profile')&(auth.has_membership('Teacher')):}}
+                            <script type="text/javascript">
+                                $("#auth_user_photo__label").replaceWith("<a class='btn btn-success' href='{{=URL('default','user/profile' , vars=dict(edit_foto=True) )}}'>{{=T('Active Photo Edit')}}</a>");
+                            </script>
+                        {{
+                        pass
+                        pass
+
+                    #CERODAS 1: SI ES RECUPERAR PASS SE DA UNA NUEVA FUNCIONALIDAD CON UN FORMULARIO PERSONALIZADO
+                    #CERODAS 1: SE DEBE VERIFICAR SI NUNCA HA INGRESADO PARA LA NUEVA FUNCIONALIDAD SINO DEBE LLAMARSE EL METODO GENERAL
+                    else:
+                        if (
+                            (request.vars['message']=='NOT_RESULT') or
+                            (request.vars['message']=='NOT_DATA') or
+                            (request.vars['message'] is None)
+                            ):
+                        }}
+                        <form enctype="multipart/form-data" action="{{=URL('get_user_update_data')}}">
+                        <b>{{=T('Username')}}: </b><input name="Username" id="Username" />
+                        <input type="submit" name="ok" value="{{=T('Verificar')}}" class="btn btn-primary" />
+                        </form>
+                        {{
+                        pass
                     pass
-
-                    =form
-
-                    if (request.args(0) == 'profile')&(auth.has_membership('Teacher')):}}
-                        <script type="text/javascript">
-                            $("#auth_user_photo__label").replaceWith("<a class='btn btn-success' href='{{=URL('default','user/profile' , vars=dict(edit_foto=True) )}}'>{{=T('Active Photo Edit')}}</a>");
-                        </script>
-                    {{
-                    pass
-                    pass
-
-                #CERODAS 1: SI ES RECUPERAR PASS SE DA UNA NUEVA FUNCIONALIDAD CON UN FORMULARIO PERSONALIZADO
-                #CERODAS 1: SE DEBE VERIFICAR SI NUNCA HA INGRESADO PARA LA NUEVA FUNCIONALIDAD SINO DEBE LLAMARSE EL METODO GENERAL
-                else:
-                    if (
-                        (request.vars['message']=='NOT_RESULT') or
-                        (request.vars['message']=='NOT_DATA') or
-                        (request.vars['message'] is None)
-                        ):
                     }}
-                    <form enctype="multipart/form-data" action="{{=URL('GetUserUpdateData')}}">
-                    <b>{{=T('Username')}}: </b><input name="Username" id="Username" />
-                    <input type="submit" name="ok" value="{{=T('Verificar')}}" class="btn btn-primary" />
-                    </form>
-                    {{
-                    pass
-                pass
-                }}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <script src="{{=URL('static','build/js/jquery.js')}}"></script>
-    <script src="{{=URL('static','build/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{=URL('static','build/js/web2py.js')}}"></script>
-    <script src="{{=URL('static','build/js/web2py-bootstrap4.js')}}"></script>
-    <script language="javascript">
-        jQuery("#web2py_user_form input:visible:enabled:first").focus();
-        {{if request.args(0)=='register':}}
-            web2py_validate_entropy(jQuery('#auth_user_password'),100);
-        {{elif request.args(0)=='change_password':}}
-            web2py_validate_entropy(jQuery('#no_table_new_password'),100);
-        {{pass}}
-        //-->
-    </script>
-</body>
+        <script src="{{=URL('static','build/js/jquery.js')}}"></script>
+        <script src="{{=URL('static','build/js/bootstrap.bundle.min.js')}}"></script>
+        <script src="{{=URL('static','build/js/web2py.js')}}"></script>
+        <script src="{{=URL('static','build/js/web2py-bootstrap4.js')}}"></script>
+        <script language="javascript">
+            jQuery("#web2py_user_form input:visible:enabled:first").focus();
+            {{if request.args(0)=='register':}}
+                web2py_validate_entropy(jQuery('#auth_user_password'),100);
+            {{elif request.args(0)=='change_password':}}
+                web2py_validate_entropy(jQuery('#no_table_new_password'),100);
+            {{pass}}
+            //-->
+        </script>
+    </body>
+
+    {{if school == 'ecys':}}
+        {{include 'schools/ecys/footer.html'}}  
+    {{elif school == 'emi':}}
+        {{include 'schools/emi/footer.html'}}         
+    {{pass}}
 </html>

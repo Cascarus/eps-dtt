@@ -2,6 +2,11 @@
 import os
 import uuid
 
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import cm
+from PyPDF2 import PdfWriter, PdfReader
+
 # ================================= QUERIES LIST =================================
 
 def get_delivered_document_period():
@@ -278,15 +283,9 @@ def decode_delivered_id(cad_base64):
 
 
 def sign_file(path, filename, url, signatures, username, signed_file=None):
-    
     extension = os.path.splitext(filename)[1]
     if extension.strip().upper() != '.PDF':
         return 'Extension del archivo no es PDF', 0
-
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import cm
-    from PyPDF2 import PdfFileWriter, PdfFileReader
 
     #obteniendo el carnet de usuario (algo-carnet)
     user = filename.split('-')[1]
@@ -307,11 +306,11 @@ def sign_file(path, filename, url, signatures, username, signed_file=None):
     qrcode_f = 'qrcode_file_' + username + '.pdf'
     temp_path_file = os.path.join(uploads_path, qrcode_f)
     try:
-        input_file = PdfFileReader(open(source_path_file,"rb"), strict=False)
+        input_file = PdfReader(open(source_path_file,"rb"), strict=False)
     except Exception as ex:
         return ex,0
-    page_count = input_file.getNumPages()
-
+    page_count = len(input_file.pages)
+        
     qrcode_img = None
     actual_page = 1
     cont_signature = 0
@@ -325,7 +324,7 @@ def sign_file(path, filename, url, signatures, username, signed_file=None):
         if actual_page < signature['page']:
             if cont_signature > 0:
                 c.showPage()
-                print('Se guardaron {} firmas en la página {}').format(cont_signature, actual_page)
+                print('r Se guardaron {} firmas en la página {}'.format(cont_signature, actual_page))
                 actual_page = actual_page + 1
                 cont_signature = 0
 
@@ -336,7 +335,6 @@ def sign_file(path, filename, url, signatures, username, signed_file=None):
         if signature['signature_type'] == 'QR Code':
             if qrcode_img is None:
                 qrcode_img = generate_qrcode(path, url, username)
-
             c.drawImage(qrcode_img, signature['position_x'] * cm, signature['position_y'] * cm,
                         signature['width'], signature['height'], mask='auto')
 
@@ -344,7 +342,6 @@ def sign_file(path, filename, url, signatures, username, signed_file=None):
             if signature['image'] is None:
                 print('Firma no tiene asociada una imagen, archivo: {}').format(filename)
                 return 'Firma no tiene asociada una imagen', 0
-
             
             path_image = os.path.join(uploads_path, signature['image'])
             
@@ -355,34 +352,37 @@ def sign_file(path, filename, url, signatures, username, signed_file=None):
                 print(ex)
                 return ex,0
         cont_signature = cont_signature + 1    
-    
+        
     # agregando las ultimas hojas, en caso que la última firma agregada este al inicio
-    print('Se guardaron {} firmas en la página {}').format(cont_signature, actual_page)
+    print(cont_signature, actual_page)
+    print('a Se guardaron {} firmas en la página {}'.format(cont_signature, actual_page))
     c.save()
-
     try:
-        output_file = PdfFileWriter()
-        image_temp = PdfFileReader(open(temp_path_file, "rb"), strict=False)
-        page_count_temp = image_temp.getNumPages()
-        for actual in range(0, page_count):
-            input_page = input_file.getPage(actual)
-            if actual < page_count_temp:
-                input_page.mergePage(image_temp.getPage(actual))
-            output_file.addPage(input_page)
-    except Exception as ex:
-        print('No es posible firmar el documento')
-        print(ex)
-        return 'No es posible firmar el documento', 0
-    
-    try:
-        output_stream = open(dest_path_file, "wb")
-        output_file.write(output_stream)
-        output_stream.close()
+        try:
+            output_file = PdfWriter()
+            image_temp = PdfReader(open(temp_path_file, "rb"), strict=False)
+            page_count_temp = len(image_temp.pages)
+            for actual in range(0, page_count):
+                input_page = input_file.pages[actual]
+                if actual < page_count_temp:
+                    input_page.merge_page(image_temp.pages[actual])
+                output_file.add_page(input_page)
+        except Exception as ex:
+            print('No es posible firmar el documento')
+            print(ex)
+            return 'No es posible firmar el documento', 0
+        
+        try:
+            output_stream = open(dest_path_file, "wb")
+            output_file.write(output_stream)
+            output_stream.close()
+        except Exception as e:
+            print(e)
+            return str(e), 0
+        return dest_filename, 1
     except Exception as e:
-        print(e)
-        return str(e), 0
-    
-    return dest_filename, 1
+        print('error', e)
+        
 
 def generate_qrcode(path, url_, username):
     import qrcode
@@ -543,11 +543,6 @@ def validate_form_signature_assignment(vars_form):
     return True, result
 
 def sign_sample(path, signature, values):
-    from reportlab.pdfgen import canvas
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import cm
-    from PyPDF2 import PdfFileWriter, PdfFileReader
-
     uploads_path = os.path.join(path, 'uploads')
 
     dest_path = os.path.join(uploads_path, 'type_sample_signed.pdf')
@@ -555,8 +550,8 @@ def sign_sample(path, signature, values):
     qrcode_f = 'qrcode_file_sample.pdf'
 
     temp_path_file = os.path.join(uploads_path, qrcode_f)
-    input_file = PdfFileReader(open(dest_path_file, 'rb'))
-    page_count = input_file.getNumPages()
+    input_file = PdfReader(open(dest_path_file, 'rb'))
+    page_count = len(input_file.pages)
 
     qrcode_img = None
     actual_page = 1
@@ -598,19 +593,19 @@ def sign_sample(path, signature, values):
     
     c.save()
     try:
-        output_file = PdfFileWriter()
-        image_temp = PdfFileReader(open(temp_path_file,'rb'))
-        page_count_temp = image_temp.getNumPages()
+        output_file = PdfWriter()
+        image_temp = PdfReader(open(temp_path_file,'rb'))
+        page_count_temp = len(image_temp.pages)
     except Exception as e:
         print(e)
         return "Error", 0
 
     try:
         for actual in range(0, page_count):
-            input_page = input_file.getPage(actual)
+            input_page = input_file.pages[actual]
             if actual < page_count_temp:
-                input_page.mergePage(image_temp.getPage(actual))
-            output_file.addPage(input_page)
+                input_page.merge_page(image_temp.pages[actual])
+            output_file.add_page(input_page)
     except Exception as ex:
         print('No es posible firmar el documento')
         print(ex)

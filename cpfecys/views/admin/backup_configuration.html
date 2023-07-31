@@ -174,14 +174,14 @@
 							</tr>
 						</thead>
 						<tbody>
-							{{bk_list=backup_list(back.ruta,back.servidor)}}
+							{{bk_list = backup_list(back.ruta, back.servidor)}}
 							{{for bkl in bk_list:}}
 							<tr>
 								<td>{{=bkl.fecha}}</td>
 								<td>{{=bkl.nombre}}</td>
 								<td>{{="Incremental" if bkl.tipo == "I" else "Completo"}}</td>
 								<td style="color: {{="#0F0" if bkl.estado == "E" else "#F00"}}">{{="Exitoso" if bkl.estado == "E" else "Fallido"}}</td>
-								<td>{{=int(bkl.tamano)/1000 if bkl.tamano!='' and bkl.tamano>0 else "--"}} MB </td>
+								<td>{{=int(bkl.tamano)/1000 if bkl.tamano != '' and int(bkl.tamano) > 0 else "--"}} MB </td>
 								<td style="text-align: center;">
 								<span id="bk_closebtnlog{{=bkl.id}}" class="bk_closebtn icon-plus-sign" style="float: none;" onclick="bk_detallelog({{=bkl.id}})"></span>
 								</td>

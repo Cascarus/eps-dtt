@@ -20,6 +20,10 @@ import os
 import gluon.contenttype as c
 import dsa_utils_temp
 import base64
+import zipfile
+import chardet
+import io
+from gluon.contenttype import contenttype
 
 def obtain_period_report(report):
     #Get the minimum and maximum date of the report
@@ -227,8 +231,7 @@ def metric_statistics(act_tempo, recovery, data_incoming):
     #Fill the activity
     if data_incoming is None:
         if recovery==1 or recovery==2:
-            import datetime
-            activity.append(datetime.datetime.now().date())
+            activity.append(datetime.now().date())
         else:
             activity.append(act_tempo.date_start)
         activity.append(description)
@@ -273,47 +276,47 @@ def activities_report_tutor(report):
         end_date_activity=None
         init_semester=None
         if cperiod.period == 1:
-            init_semester = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '01-01', "%Y-%m-%d")
+            init_semester = datetime.strptime(str(cperiod.yearp) + '-' + '01-01', "%Y-%m-%d")
             if report.report_restriction.is_final==False:
                 activities_f=[]
                 name_report_split = report.report_restriction.name.upper()
                 name_report_split = name_report_split.split(' ')
                 for word in name_report_split:
                     if word=='ENERO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '02-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '02-01', "%Y-%m-%d")
                     elif word=='FEBRERO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '03-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '03-01', "%Y-%m-%d")
                     elif word=='MARZO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '04-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '04-01', "%Y-%m-%d")
                     elif word=='ABRIL':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '05-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '05-01', "%Y-%m-%d")
                     elif word=='MAYO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
             else:
-                end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+                end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
         else:
-            init_semester = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
+            init_semester = datetime.strptime(str(cperiod.yearp) + '-' + '06-01', "%Y-%m-%d")
             if report.report_restriction.is_final==False:
                 activities_f=[]
                 name_report_split = report.report_restriction.name.upper()
                 name_report_split = name_report_split.split(' ')
                 for word in name_report_split:
                     if word=='JUNIO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '07-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '07-01', "%Y-%m-%d")
                     elif word=='JULIO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '08-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '08-01', "%Y-%m-%d")
                     elif word=='AGOSTO':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '09-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '09-01', "%Y-%m-%d")
                     elif word=='SEPTIEMBRE':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '10-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '10-01', "%Y-%m-%d")
                     elif word=='OCTUBRE':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '11-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '11-01', "%Y-%m-%d")
                     elif word=='NOVIEMBRE':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp) + '-' + '12-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp) + '-' + '12-01', "%Y-%m-%d")
                     elif word=='DICIEMBRE':
-                        end_date_activity = datetime.datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+                        end_date_activity = datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
             else:
-                end_date_activity = datetime.datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
+                end_date_activity = datetime.strptime(str(cperiod.yearp+1) + '-' + '01-01', "%Y-%m-%d")
 
         #Get the latest reports and are of this semester
         before_reports_restriction = db((db.report_restriction.id<report.report_restriction)&(db.report_restriction.start_date>=init_semester)).select(db.report_restriction.id)
@@ -360,8 +363,8 @@ def activities_report_tutor(report):
                     if report.report_restriction.is_final==False:
                         #temp_end_act = act_tempo.date_finish + datetime.timedelta(days=parameters_period.timeout_income_notes)
                         temp_end_act = act_tempo.date_finish
-                        temp_end_act = datetime.datetime(temp_end_act.year, temp_end_act.month, temp_end_act.day)
-                        end_date_activityt1 = datetime.datetime(end_date_activity.year, end_date_activity.month, end_date_activity.day)
+                        temp_end_act = datetime(temp_end_act.year, temp_end_act.month, temp_end_act.day)
+                        end_date_activityt1 = datetime(end_date_activity.year, end_date_activity.month, end_date_activity.day)
                         if temp_end_act<end_date_activityt1:
                             #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
                             if (((int(db((db.grades_log.activity_id == act_tempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==report.assignation.assigned_user.username)).count())*100)/int(db(db.grades.activity == act_tempo.id).count()))>=int(parameters_period.percentage_income_activity)):
@@ -386,8 +389,8 @@ def activities_report_tutor(report):
                     if report.report_restriction.is_final==False:
                         #temp_end_act = act_tempo.date_finish + datetime.timedelta(days=parameters_period.timeout_income_notes)
                         temp_end_act = act_tempo.date_finish
-                        temp_end_act = datetime.datetime(temp_end_act.year, temp_end_act.month, temp_end_act.day)
-                        end_date_activityt1 = datetime.datetime(end_date_activity.year, end_date_activity.month, end_date_activity.day)
+                        temp_end_act = datetime(temp_end_act.year, temp_end_act.month, temp_end_act.day)
+                        end_date_activityt1 = datetime(end_date_activity.year, end_date_activity.month, end_date_activity.day)
                         if temp_end_act<end_date_activityt1:
                             #Check if you have the minimum of notes recorded in the activity amount that you are worth in the report
                             if (((int(db((db.grades_log.activity_id == act_tempo.id)&(db.grades_log.operation_log=='insert')&(db.grades_log.user_name==report.assignation.assigned_user.username)).count())*100)/int(db(db.grades.activity == act_tempo.id).count()))>=int(parameters_period.percentage_income_activity)):
@@ -747,7 +750,6 @@ def calificar_practicantes():
 
 @auth.requires_membership('Super-Administrator')
 def dtt_general_approval():
-    from datetime import datetime
     status = request.vars['status']
     period = request.vars['period']
     approve = request.vars['approve']
@@ -766,8 +768,8 @@ def dtt_general_approval():
             entries = count_log_entries(report)
             metrics = count_metrics_report(report)
             #TODO cambio
-            anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
-            #anomalies = count_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']
+            #anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
+            anomalies = count_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']
             if entries != 0 or metrics!= 0 or anomalies != 0:
                 report.update_record(dtt_approval = approve)
     elif int(status) == -1:
@@ -780,8 +782,8 @@ def dtt_general_approval():
             entries = count_log_entries(report)
             metrics = count_metrics_report(report)
             #TODO 
-            anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
-            #anomalies = count_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']
+            #anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
+            anomalies = count_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']
             if entries != 0 or metrics!= 0 or anomalies != 0:
                 report.update_record(dtt_approval = approve)
     else:
@@ -830,8 +832,8 @@ def dtt_general_approval_dcos():
         entries = count_log_entries(report)
         metrics = count_metrics_report(report)
         #TODO
-        anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
-        #anomalies = count_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']
+        #anomalies = count_anomalies(report)[0]['COUNT(log_entry.id)']
+        anomalies = count_anomalies(report)[0]['_extra']['COUNT(`log_entry`.`id`)']
         if entries != 0 or metrics!= 0 or anomalies != 0:
             report.update_record(dtt_approval = approve)
         else:
@@ -846,12 +848,10 @@ def dtt_general_approval_dcos():
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def roles():
-    grid = SQLFORM.smartgrid(
-        db.auth_group, linked_tables=['auth_membership'])
+    grid = SQLFORM.smartgrid(db.auth_group, linked_tables=['auth_membership'])
     return dict(grid=grid)
 
 # Inicio - Practicas Finales(DSA) - Jose Carlos I Alonzo Colocho
-
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def documents_roles():
@@ -868,7 +868,7 @@ def documents_roles():
         users_list = list()
         users_list.append(OPTION("", _value=0))
         for user in users:
-            content = "{} - {} {}".format(user['username'].encode("utf-8"), user['first_name'].encode("utf-8"), user['last_name'].encode("utf-8"))
+            content = "{} - {} {}".format(user['username'], user['first_name'], user['last_name'])
             users_list.append(OPTION(content, _value=str(user['id']), _selected=(True if type == str(user['id']) else False)))
 
         return SELECT(users_list, _name='inputUsers', _id='inputUsers', _class="form-control")
@@ -1223,7 +1223,7 @@ def manage_document_ecys():
                 signature = "true" if vars['inputSignature'] == "1" else "false"
                 validation = "true" if vars['inputValidation'] == "1" else "false"
                 complement = "true" 
-                #if not vars.has_key('inputComplement'):
+
                 if not 'imputComplement' in vars:
                     complement = "false"
                     vars['inputComplementSize'] = "0"
@@ -1403,7 +1403,6 @@ def general_report():
                 ).select(db.user_project.ALL)
         return assignations
     def get_final_report(project_id,period):
-        from datetime import datetime
         log_final = None
         parcial_1 = None
         parcial_2 = None
@@ -1479,7 +1478,7 @@ def count_log_entries(report):
     #******************************************************PHASE 2 DTT******************************************************
     if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
         activities_tutor = activities_report_tutor(report)
-        log_entries=len(activities_tutor['activities_WM'])+len(activities_tutor['activities_M'])
+        log_entries=len(activities_tutor['activities_wm'])+len(activities_tutor['activities_m'])
     else:
         #log_entries = db((db.log_entry.report==report.id)).select(db.log_entry.id.count())[0]['COUNT(log_entry.id)']
         log_entries = db((db.log_entry.report == report.id)).select(db.log_entry.id.count())[0]['_extra']['COUNT(`log_entry`.`id`)']
@@ -1494,7 +1493,7 @@ def count_metrics_report(report):
     #******************************************************PHASE 2 DTT******************************************************
     if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
         activitiesTutor = activities_report_tutor(report)
-        log_metrics=len(activitiesTutor['activities_M'])
+        log_metrics=len(activitiesTutor['activities_m'])
     else:
         log_metrics = db((db.log_metrics.report== report.id)).select(db.log_metrics.id.count())[0]['COUNT(log_metrics.id)']
     return log_metrics
@@ -1575,7 +1574,7 @@ def delivered():
                     (db.user_project.project==project.id)&
                     (db.user_project.period == db.period_year.id)&
                     ((db.user_project.period <= period.id)&
-                 ((db.user_project.period + db.user_project.periods) > \
+                 ((db.user_project.period.cast('integer') + db.user_project.periods) > \
                   period.id))
                     ).select(db.user_project.ALL)
                 for assignation in assignations:
@@ -1716,121 +1715,101 @@ def assignations():
     #requires parameter year_period if no one is provided then it is automatically detected
     #and shows the current period
     year_period = request.vars['year_period'] or False
-
     max_display = 1
-    import cpfecys
+    currentyear_period = db(db.period_year.id == cpfecys.current_year_period()).select(db.period_year.id).first()
 
-    currentyear_period = db.period_year(db.period_year.id ==  cpfecys.current_year_period())
-
-    #emarquez
-    current_period_name = db((db.period.id==db.period_year.period)&(db.period_year.id == 1)).select().first()
-    #current_period_name = db.period(db.period.id ==  currentyear_period.period)
-    query = ''
     if year_period:
-        currentyear_period = db.period_year(db.period_year.id == year_period)
-        #currentyear_period =  db((db.period.id==db.period_year.period)&(db.period_year.id == year_period)).select().first()
-        #emarquez: enlazando el nombre de periodo a la base de datos
-        current_period_name = db((db.period.id==db.period_year.period)&(db.period_year.id == year_period)).select().first()
-
+        currentyear_period = db(db.period_year.id == year_period).select(db.period_year.id).first()
         if int(year_period) == 0:
-            current_period_name = db((db.period.id == db.period_year.period)&(db.period_year.id==cpfecys.current_year_period())).select().first()
-            query = db._lastsql
-            currentyear_period = db.period_year(db.period_year.id ==  cpfecys.current_year_period())
-        #current_period_name = db.period(db.period.id == currentyear_period.period)
+            currentyear_period = db(db.period_year.id == cpfecys.current_year_period()).select(db.period_year.id).first()
 
     #emarquez
     #type=2, periodo variable.  si type=1, periodo semestre
     tipo_periodo = request.vars['type'] or False
-    if tipo_periodo==False:
-        tipo_periodo=1
+    if not tipo_periodo:
+        tipo_periodo = 1
 
-    q_selected_period_assignations = ((db.user_project.period ==1))
+    q_selected_period_assignations = ((db.user_project.period == 1))
     if year_period:
-        q_selected_period_assignations = ((db.user_project.period ==year_period))
+        q_selected_period_assignations = ((db.user_project.period == year_period))
 
     #emarquez: si es semestre la funcionalidad se queda intacta, enero 2017    
     if int(tipo_periodo) == 1:
-            q_selected_period_assignations = ((db.user_project.period <= \
-                currentyear_period.id)&
-                      ((db.user_project.period + db.user_project.periods) > \
-                        currentyear_period.id))
+        q_selected_period_assignations = ((db.user_project.period <= currentyear_period.id) & ((db.user_project.period.cast('integer') + db.user_project.periods) > currentyear_period.id))
 
-    q2 = (db.user_project.assigned_user == db.auth_user.id)
-    q3 = (db.user_project.project == db.project.id)
-    q4 = (db.user_project.period == db.period_year.id)
-    q5 = (db.project.area_level == db.area_level.id)
-    q6 = (db.auth_user.id==db.user_project.assigned_user)
-    q7 = (db.auth_user.id==db.auth_membership.user_id)
-    q8 = (db.auth_membership.group_id==db.auth_group.id)
-    q9 = (db.auth_group.role!='Teacher')
-    orderby =  db.area_level.name
-    orderby2 = db.project.name
-    orderby3 = db.auth_user.username
-    orderby4 = db.auth_user.first_name
-    data = db(q_selected_period_assignations&q2&q3&q4&q5&q6&q7&q8&q9\
-        ).select(orderby=orderby|orderby2|orderby3|orderby4,groupby=db.user_project.id)
-    #emarquez
-    #current_period_name = T(cpfecys.second_period.name)
-
-    #emarquez: comentado
-    #if currentyear_period.period == cpfecys.first_period.id:
-    #    current_period_name = T(cpfecys.first_period.name)
+    data = db(q_selected_period_assignations & (db.user_project.assigned_user == db.auth_user.id)
+            & (db.user_project.project == db.project.id) & (db.user_project.period == db.period_year.id)
+            & (db.project.area_level == db.area_level.id) & (db.auth_user.id == db.user_project.assigned_user)
+            & (db.auth_user.id == db.auth_membership.user_id) & (db.auth_membership.group_id == db.auth_group.id) 
+            & (db.auth_group.role != 'Teacher')).select(
+                db.auth_user.registration_key,
+                db.auth_user.id,
+                db.auth_user.last_name,
+                db.auth_user.first_name,
+                db.auth_user.username,
+                db.auth_user.cui,
+                db.auth_user.email,
+                db.auth_user.phone,
+                db.auth_user.work_address,
+                db.auth_user.company_name,
+                db.auth_user.work_phone,
+                db.auth_user.home_address,
+                db.project.area_level,
+                db.project.name,
+                db.period_year.yearp,
+                db.period_year.period,
+                db.user_project.periods,
+                db.user_project.assignation_status,
+                db.user_project.assignation_status_comment,
+                db.user_project.assignation_ignored,
+                db.user_project.id,
+                orderby=db.area_level.name | db.project.name 
+                        | db.auth_user.username | db.auth_user.first_name,
+                groupby=db.user_project.id
+            )
 
     start_index = currentyear_period.id - max_display - 1
-
     if start_index < 1:
         start_index = 0
     end_index = currentyear_period.id + max_display
 
     #emarquez: periodos dinamicos
-    other_periods = db(db.period).select()
-
     if request.args(0) == 'toggle':
         enabled = ''
         user = request.vars['user']
-        user = db(db.auth_user.id==user).select().first()
-        if user == None:
+        user = db(db.auth_user.id == user).select(db.auth_user.id, db.auth_user.registration_key).first()
+        if user is None:
             session.flash = T("No existing user")
-            redirect(URL('admin', 'assignations', \
-            vars=dict(year_period = currentyear_period)))
+            redirect(URL('admin', 'assignations', vars=dict(year_period=currentyear_period)))
         if user.registration_key != 'blocked':
             enabled = 'blocked'
-        user.update_record(
-                registration_key=enabled)
-        redirect(URL('admin', 'assignations', \
-            vars=dict(year_period = currentyear_period.id)))
+        
+        user.update_record(registration_key=enabled)
+        redirect(URL('admin', 'assignations', vars=dict(year_period=currentyear_period.id)))
 
     #emarquez nueva formula de periodos dinamicos
-    #periods_before = db(db.period.id == db.period_year.period).select()
     listperios = db(db.period_detail.period)._select(db.period_detail.period)
-    periods_before = db((~db.period.id.belongs(listperios))&(db.period_year.period==db.period.id)).select(orderby=~db.period_year.id)
-
     if int(tipo_periodo) == 1:
-        periods_before = db((~db.period.id.belongs(listperios))&(db.period_year.period==db.period.id)).select(orderby=~db.period_year.id)
-
+        periods_before = db((~db.period.id.belongs(listperios)) & (db.period_year.period == db.period.id)).select(
+            db.period_year.id,
+            db.period_year.period,
+            db.period_year.yearp,
+            orderby=~db.period_year.id
+        )
     else:
-        periods_before = db((db.period.id==db.period_detail.period)&\
-        (db.period_year.period==db.period.id)).select()
-
-    #response.view ='aatest.html'
-    rowsi = db((db.period.id==db.period_detail.period)&(db.period_year.period==db.period.id)).select()
-
-    #test
-    lst = []
-    for r in rowsi:
-        lst.append(r.period_year.id)
-
-    assignations = db((db.user_project.assignation_status == None)&(~db.user_project.period.belongs(lst))).select()
-    query = db._lastsql
+        periods_before = db((db.period.id == db.period_detail.period) & (db.period_year.period == db.period.id)).select(
+            db.period_year.id,
+            db.period_year.period,
+            db.period_year.yearp,
+        )
 
     #fintest
-    return dict(data = data,
-                currentyear_period = currentyear_period,
-                current_period_name = current_period_name,
-                periods_before = periods_before,
-                #periods_after = periods_after,
-                other_periods = other_periods,
-                type=tipo_periodo, query=query)
+    return dict(
+        data=data,
+        currentyear_period=currentyear_period,
+        periods_before=periods_before,
+        type=tipo_periodo,
+    )
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -1897,7 +1876,7 @@ def report():
                         (db.user_project.project==report.assignation.project)&
                         (db.user_project.period==db.period_year.id)&
                         ((db.user_project.period <= period.id)&
-                       ((db.user_project.period + db.user_project.periods) > \
+                       ((db.user_project.period.cast('integer') + db.user_project.periods) > \
                         period.id))
                         ).select(db.auth_user.ALL).first()
             def add_timing(status):
@@ -2082,12 +2061,13 @@ def courses_report():
     period = cpfecys.current_year_period()
     periods = db(db.period_year).select()
     area = None
-    if request.vars['period'] != None:
+    if request.vars['period'] is not None:
         period = request.vars['period']
-        period = db(db.period_year.id==period).select().first()
+        period = db(db.period_year.id == period).select().first()
         if not period:
             session.flash = T('Not valid Action.')
             redirect(URL('default', 'home'))
+    
     if request.args(0) == 'areas':
         areas = db(db.area_level).select()
         return dict(areas=areas)
@@ -2106,35 +2086,40 @@ def courses_report():
             if report.report_restriction.start_date.month >= 6:
                tmp_period=2
             return db((db.period_year.yearp==tmp_year)&(db.period_year.period==tmp_period)).select().first()
+        
         def count_assigned_students(project):
             assigned = []
             desertion = []
-            assignations = get_assignations(project, period, 'Student' \
-                ).select(db.user_project.ALL)
+            assignations = get_assignations(project, period, 'Student').select(db.user_project.ALL)
             for assignation in assignations:
-                reports = db(db.report.assignation==assignation.id
-                    ).select()
+                reports = db(db.report.assignation == assignation.id).select()
                 for report in reports:
                     if obtain_period_report(report) == period:
                         assigned.append(report.desertion_started)
-            if assignations.first() != None:
+            
+            if assignations.first() is not None:
                 desertion_assignation = assignations.first()
-                desertion_reports = db(
-                    db.report.assignation==desertion_assignation.id).select()
+                desertion_reports = db(db.report.assignation == desertion_assignation.id).select()
                 for report in desertion_reports:
                     if obtain_period_report(report) == period:
-                        if report.desertion_gone != None:
+                        if report.desertion_gone is not None:
                             if report.desertion_gone:
                                 desertion.append(report.desertion_gone)
+            
+            assigned = [element_assigned for element_assigned in assigned if element_assigned is not None]
             if len(assigned) > 0:
                 assigned = max(assigned)
             else:
                 assigned = T('Pending')
+
+            desertion = [element_desertion for element_desertion in desertion if element_desertion is not None]
             if len(desertion) > 0:
                 desertion = sum(desertion)
             else:
                 desertion = T('Pending')
+
             return desertion, assigned
+        
         def count_student_hours(project):
             resp = []
             assignations = get_assignations(project, period, 'Student' \
@@ -2174,94 +2159,109 @@ def courses_report():
 @auth.requires_membership('Super-Administrator')
 def active_teachers():
     period = cpfecys.current_year_period()
-    if request.vars['period'] != None:
-            period = request.vars['period']
-            period = db(db.period_year.id==period).select().first()
-            if not period:
-                session.flash = T('Not valid Action.')
-                redirect(URL('default', 'home'))
-    if (request.args(0) == 'toggle'):
+
+    if request.vars['period'] is not None:
+        period = request.vars['period']
+        period = db(db.period_year.id == period).select().first()
+        if not period:
+            session.flash = T('Not valid Action.')
+            redirect(URL('default', 'home'))
+    
+    if request.args(0) == 'toggle':
         enabled = ''
         user = request.vars['user']
-        user = db(db.auth_user.id==user).select().first()
-        if user == None:
+        user = db(db.auth_user.id == user).select(db.auth_user.registration_key, db.auth_user.id).first()
+        if user is None:
             session.flash = T("No existing user")
-            redirect(URL('admin','active_teachers'))
+            redirect(URL('admin', 'active_teachers'))
+        
         if user.registration_key != 'blocked':
             enabled = 'blocked'
         user.update_record(registration_key=enabled)
-        redirect(URL('admin','active_teachers'))
+        redirect(URL('admin', 'active_teachers'))
     elif request.args(0) == 'mail':
         user = request.vars['user']
-        if user == None:
+        if user is None:
             session.flash = T("No existing user")
             redirect(URL('admin','active_teachers'))
-        user = db(db.auth_user.id==user).select().first()
-        if user == None:
+        
+        user = db(db.auth_user.id == user).select(
+                db.auth_user.id,
+                db.auth_user.email,
+                db.auth_user.username
+            ).first()
+        if user is None:
             session.flash = T("No existing user")
             redirect(URL('admin','active_teachers'))
-        recovery = cpfecys.get_domain() + \
-        'default/user/request_reset_password?_next=/cpfecys/default/index'
-        message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
-        ' para generar su contraseña puede visitar el siguiente enlace e ' +\
-        'ingresar su usuario ' + recovery
+
+        recovery = f'{cpfecys.get_domain()}default/user/request_reset_password?_next=/cpfecys/default/index'
+        message = f"""
+            Bienvenido a CPFECYS, su usuario es {user.username} 
+            para generar su contraseña puede visitar el siguiente enlace e 
+            ingresar su usuario {recovery}
+        """
         subject = 'DTT-ECYS Bienvenido'
-        send_mail_to_users([user], message, None, None, subject,None)
+        send_mail_to_users([user], message, None, None, subject, None)
         user.update_record(load_alerted=True)
     elif request.args(0) == 'notifyall':
-        users = get_assignations(False, period, 'Teacher'
-                ).select(db.auth_user.ALL, distinct=True)
-        recovery = cpfecys.get_domain() + \
-        'default/user/request_reset_password?_next=/cpfecys/default/index'
+        users = get_assignations(False, period, 'Teacher').select(
+                    db.auth_user.id,
+                    db.auth_user.email,
+                    db.auth_user.username,
+                    distinct=True
+                )
+        recovery = f'{cpfecys.get_domain()}default/user/request_reset_password?_next=/cpfecys/default/index'
+        subject = 'DTT-ECYS Bienvenido'
         for user in users:
-            message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
-            ' para generar su contraseña puede visitar el siguiente enlace e ' +\
-            'ingresar su usuario ' + recovery
-            subject = 'DTT-ECYS Bienvenido'
-            send_mail_to_users([user], message, None, None, subject,None)
+            message = f"""
+                Bienvenido a CPFECYS, su usuario es {user.username}
+                para generar su contraseña puede visitar el siguiente enlace e 
+                ingresar su usuario {recovery}
+            """
+            send_mail_to_users([user], message, None, None, subject, None)
             user.update_record(load_alerted=True)
     elif request.args(0) == 'notifypending':
         project = False
-        users = db(
-            (db.auth_user.id==db.user_project.assigned_user)&
-            (db.auth_user.id==db.auth_membership.user_id)&
-            (db.auth_user.load_alerted==None)&
-            (db.auth_membership.group_id==db.auth_group.id)&
-            (db.auth_group.role=='Teacher')&
-            (project==False or (db.user_project.project==project))&
-            (db.project.area_level==db.area_level.id)&
-            (db.user_project.project==db.project.id)&
-            (db.user_project.period == db.period_year.id)&
-            ((db.user_project.period <= period.id)&
-            ((db.user_project.period + db.user_project.periods) > \
-            period.id))
-            ).select(db.auth_user.ALL, distinct=True)
-        recovery = cpfecys.get_domain() + \
-        'default/user/retrieve_username?_next=/cpfecys/default/index'
+        users = db((db.auth_user.id == db.user_project.assigned_user) & (db.auth_user.id == db.auth_membership.user_id)
+                & (db.auth_user.load_alerted == None) & (db.auth_membership.group_id == db.auth_group.id)
+                & (db.auth_group.role == 'Teacher') & (project==False or (db.user_project.project == project))
+                & (db.project.area_level == db.area_level.id) & (db.user_project.project == db.project.id)
+                & (db.user_project.period == db.period_year.id) & ((db.user_project.period <= period.id)
+                & ((db.user_project.period.cast('integer') + db.user_project.periods) > period.id))).select(
+                    db.auth_user.id,
+                    db.auth_user.email,
+                    db.auth_user.username,
+                    distinct=True
+                )
+        recovery = f'{cpfecys.get_domain()}default/user/retrieve_username?_next=/cpfecys/default/index'
+        subject = 'DTT-ECYS Bienvenido'
         for user in users:
-            message = "Bienvenido a CPFECYS, su usuario es " + user.username + \
-            ' para generar su contraseña puede visitar el siguiente enlace e ' +\
-            'ingresar su usuario ' + recovery
-            subject = 'DTT-ECYS Bienvenido'
-            send_mail_to_users([user], message, None, None, subject,None)
+            message = f"""
+                Bienvenido a CPFECYS, su usuario es {user.username} 
+                para generar su contraseña puede visitar el siguiente enlace e 
+                ingresar su usuario {recovery}
+            """
+            send_mail_to_users([user], message, None, None, subject, None)
             user.update_record(load_alerted=True)
 
-    assignations = get_assignations(False, period, 'Teacher' \
-                ).select(db.user_project.ALL,
-                orderby=db.area_level.name|\
-                db.project.name|\
-                db.auth_user.last_name|\
-                db.auth_user.first_name)
-    periods = db(db.period_year).select()
+    assignations = get_assignations(False, period, 'Teacher').select(
+        db.user_project.ALL,
+        orderby=db.area_level.name | db.project.name
+                | db.auth_user.last_name | db.auth_user.first_name
+    )
+
+    periods = db(db.period_year).select(orderby=~db.period_year.id)
     go_to_academic = False
     try:
         if request.vars['next'] == "academic" :
             go_to_academic = True
     except:
-        None
-    if go_to_academic == True:
+        ...
+
+    if go_to_academic:
         redirect(URL('student_academic','academic'))
-    return dict(periods=periods, assignations=assignations,actual_period=period)
+    
+    return dict(periods=periods, assignations=assignations, actual_period=period)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -2276,7 +2276,7 @@ def get_assignations(project, period, role):
                     (db.user_project.project==db.project.id)&
                     (db.user_project.period == db.period_year.id)&
                     ((db.user_project.period <= period.id)&
-                 ((db.user_project.period + db.user_project.periods) > \
+                 ((db.user_project.period.cast('integer') + db.user_project.periods) > \
                   period.id))
                     )
     return assignations
@@ -2301,7 +2301,7 @@ def courses_report_detail():
                     (db.user_project.project==project)&
                     (db.user_project.period == db.period_year.id)&
                     ((db.user_project.period <= period)&
-                 ((db.user_project.period + db.user_project.periods) > \
+                 ((db.user_project.period.cast('integer') + db.user_project.periods) > \
                   period))
                     )._select()
     return assignations
@@ -2393,7 +2393,7 @@ def mail_notifications():
                             (db.user_project.period==db.period_year.id)&
                             ( (db.user_project.assignation_status==None)|
                               ((db.user_project.period <= period.id)&
-                              ((db.user_project.period + db.user_project.periods) > \
+                              ((db.user_project.period.cast('integer') + db.user_project.periods) > \
                               period.id)) )
                             )
 
@@ -2422,7 +2422,7 @@ def mail_notifications():
                             #Until here we get users from role assigned to projects
                             (db.user_project.period==db.period_year.id)&
                             ( ((db.user_project.period <= period.id)&
-                              ((db.user_project.period + db.user_project.periods) > \
+                              ((db.user_project.period.cast('integer') + db.user_project.periods) > \
                               period.id)) )
                             )
 
@@ -2544,8 +2544,7 @@ def mail_log():
 @auth.requires_membership('Super-Administrator')
 def send_mail_to_users(users, message, roles, projects, subject, attachment_list, log=False, cc=''):
     if log:
-        import datetime
-        cdate = datetime.datetime.now()
+        cdate = datetime.now()
         roles = db(db.auth_group.id.belongs(roles)).select()
         projects = db(db.project.id.belongs(projects)).select()
         roles_text = ''
@@ -2563,7 +2562,6 @@ def send_mail_to_users(users, message, roles, projects, subject, attachment_list
     attachment_m = ''
     try:
         attachment_m = '<br><br><b>' + T('Attachments') +":</b><br>"
-        import cpfecys
         if attachment_list != []:
             for attachment_var in db(db.uploaded_file.id.belongs(attachment_list)).select():
                 attachment_m = attachment_m + '<a href="' + cpfecys.get_domain() + URL('default/download', attachment_var.file_data) +'" target="blank"> '+ attachment_var.name + '</a> <br>'
@@ -2589,7 +2587,7 @@ def send_mail_to_users(users, message, roles, projects, subject, attachment_list
     pass
 
     if user_list != '':
-        was_sent = mail.send(to='dtt.ecys@dtt-ecys.org',
+        was_sent = mail.send(to='dtt.ecys@dtt-dev.site',
           subject=subject,
           message=message,
           bcc=user_list)
@@ -3030,7 +3028,8 @@ def report_filter_dcos():
         report = db(db.report.id == report_id).select().first()
         if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
             activities_tutor = activities_report_tutor(report)
-            log_entries=len(activities_tutor['activities_WM'])+len(activities_tutor['activities_M'])
+            print(activities_tutor)
+            log_entries=len(activities_tutor['activities_wm'])+len(activities_tutor['activities_m'])
         else:
             #TODO PREGUNTAR
             #print(db((db.log_entry.report == report.id)).select(db.log_entry.id.count())[0]['_extra']['COUNT(`log_entry`.`id`)'])
@@ -3042,7 +3041,7 @@ def report_filter_dcos():
         report = db(db.report.id == report_id).select().first()
         if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
             activities_tutor = activities_report_tutor(report)
-            log_metrics=len(activities_tutor['activities_M'])
+            log_metrics=len(activities_tutor['activities_m'])
         else:
             #TODO PREGUNTAR
             #print(db((db.log_metrics.report == report.id)).select(db.log_metrics.id.count())[0]['_extra']['COUNT(`log_metrics`.`id`)'])
@@ -3085,7 +3084,7 @@ def report_filter():
         #******************************************************PHASE 2 DTT******************************************************
         if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
             activitiesTutor = activities_report_tutor(report)
-            log_entries=len(activitiesTutor['activities_WM'])+len(activitiesTutor['activities_M'])
+            log_entries=len(activitiesTutor['activities_wm'])+len(activitiesTutor['activities_m'])
         else:
             #TODO CAMBIO
             #log_entries = db((db.log_entry.report==report.id)).select(db.log_entry.id.count())[0]['COUNT(log_entry.id)']
@@ -3098,7 +3097,7 @@ def report_filter():
         #******************************************************PHASE 2 DTT******************************************************
         if report.assignation.project.area_level.name=='DTT Tutor Académico' and (report.status.name=='Draft' or report.status.name=='Recheck'):
             activitiesTutor = activities_report_tutor(report)
-            log_metrics=len(activitiesTutor['activities_M'])
+            log_metrics=len(activitiesTutor['activities_m'])
         else:
             log_metrics = db((db.log_metrics.report== report.id)).select(db.log_metrics.id.count())[0]['COUNT(log_metrics.id)']
         return log_metrics
@@ -3399,9 +3398,8 @@ def delivered_download_button():
 
     elif (request.args(0) == 'zip'):
         def count_items(restriction, period, disabled=False, enabled=False):
-            import datetime
             period = request.vars['period']
-            cdate = datetime.datetime.now().date()
+            cdate = datetime.now().date()
             restriction = request.vars['restriction']
             r_instance = db(db.item_restriction.id==1
                 ).select(db.item_restriction.ALL)
@@ -3431,7 +3429,7 @@ def delivered_download_button():
 
     elif (request.args(0) == 'dl'):
         period = request.vars['period']
-        cdate = datetime.datetime.now().date()
+        cdate = datetime.now().date()
         restriction = request.vars['restriction']
         r_instance = db(db.item_restriction.id==1
             ).select(db.item_restriction.ALL)
@@ -3444,10 +3442,27 @@ def delivered_download_button():
         for item in items:
             files.append(item.uploaded_file)
         if len(files) > 0:
-            response.headers['Content-Disposition']='attachment;filename=files.zip'
-            response.headers['Content-Type']='application/zip'
-            return response.zip(request, files, db)
+            response.headers['Content-Type'] = 'application/zip'
+            response.headers['Content-Disposition'] = 'attachment; filename="files.zip"'
+            ruta_uploads = os.path.join(request.folder, 'uploads')
+            archivos = obtener_archivos_uploads(ruta_uploads, files)
+            archivo_zip = os.path.join(request.folder, 'files.zip')
+            with zipfile.ZipFile(archivo_zip, 'w') as zip_file:
+                for archivo in archivos:
+                    zip_file.write(archivo, os.path.basename(archivo))
+            return response.stream(open(archivo_zip, 'rb'), attachment=True, filename='files.zip')
     return dict(restriction=restriction,period=period)
+
+def obtener_archivos_uploads(ruta_uploads, files):
+    archivos = []
+    
+    for archivo in files:
+        ruta_completa = os.path.join(ruta_uploads, archivo)
+        
+        if os.path.isfile(ruta_completa):
+            archivos.append(ruta_completa)
+    
+    return archivos
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
@@ -3485,11 +3500,11 @@ def send_item_mail():
             item_res = db(db.item_restriction.id == item.item_restriction).select().first()
 
             values_log = {
-                'document_name': str(item_res.name.encode("utf8")),
+                'document_name': item_res.name,
                 'status': 'Rejected',
                 'comment': item.admin_comment if item.admin_comment is not None else 'Sin comentario',
                 'ref_delivered': item_delivered[0]['id'],
-                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'created_by': auth.user.username
             }
 
@@ -3626,7 +3641,7 @@ def teacher_assignation_upload():
                                   (db.period_year.period == period_var)).select().first()
     #emarquez: fin cambio.
 
-    if request.vars.csvfile != None:
+    if request.vars.csvfile is not None:
         try:
             file = request.vars.csvfile.file
         except AttributeError:
@@ -3635,9 +3650,23 @@ def teacher_assignation_upload():
                 file = False,
                 periods = periods)
         try:
-            cr = csv.reader(file.getvalue().decode('utf-8').splitlines(), delimiter=',', quotechar='"')
-            success = True
-            header = next(cr)
+            try:
+                content_file = file.read()
+                detection = chardet.detect(content_file)['encoding']
+                content_file = content_file.decode(detection).splitlines()
+            except:
+                content_file = []
+
+            cr = csv.reader(content_file, delimiter=',', quotechar='"')
+            try:
+                success = True
+                header = next(cr)
+            except:
+                response.flash = T('File doesn\'t seem properly encoded.')
+                return dict(success = False,
+                    file = False,
+                    periods = periods,
+                    current_period = current_period)
             for row in cr:
                 ## parameters
                 rusername = row[2] or ''
@@ -3743,7 +3772,6 @@ def assignation_upload():
     warning_users = []
 
     #emarquez: se pone por default el check
-    #uv_off = request.vars['uv_off'] or False
     uv_off = True
 
     success = False
@@ -3757,22 +3785,33 @@ def assignation_upload():
         if cmb_period != '0':
             periodo_variable = True
             period_var = db.period(id = cmb_period)
-            current_period = db((db.period_year.period==cmb_period)&
-                                  (db.period_year.period == period_var)).select().first()
+            current_period = db((db.period_year.period == cmb_period) & (db.period_year.period == period_var)).select().first()
     #emarquez: fin cambio.
 
-    if request.vars.csvfile != None:
+    if request.vars.csvfile is not None:
         try:
             file = request.vars.csvfile.file
         except AttributeError:
             response.flash = T('Please upload a file.')
-            return dict(success = False,
-                file = False,
-                periods = periods)
+            return dict(success=False, file=False, periods=periods)
+
         try:
-            cr = csv.reader(file, delimiter=',', quotechar='"')
-            success = True
-            header = next(cr)
+            try:
+                content_file = file.read()
+                detection = chardet.detect(content_file)['encoding']
+                content_file = content_file.decode(detection).splitlines()
+            except:
+                content_file = []
+            cr = csv.reader(content_file, delimiter=',', quotechar='"')
+            try:
+                success = True
+                header = next(cr)
+            except:
+                response.flash = T('File doesn\'t seem properly encoded.')
+                return dict(success = False,
+                file = False,
+                periods = periods,
+                current_period = current_period)
             for row in cr:
                 ## parameters
                 rusername = row[1]
@@ -3799,8 +3838,7 @@ def assignation_upload():
                             if usr is None:
                             """
                             # report error and get on to next row
-                            row.append(T('Error: ') + T('User is not valid. \
-                                User doesn\'t exist in UV.'))
+                            row.append(T('Error: ') + T('User is not valid. User doesn\'t exist in UV.'))
                             error_users.append(row)
                             continue
                             """
@@ -3818,8 +3856,7 @@ def assignation_upload():
                             """
                         else:
                             #insert a new user with csv data
-                            usr = db.auth_user.insert(username = rusername,
-                                                      email = remail)
+                            usr = db.auth_user.insert(username=rusername, email=remail)
                             #add user to role 'student'
                             auth.add_membership('Student', usr)
                     else:
@@ -3846,8 +3883,7 @@ def assignation_upload():
 
 
                         if assignation != None:
-                            row.append(T('Error: ') + T('User \
-                             was already assigned, Please Manually Assign Him.'))
+                            row.append(T('Error: ') + T('User was already assigned, Please Manually Assign Him.'))
                             error_users.append(row)
                             #assignation.update_record(periods = \
                                 #rassignation_length, pro_bono = \
@@ -3862,8 +3898,7 @@ def assignation_upload():
                                                 hours = rhours)
                     else:
                         # project_id is not valid
-                        row.append('Error: ' + T('Project code is not valid. \
-                         Check please.'))
+                        row.append('Error: ' + T('Project code is not valid. Check please.'))
                         error_users.append(row)
                         continue
         except csv.Error:
@@ -3903,9 +3938,8 @@ def final_practice():
     #emarquez
     #type=2, periodo variable.  si type=1, periodo semestre
     tipo_periodo = request.vars['type'] or False
-    if tipo_periodo==False:
-        tipo_periodo=1
-
+    if not tipo_periodo:
+        tipo_periodo = 1
 
     #requires parameter year_period if no one is provided then it is
     #automatically detected
@@ -3918,88 +3952,56 @@ def final_practice():
         changid = currentyear_period.id
         #emarquez: si el periodo no es 0( periodo) o no trae periodo( actual), entonces setea al periodo actual,
         if year_period:
-            if int(year_period)!=0:
-                year_period=changid
+            if int(year_period) != 0:
+                year_period = changid
         else:
-            year_period= changid
+            year_period = changid
 
 
     #emarquez: grid enlazado al periodo
     grid = SQLFORM.grid((db.user_project.period == year_period))
 
-    #emarquez: comentado, codigo enlazado a periodo
-    #current_period_name = T(cpfecys.second_period.name)
-    #if currentyear_period.period == cpfecys.first_period.id:
-    #    current_period_name = T(cpfecys.first_period.name)
-    current_period_name = db.period(db.period.id == 1)
-    if year_period:
-        #emarquez: enlazando el nombre de periodo a la base de datos
-        current_period_name = db.period(db.period.id == currentyear_period.period)
-
-
     #emarquez: cambiando la logica de las pestañas, para tratamiento de periodos
-
-    #start_index = currentyear_period.id - max_display - 1
-    #if start_index < 1:
-    #    start_index = 0
-    #end_index = currentyear_period.id + max_display
-    #periods_before = db(db.period_year).select(limitby=(start_index,  \
-    #    currentyear_period.id - 1))
-    #periods_after = db(db.period_year).select(limitby=(currentyear_period.id, \
-    #end_index))
-
-    #type=2, periodo variable.  si type=1, periodo semestre
-    tipo_periodo = request.vars['type'] or False
-    if tipo_periodo==False:
-        tipo_periodo=1
-
     list_periods = db(db.period_detail.period)._select(db.period_detail.period)
-
-    periods_before = db((~db.period.id.belongs(list_periods))&(db.period_year.period==db.period.id)).select(orderby=~db.period_year.id)
-
-    #periods_before = db.executesql('SELECT * FROM  period_year a, period b where a.period = b.id and b.id not in (select period from period_detail);')
-
     if int(tipo_periodo) == 1:
-        #periods_before = db((db.period.id<>db.period_detail.period)&\
-        #(db.period_year.period==db.period.id)).select(orderby=~db.period_year.id)
-        periods_before = db((~db.period.id.belongs(list_periods))&(db.period_year.period==db.period.id)).select(orderby=~db.period_year.id)
+        periods_before = db((~db.period.id.belongs(list_periods)) & (db.period_year.period == db.period.id)).select(orderby=~db.period_year.id)
     else:
-        periods_before = db((db.period.id==db.period_detail.period)&\
-        (db.period_year.period==db.period.id)).select()
+        periods_before = db((db.period.id == db.period_detail.period) & (db.period_year.period == db.period.id)).select()
 
 
    #emarquez: fin cambio de logica de pestañas
 
     #emarquez: periodos dinamicos
     other_periods = db(db.period).select()
-    #periods_before = db(db.period.id == db.period_year.period).select()
 
     #emarquez:agrego parametro type, para retorno de tipo de periodo
-    return dict(grid = grid,
-                currentyear_period = currentyear_period,
-                current_period_name = current_period_name,
-                periods_before = periods_before,
-                #periods_after = periods_after,
-                other_periods = other_periods,
-                type=tipo_periodo)
+    return dict(
+        grid=grid,
+        currentyear_period=currentyear_period,
+        periods_before=periods_before,
+        other_periods=other_periods,
+        type=tipo_periodo
+    )
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def users():
-    orderby = dict(auth_user=[db.auth_user.first_name, \
-                db.auth_user.username])
+    orderby = dict(auth_user=[db.auth_user.first_name, db.auth_user.username])
     db.auth_user.photo.writable = False
-    grid = SQLFORM.smartgrid(db.auth_user,linked_tables=['auth_membership','auth_event','auth_cas','user_project','report'], orderby=orderby)
+    grid = SQLFORM.smartgrid(
+        db.auth_user,
+        linked_tables=['auth_membership', 'auth_event', 'auth_cas', 'user_project', 'period_year', 'period', 'report'],
+        orderby=orderby
+    )
     return dict(grid = grid)
 
 @auth.requires_login()
 @auth.requires_membership('Super-Administrator')
 def user_mail_update():
-    group_teacher = []
-    for teacher in db((db.auth_membership.group_id==db.auth_group.id)&(db.auth_group.role=='Teacher')).select(db.auth_membership.user_id, distinct=True):
-        group_teacher.append(teacher.user_id)
+    teachers = db((db.auth_membership.group_id == db.auth_group.id) & (db.auth_group.role == 'Teacher')).select(db.auth_membership.user_id, distinct=True)
+    group_teacher = [teacher.user_id for teacher in teachers]
 
-    if len(group_teacher)<=0:
+    if len(group_teacher) <= 0:
         group_teacher.append(-1)
 
     db.auth_user.first_name.writable = False
@@ -4019,15 +4021,17 @@ def user_mail_update():
     db.auth_user.photo.writable = False
     db.auth_user.photo.readable = False
     grid = SQLFORM.grid(db.auth_user.id.belongs(group_teacher), oncreate=oncreate_user_mail_update)
-    return dict(grid =grid)
+    
+    return dict(grid=grid)
 
 def oncreate_user_mail_update(form):
-    new_teacher = db(db.auth_user.id == form.vars.id).select().first()
-    rol_teacher = db(db.auth_group.role=='Teacher').select().first()
+    new_teacher = db(db.auth_user.id == form.vars.id).select(db.auth_user.id).first()
+    rol_teacher = db(db.auth_group.role == 'Teacher').select(db.auth_group.id).first()
+    
     if rol_teacher is None:
-        db(db.auth_user.id==new_teacher.id).delete()
+        db(db.auth_user.id == new_teacher.id).delete()
         session.flash = T('Not valid Action.')
-        redirect(URL('default','home'))
+        redirect(URL('default', 'home'))
     else:
         db.auth_membership.insert(user_id=new_teacher.id, group_id=rol_teacher.id)
 
@@ -4036,6 +4040,7 @@ def get_periodos_variables():
 
 def get_periodos_semestre():
     list_periods = db(db.period_detail.period)._select(db.period_detail.period)
+
     return response.json(db((~db.period.id.belongs(list_periods))&(db.period_year.period==db.period.id)).select(orderby=~db.period_year.id))
 
 #*********************EPS DANIEL COS
@@ -4315,7 +4320,7 @@ def manage_signature():
                 values = {
                     'name': resultado['inputName'],
                     'signature_type': resultado['inputType'],
-                    'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'created_by': auth.user.username
                 }
 
@@ -4401,7 +4406,7 @@ def manage_signature():
                 values = {
                     'name': resultado['inputName'],
                     'signature_type': resultado['inputType'],
-                    'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    'updated_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
 
                 if item[0]['signature_type'] != resultado['inputType']:
@@ -4494,7 +4499,7 @@ def manage_signature():
                 if result is not None:
                     values = {
                         'image': result,
-                        'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        'updated_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                     }
                     condition = {'id': int(signature)}
                     try:
@@ -4502,8 +4507,6 @@ def manage_signature():
                         db.executesql(update_query)
                         session.flash = 'Archivo guardado exitosamente'
                     except Exception as e:
-                        print('********** Admin - manage signature **********')
-                        print(str(e))
                         session.flash = 'No se pudo guardar el archivo'
 
                     redirect(URL('admin', 'manage_signature', args=['edit', signature]))
@@ -4642,7 +4645,7 @@ def manage_document():
 
                     # Actualizando control period
                     values = {
-                        'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        'updated_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         'updated_by': auth.user.username
                     }
 
@@ -4757,6 +4760,7 @@ def manage_document():
 
                 was_change_date = ds_utils.change_dates_form_document(str(item[0]['date_start']), str(item[0]['date_finish']),
                                                                  resultado['inputStart'], resultado['inputFinish'])
+                print(was_change_date)
                 try:
                     update_query = ds_utils.create_script_string('ds_document', 'U', values, condition)
                     db.executesql(update_query)
@@ -4949,7 +4953,7 @@ def signature_assignment():
                                 redirect(URL('admin', 'signature_assignment', vars=dict(document=str(document[0]['id']), reference=new_dict['reference'])))
 
                             values = {
-                                'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                'updated_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                 'updated_by': auth.user.username
                             }
 
@@ -5455,7 +5459,7 @@ def manage_deliverables():
             if item[0]['control_period'] == 0:
                 values = {
                     'period_year': input_period,
-                    'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'created_by': auth.user.username
                 }
 
@@ -5522,7 +5526,7 @@ def manage_deliverables():
 
 
             values = {
-                'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'updated_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'updated_by': auth.user.username
             }
 
@@ -5572,8 +5576,7 @@ def manage_deliverables():
                 type_d = ds_utils.get_deliverable_type(deliverable_type)
                 new_dict['type_name'] = type_d[1]
 
-                new_dict['control_period_name'] = T(control_period[0]['name']) + ' - ' + str(control_period[0]['yearp']) \
-                                                  + ' (' + type_d[1] + ')'
+                new_dict['control_period_name'] = T(control_period[0]['name']) + ' - ' + str(control_period[0]['yearp']) + ' (' + type_d[1] + ')'
 
                 if option == 'deliverables':
                     # Obteniendo listado
@@ -5672,7 +5675,7 @@ def manage_items_signature():
 
                 values = {
                     'period_year': input_period,
-                    'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'created_by': auth.user.username
                 }
 
@@ -5703,7 +5706,7 @@ def manage_items_signature():
             if item[0]['control_period'] != 0:
                 m = 'Registro actualizado exitosamente'
                 values = {
-                    'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'updated_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'updated_by': auth.user.username
                 }
 
@@ -5885,6 +5888,7 @@ def change_deliverable_status():
         query = ds_utils.get_document_delivered_to_sign(id_doc)
 
     document = db.executesql(query, as_dict=True)
+    print('documento', document)
 
     if len(document) < 1:
         return response.json({'ok': 0, 'message': 'No existe entregable'})
@@ -5930,17 +5934,21 @@ def change_deliverable_status():
     if action == '4':
         query_sig = ds_utils.get_signatures_by_document(document[0]['document'])
         signatures = db.executesql(query_sig, as_dict=True)
+        print('signatures', signatures)
 
         if len(signatures) < 1:
             return response.json({'ok': 0, 'message': 'Documento no tiene firmas asociadas'})
 
         document_base = ds_utils.encode_delivered_id(document[0]['id'])
+        print(document_base)
 
-        url = "%s://%s%s" % (request.env.wsgi_url_scheme, request.env.http_host,
-                             URL('default', 'file_validation', args=['document', document_base]))
-        #print(url)
-        result_sign, status_sign = ds_utils.sign_file(request.folder, document[0]['file_uploaded'], url, signatures,
-                                                      auth.user.username, document[0]['signed_file'])
+        url = f"{request.env.wsgi_url_scheme}://{request.env.http_host}{URL('default', 'file_validation', args=['document', document_base])}"
+        print('url', url)
+        try:
+            result_sign, status_sign = ds_utils.sign_file(request.folder, document[0]['file_uploaded'], url, signatures, auth.user.username, document[0]['signed_file'])
+        except Exception as e:
+            print('a ver', e)
+        print(result_sign, status_sign)
 
         if status_sign == 0:
             return response.json({'ok': 0, 'message': result_sign})
@@ -5978,11 +5986,11 @@ def change_deliverable_status():
     # agregando bitacora de rechazos
     if action == '5':
         values_log = {
-            'document_name': str(document[0]['deliverable'].encode("utf8")),
+            'document_name': document[0]['deliverable'],
             'status': stat,
             'comment': comment,
             'ref_delivered': document[0]['id'],
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'created_by': auth.user.username
         }
 
@@ -6126,11 +6134,11 @@ def change_item_status():
     # agregando bitacora de rechazos
     if action == '5':
         values_log = {
-            'document_name': str(document[0]['deliverable'].encode("utf8")),
+            'document_name': document[0]['deliverable'],
             'status': stat,
             'comment': comment,
             'ref_delivered': document[0]['id'],
-            'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             'created_by': auth.user.username
         }
 
@@ -6233,9 +6241,9 @@ def update_all_deliverables():
 
     control_period = request.vars.control_period.strip()
     type_d = ds_utils.get_deliverable_type(deliverable_type)
-    document = request.vars.document.strip() if request.vars.has_key('document') else None
-    status = request.vars.status.strip() if request.vars.has_key('status') else None
-    enable = request.vars.enable.strip() if request.vars.has_key('enable') else None
+    document = request.vars.document.strip() if 'document' in request.vars else None
+    status = request.vars.status.strip() if 'status' in request.vars else None
+    enable = request.vars.enable.strip() if 'enable' in request.vars else None
 
     operator = ' IN '
     # verificando si habilitar o deshabilitar entregable
@@ -6370,9 +6378,9 @@ def update_all_items():
         redirect(URL('admin', 'manage_items_signature'))
 
     control_period = request.vars.control_period.strip()
-    document = request.vars.document.strip() if request.vars.has_key('document') else None
-    status = request.vars.status.strip() if request.vars.has_key('status') else None
-    enable = request.vars.enable.strip() if request.vars.has_key('enable') else None
+    document = request.vars.document.strip() if 'document' in request.vars else None
+    status = request.vars.status.strip() if 'status' in request.vars else None
+    enable = request.vars.enable.strip() if 'enable' in request.vars else None
 
     operator = ' IN '
     # verificando si habilitar o deshabilitar entregable
@@ -6820,7 +6828,7 @@ def manage_signature_linguistica():
                 values = {
                     'name': resultado['inputName'],
                     'signature_type': resultado['inputType'],
-                    'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                     'created_by': auth.user.username
                 }
 
@@ -6856,10 +6864,6 @@ def manage_deliverables_ecys():
         query = dsa_utils_temp.get_delivered_document_period()
         new_dict['list'] = db.executesql(query, as_dict=True)
         new_dict['is_admin'] = auth.has_membership('Super-Administrator')
-
-        #if new_dict['is_admin']:
-        #    new_dict['select'], load_label = get_period_form_select()
-        #    new_dict['label_button'] = XML(load_label)
     
     elif len(args) ==1:
 
@@ -6894,7 +6898,7 @@ def manage_deliverables_ecys():
                 session.flash = 'No existe rol'
                 redirect(URL('admin','manage_deliverables_ecys'))
             
-            new_dict['rolename'] = request.vars.rolename.strip().decode('utf-8')
+            new_dict['rolename'] = request.vars.rolename.strip()
             role = request.vars.idrole.strip()
             new_dict['idrole'] = role
             query = dsa_utils_temp.get_documents_type_by_period(role,symbol,year)
@@ -6909,10 +6913,10 @@ def manage_deliverables_ecys():
                 redirect(URL('admin','manage_deliverables_ecys'))
 
             new_dict['idrole'] = request.vars.idrole.strip()
-            new_dict['rolename'] = request.vars.rolename.strip().decode('utf-8')
+            new_dict['rolename'] = request.vars.rolename.strip()
             doc_name = request.vars.name.strip()
             doc_id = request.vars.document.strip()
-            new_dict['name'] = doc_name.decode('utf-8')
+            new_dict['name'] = doc_name
             new_dict['document'] = doc_id
 
             condition = None
@@ -6961,7 +6965,6 @@ def change_deliverable_status_linguistica():
         btn_class = 'btn-secondary'
 
     if action == '1':
-        import datetime
         # Obtener datos de firma
         query = dsa_utils_temp.get_document_delivered_sign_info(id_doc)
         signatures = db.executesql(query, as_dict=True)
@@ -6973,10 +6976,6 @@ def change_deliverable_status_linguistica():
         print(document_base)
         url = "%s://%s%s" % (request.env.wsgi_url_scheme, request.env.http_host,
                              URL('default', 'file_validation_ecys', args=['document', document_base]))
-        print('path')
-        print(request.folder)
-        print('url')
-        print(url)
         result_sign, status_sign = dsa_utils_temp.sign_file(request.folder, document[0]['file_uploaded'], url, signatures,
                                                             auth.user.username, document[0]['signed_file'])
         print('Termina Firmado')
@@ -6991,7 +6990,7 @@ def change_deliverable_status_linguistica():
             'comment': comment,
             'status': stat,
             'signed_file': result_sign,
-            'signed_at': str(datetime.datetime.utcnow())
+            'signed_at': str(datetime.utcnow())
         }
 
         condition = {'id': int(id_doc)}
@@ -7100,7 +7099,7 @@ def update_all_deliverables_linguistica():
         values = {
             'status': 'firmado',
             'signed_file': result_sign,
-            'signed_at': str(datetime.datetime.utcnow())
+            'signed_at': str(datetime.utcnow())
         }
 
         condition = {'id': doc['id']}
@@ -7467,3 +7466,29 @@ def get_all_signatures_available_form_select(sig=None):
     return SELECT(signature_options, _name='inputSignature', _id='inputSignature', _class='form-control')
 
 #*********** Fin - Practicas Finales - Juan Pablo Ardón ************
+
+def get_periods_on_change():
+    period_type = request.vars['period_type']
+    period_id = request.vars['period_id'] or 0
+    period_id = int(period_id)
+
+    query = db(db.period_year)
+    if period_type != '1':
+        query = db(db.period_year.period == db.period_detail.period)
+        
+    periods_array = query.select(
+                        db.period_year.id,
+                        db.period_year.yearp,
+                        db.period_year.period,
+                        orderby=~db.period_year.id
+                    )
+
+    options = []
+    for period in periods_array:
+        selected_var = False
+        if period_id == period.id:
+            selected_var = True
+            
+        options.append(OPTION(f"{T(period.period.name)} - {period.yearp}", _value=period.id, _selected=selected_var))
+
+    return response.json(options)

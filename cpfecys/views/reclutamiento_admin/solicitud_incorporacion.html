@@ -1,0 +1,172 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>Gestión de reclutamiento</h2>
+            <center>{{=opciones}}</center>
+        </div>
+    </div>
+    <div class="row well">
+        <div class="col-12 text-center">
+            <h3>Gestión de solicitudes de incorporación{{=label_estado}}</h3>
+        </div>
+        <div class="col-12 row">
+            <div class="input-append col-12 col-md-4">
+                <label class="lbl_seleccionar"><b>Seleccionar Estado</b></label>
+                {{=estados_html}}
+            </div>
+            <div class="col-12 col-md-6 mt-4">
+                <button class="btn btn-primary" type="button" id="btn_cargar">
+                    <i class="icon-chevron-right icon-white"></i>Cargar
+                </button>
+                <button class="btn btn-success" type="button" id="btn_guardar_inc">
+                    <i class="icon-hdd icon-white"></i>
+                    Guardar estado
+                </button>
+                <button class="btn btn-warning" type="button" id="btn_registrar_inc">
+                    <i class="icon-hdd icon-white"></i>
+                    Registrar aprobados
+                </button>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="table-responsive">
+                <table id="tb_incorporacion" class="table table-bordered table-hover table-striped tb_reporte">
+                    <thead>
+                        <tr>
+                            <td width="15%"><b>Carnet</b></td>
+                            <td width="35%"><b>Nombre del estudiante</b></td>
+                            <td width="15%"><b>Correo</b></td>
+                            <td width="15%"><b>Contraseña</b></td>
+                            <td width="10%"><b>Fotografia</b></td>
+                            <td width="10%"><b>Estado</b></td>
+                        </tr>
+                    </thead>
+                    <tbody id="tb_incorporacion_body">
+                        <!-- Inicia ciclo para llenar tabla -->
+                        {{if lista_incorporacion is not None:}}
+                            {{for item in lista_incorporacion:}}
+                                <tr id="{{=item[0]}}-{{=item[6]}}">
+                                    <td>{{=item[6]}}</td>
+                                    <td>{{=item[5]}} {{=item[4]}}</td>
+                                    <td>{{=item[2]}}</td>
+                                    <td>
+                                        <input style="width:80%" id="inp_pass" name="inp_pass" class="cls_inp_pass" value="{{=item[8]}}"/>
+                                    </td>
+                                    <td>
+                                        <center>
+                                            <a style="height:32px; width:32px;" title="Ver fotografía" id="btn_ver_modal"
+                                                onclick='javascript:ver_modal_incorporacion("Fotografía del estudiante","{{=item[3]}}");'>
+                                                <img class="img_pdf" src="{{=ruta_img_nvo}}/{{=item[3]}}" height="32"
+                                                    width="32">
+                                            </a>
+                                        </center>
+                                    </td>
+                                    <td>
+                                        {{if item[7] != 4:}}
+                                            <select style="width:100%" name="select_estado" class="form-control">
+                                                {{for estado in lista_estados_cambiar:}}
+                                                    {{if item[7] != estado.id:}}
+                                                        <option value="{{=estado.id}}">{{=estado.nombre}}</option>
+                                                    {{else:}}
+                                                        <option value="{{=estado.id}}" selected>{{=estado.nombre}}</option>
+                                                    {{pass}}
+                                                {{pass}}
+                                            </select>
+                                        {{else:}}
+                                            {{=item[9]}}
+                                        {{pass}}
+                                    </td>
+                                </tr>
+                            {{pass}}
+                        {{pass}}
+                        <!-- termina ciclo para llenar tabla -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_incorporacion" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h5 id="modal_label_incorporacion" class="modal-title">Ver foto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <img id="img_incorporacion" height="300" width="200">
+                    </center>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{{block page_js}}
+<script type="text/javascript" src="{{=URL('static','sources/js/accion_admin.js')}}"></script>
+<script>
+    $(function () {
+        $('.pop').popover();
+    });
+    function visible_detail() {
+        $(".hide_class").css("display", "table-cell");
+        $(".show_class").css("display", "none");
+    }
+    function hide_detail() {
+        $(".show_class").css("display", "table-cell");
+        $(".hide_class").css("display", "none");
+    }
+    $(document).ready(function () {
+        $('.img_pdf').hover(function () {
+            $(this).addClass('transition');
+
+        }, function () {
+            $(this).removeClass('transition');
+        }
+        );
+        $("#btn_cargar").click(function () {
+            if ($("#tb_incorporacion >tbody >tr").length > 0) {
+                if (confirm("Recuerde guardar cambios antes de cargar un estado, ¿Continuar")) {
+                    var id_estado = $('#select_estado option:selected').val();
+                    var etiqueta_estado = $('#select_estado option:selected').text();
+
+                    var parametros = "{{=URL('reclutamiento_admin', 'solicitud_incorporacion')}}?id_estado=" + id_estado + "&etiqueta_estado=" + etiqueta_estado;
+                    window.location.href = parametros;
+                }
+            } else {
+                var id_estado = $('#select_estado option:selected').val();
+                var etiqueta_estado = $('#select_estado option:selected').text();
+
+                var parametros = "{{=URL('reclutamiento_admin', 'solicitud_incorporacion')}}?id_estado=" + id_estado + "&etiqueta_estado=" + etiqueta_estado;
+                window.location.href = parametros;
+            }
+        });
+        $("#btn_guardar_inc").click(function () {
+            if ($("#tb_incorporacion >tbody >tr").length > 0) {
+                if (confirm("Se guardara el estado de la solicitudes, ¿Continuar?")) {
+                    var parametros = "{{=URL('reclutamiento_admin', 'mtd_guardar_estado_inc')}}?tabla=" + get_items_tabla_incorporacion();
+                    window.location.href = parametros;
+                    //alert(parametros);
+                }
+            } else {
+                alert('El proceso no contiene solicitudes');
+            }
+        });
+        $("#btn_registrar_inc").click(function () {
+            if (confirm("Se registrará las solicitudes aprobadas, ¿Continuar?")) {
+                var parametros = "{{=URL('reclutamiento_admin', 'mtd_registrar_inc')}}";
+                window.location.href = parametros;
+                //alert(parametros);
+            }
+        });
+    });
+</script>
+{{end page_js}}

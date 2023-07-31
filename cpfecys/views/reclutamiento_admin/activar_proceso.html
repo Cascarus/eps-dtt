@@ -1,0 +1,88 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+	<div class="row">
+		<div class="col-12 text-center">
+			<h2>Gestión de reclutamiento</h2>
+		</div>
+		<div class="col-12">
+			<center>{{=opciones}}</center>
+		</div>
+	</div>
+	<div class="row well">
+		<div class="col-12 text-center">
+			<h3>Activar proceso de reclutamiento</h3>
+		</div>
+		<div class="col-12">
+			<div class="table-responsive">
+				<table class="table">
+					<tr>
+						<td>
+							<p>
+								<button class="btn btn-success" type="button" id="btn_aceptar"><i class="icon-ok-sign icon-white"></i>Aceptar</button>
+								<a href="#myModal" role="button" class="btn btn-danger" data-toggle="modal"><i class="icon-remove icon-white"></i>Desactivar proceso</a>
+							</p>
+							<label class="lbl_seleccionar"><b>Seleccionar proceso a activar</b></label>
+							<div class="box">
+								{{=opc_radio}}
+							</div>
+							<!-- **************************** Modal ****************** -->
+							<div id="myModal" class="modal" tabindex="-1" role="dialog">
+								<div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 id="myModalLabel" class="modal-title text-left">¿Desea desactivar el proceso?</h3>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Seleccionar una opcion</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancelar</button>
+                                            <button class="btn btn-primary" id="btn_mod_aceptar">Aceptar</button>
+                                        </div>
+                                    </div>
+                                </div>
+							</div>
+							<!-- **************************** End Modal ****************** -->
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{{block page_js}}
+<script type="text/javascript" src="{{=URL('static',ruta_fuente+'js/accion_admin.js')}}"></script>
+<link href="{{=URL('static', 'sources/css/rec_admin.css')}}" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+	//------------------------------javascript
+	var act_anio = {{=XML(act_anio)}};
+	var act_periodo = {{=XML(act_periodo)}};
+
+	//------------------------------jquery
+	$(document).ready(function(){
+		$('#btn_mod_aceptar').click(function(){
+			window.location.href="{{=URL('reclutamiento_admin', 'mtd_desactivar_proceso')}}"
+		});
+
+		$('#btn_aceptar').click(function(){
+			if ($('input[name="rad_proceso"]:checked').val()){
+				var seleccionado=$('input[name="rad_proceso"]:checked').val();
+				var arr=seleccionado.split('-');
+				var per_letra = (arr[1]==1) ? "Primer semestre": "Segundo semestre";
+
+				if(confirm("¿Desea activar el proceso: "+arr[0]+" "+per_letra+"?")){
+					var val_radio=$('input[name="rad_proceso"]:checked').val();
+					var arr_radio=val_radio.split('-');
+					var parametros="{{=URL('reclutamiento_admin', 'mtd_activar_proceso')}}?act_anio="+act_anio+"&act_periodo="+act_periodo+"&nvo_anio="+arr_radio[0]+"&nvo_periodo="+arr_radio[1];
+					window.location.href=parametros;
+				}
+			}
+			else{
+				alert('No ha seleccionado ningún proceso');
+			}
+		});
+	});
+</script>
+{{end page_js}}
+

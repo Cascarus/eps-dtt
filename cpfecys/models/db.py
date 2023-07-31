@@ -22,11 +22,13 @@ redis_db_4 = redis.StrictRedis(host=redis_host, port=redis_port, password=redis_
 school = config.config_School()
 
 if not request.env.web2py_runtime_gae:
-    db = DAL(config.config_db_connection_string(),
-             pool_size=1,
-             migrate=True,
-             fake_migrate_all=True,
-             check_reserved=['all'])
+      db = DAL(
+            config.config_db_connection_string(),
+            pool_size=1,
+            migrate=True,
+            fake_migrate_all=True,
+            check_reserved=['all']
+      ) 
 else:
     db = DAL('google:datastore+ndb')
     session.connect(request, response, db=db)
@@ -70,28 +72,26 @@ response.generic_patterns = ['*']
 auth = Auth(db)
 
 auth.settings.extra_fields['auth_user'] = [
-    Field('phone', 'string', length=16, notnull=True,
-          label=T("Phone")),
-    Field('home_address', 'string', length=500, notnull=True,
-          label=T("Home address")),
-    Field('working', 'boolean', notnull=False,
-          label=T("is Working"), writable=False, readable=False),
-    Field('company_name', 'string', length=200, notnull=False,
-          label=T("Company name")),
-    Field('work_address', 'string', length=500, notnull=False,
-          label=T("Work address")),
-    Field('work_phone', 'string', length=500, notnull=False,
-                        label=T("Work phone")),
-    Field('uv_token', 'string', length=64, notnull=False,
-          writable=False, readable=False),
-    Field('data_updated', 'boolean', notnull=False,
-          writable=False, readable=False),
-    Field('load_alerted', 'boolean', notnull=False,
-          writable=False, readable=False),
-    Field('photo', 'upload', notnull=False, label=T('Photo'),
-          requires=[IS_IMAGE(extensions=('jpeg', 'png'), maxsize=(200, 300),
-                             error_message=T('Only files are accepted with extension') +
-                             ' png|jpg'+" "+T('with 200x300px size')+".")]), Field('cui', 'string', length=18, notnull=False, label=T('Cui'))]
+      Field('phone', 'string', length=16, notnull=True, label=T("Phone")),
+      Field('home_address', 'string', length=500, notnull=True, label=T("Home address")),
+      Field('working', 'boolean', notnull=False, label=T("is Working"), writable=False, readable=False),
+      Field('company_name', 'string', length=200, notnull=False, label=T("Company name")),
+      Field('work_address', 'string', length=500, notnull=False, label=T("Work address")),
+      Field('work_phone', 'string', length=500, notnull=False, label=T("Work phone")),
+      Field('uv_token', 'string', length=64, notnull=False, writable=False, readable=False),
+      Field('data_updated', 'boolean', notnull=False, writable=False, readable=False),
+      Field('load_alerted', 'boolean', notnull=False, writable=False, readable=False),
+      Field('photo', 'upload', notnull=False, label=T('Photo'),
+            requires=[
+                  IS_IMAGE(
+                        extensions=('jpeg', 'png'),
+                        maxsize=(200, 300),
+                        error_message=T('Only files are accepted with extension') + ' png|jpg'+" "+T('with 200x300px size')+"."
+                  )
+            ]
+      ),
+      Field('cui', 'string', length=18, notnull=False, label=T('Cui'))
+]
 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
@@ -136,81 +136,91 @@ auth.settings.actions_disabled.append('register')
 
 
 # Table to save if we are done with setup
-db.define_table('setup',
-                Field('done', 'boolean', unique = True))
+db.define_table('setup', Field('done', 'boolean', unique = True))
 
-db.define_table('area_level',
-                Field('name', 'string', label=T(
-                    'name'), unique=True, length=255),
-                Field('description', 'text', label=T('description')),
-                format='%(name)s')
+db.define_table(
+      'area_level',
+      Field('name', 'string', label=T('name'), unique=True, length=255),
+      Field('description', 'text', label=T('description')),
+      format='%(name)s'
+)
 
-db.define_table('project',
-                Field('project_id', 'string', unique=True,
-                      length=255, label=T('project_id')),
-                Field('name', 'string', label=T('name'),
-                      notnull=True, unique=True, length=255),
-                Field('area_level', 'reference area_level',
-                      label=T('area_level')),
-                Field('description', 'text', label=T('description')),
-                Field('physical_location', 'text',
-                      label=T('physical_location')),
-                format='%(name)s')
+db.define_table(
+      'project',
+      Field('project_id', 'string', unique=True, length=255, label=T('project_id')),
+      Field('name', 'string', label=T('name'), notnull=True, unique=True, length=255),
+      Field('area_level', 'reference area_level', label=T('area_level')),
+      Field('description', 'text', label=T('description')),
+      Field('physical_location', 'text', label=T('physical_location')),
+      format='%(name)s'
+)
 
-db.define_table('period',
-                Field('name', 'string', length=255, label=T('name')),
-                format='%(name)s')
+db.define_table(
+      'period',
+      Field('name', 'string', length=255, label=T('name')),
+      format='%(name)s'
+)
 
-db.define_table('assignation_freeze',
-                Field('pmonth', 'string', length=255, label=T('month')),
-                Field('period', 'reference period',
-                      label=T('period'), unique=True),
-                format='%(pmonth)s - %(period)s')
+db.define_table(
+      'assignation_freeze',
+      Field('pmonth', 'string', length=255, label=T('month')),
+      Field('period', 'reference period', label=T('period'), unique=True),
+      format='%(pmonth)s - %(period)s'
+)
 
 db.assignation_freeze.pmonth.requires = IS_IN_SET((
-    T('January'), T('February'), T('March'), T('April'), T('May'), T('June'),
-    T('July'), T('August'), T('September'), T('October'), T('November'), T('December')))
+    T('January'),
+    T('February'),
+    T('March'),
+    T('April'),
+    T('May'),
+    T('June'),
+    T('July'),
+    T('August'),
+    T('September'),
+    T('October'),
+    T('November'),
+    T('December')
+))
 
-db.define_table('period_year',
-                Field('yearp', 'integer', label=T('yearp')),
-                Field('period', 'reference period',
-                      label=T('period'), notnull=True),
-                format='%(yearp)s - %(period)s')
+db.define_table(
+      'period_year',
+      Field('yearp', 'integer', label=T('yearp')),
+      Field('period', 'reference period', label=T('period'), notnull=True),
+      format='%(yearp)s - %(period)s'
+)
 
 # The only valid assignation_status are: Failed, Successful
-db.define_table('assignation_status',
-                Field('name', 'string', unique=True,
-                      label=T('name'), length=255),
-                format='%(name)s')
+db.define_table(
+      'assignation_status',
+      Field('name', 'string', unique=True, label=T('name'), length=255),
+      format='%(name)s'
+)
 
 # The relationship between a user and a subproject contains
 # the history of the final practice,
 # it has the starting cycle and the ending cycle
 # it also is the central key for all operations with interesting data
-db.define_table('user_project',
-                Field('assignation_status_comment', 'text',
-                      notnull=False, writable=False, readable=False),
-                Field('assignation_comment', 'text', notnull=False,
-                      writable=False, readable=False),
-                Field('assignation_ignored', 'boolean', notnull=True,
-                      default=False, writable=False, readable=False),
-                # The None value in assignation_status means that it is currently not blocked
-                # any other value than None means that is locked and no further changes
-                # it can have.
-                # - (cpfecys module) method assignation_is_locked(assignation)
-                # - was created to check if this assignation can have modifications
-                Field('assignation_status', 'reference assignation_status', notnull=False,
-                      requires=IS_EMPTY_OR(IS_IN_DB(db, 'assignation_status.id', '%(name)s', zero=T('Active')))),
-                Field('assigned_user', 'reference auth_user',
-                      label=T('assigned_user')),
-                Field('project', 'reference project', label=T('project')),
-                Field('period', 'integer', 'reference period_year', label=T('period')),
-                Field('pro_bono', 'boolean', length=255,
-                      notnull=False, label=T('pro_bono')),
-                Field('hours', 'integer', label=T(
-                    'Assignation Hours'), notnull=True),
-                Field('periods', 'integer', notnull=True, label=T('periods')),
-                format='%(project)s - %(assigned_user)s')
+# The None value in assignation_status means that it is currently not blocked
+# any other value than None means that is locked and no further changes
+# it can have.
+# - (cpfecys module) method assignation_is_locked(assignation)
+# - was created to check if this assignation can have modifications
+db.define_table(
+      'user_project',
+      Field('assignation_status_comment', 'text', notnull=False, writable=False, readable=False),
+      Field('assignation_comment', 'text', notnull=False, writable=False, readable=False),
+      Field('assignation_ignored', 'boolean', notnull=True, default=False, writable=False, readable=False),
+      Field('assignation_status', 'reference assignation_status', notnull=False,
+            requires=IS_EMPTY_OR(IS_IN_DB(db, 'assignation_status.id', '%(name)s', zero=T('Active')))),
+      Field('assigned_user', 'reference auth_user', label=T('assigned_user')),
+      Field('project', 'reference project', label=T('project')),
+      Field('period', 'reference period_year', label=T('period')),
+      Field('pro_bono', 'boolean', length=255, notnull=False, label=T('pro_bono')),
+      Field('hours', 'integer', label=T('Assignation Hours'), notnull=True),
+      Field('periods', 'integer', notnull=True, label=T('periods')),
+      format='%(project)s - %(assigned_user)s'
+)
 
 # This are the tables that store important links and uploaded
 # files by admin.
@@ -218,744 +228,606 @@ db.define_table('user_project',
 # emarquez: INICIO periodos_multiples
 # definicion de tablas para periodos multiples
 
-db.define_table("period_type",
-                Field("description", "string", length=100,
-                      default=None, label=T("Descripcion")),
-                Field("isVariable", "boolean",
-                      default=None, label=T("Variable")),
-                format='%(description)s')
+db.define_table(
+      "period_type",
+      Field("description", "string", length=100, default=None, label=T("Descripcion")),
+      Field("isVariable", "boolean", default=None, label=T("Variable")),
+      format='%(description)s'
+)
 
-db.define_table("period_detail",
-                Field("description", "string", length=100, default=None,
-                      unique=True, label=T('Descripcion')),
-                Field("date_start", "datetime",
-                      default=None, label=T('Fecha Inicio')),
-                Field("date_finish", "datetime",
-                      default=None, label=T('Fecha Fin')),
-                Field("date_start_semester", "date", default=None,
-                      label=T('Fecha Inicio Periodo')),
-                Field("date_finish_semester", "date",
-                      default=None, label=T('Fecha fin Periodo')),
-                Field('timeout_income_notes', 'integer',
-                      notnull=True,  label=T('timeout_income_notes')),
-                Field("min_average", "integer", default=None,
-                      label=T('Minimo Average')),
-                Field("max_average", "integer", default=None,
-                      label=T('Maximo Average')),
-                Field("percentaje_income_activity", "integer",
-                      default=None, label=T('Porcentaje de actividad')),
-                Field("period_type", "reference period_type",
-                      label=T('Tipo Periodo')),
-                Field("period", "reference period", unique=True,
-                      label=T('Periodo'), writable=False),
-                Field("period_active", "boolean", notnull=False),
-                format='%(description)s')
+db.define_table(
+      "period_detail",
+      Field("description", "string", length=100, default=None, unique=True, label=T('Descripcion')),
+      Field("date_start", "datetime", default=None, label=T('Fecha Inicio')),
+      Field("date_finish", "datetime", default=None, label=T('Fecha Fin')),
+      Field("date_start_semester", "date", default=None, label=T('Fecha Inicio Periodo')),
+      Field("date_finish_semester", "date", default=None, label=T('Fecha fin Periodo')),
+      Field('timeout_income_notes', 'integer', notnull=True,  label=T('timeout_income_notes')),
+      Field("min_average", "integer", default=None, label=T('Minimo Average')),
+      Field("max_average", "integer", default=None, label=T('Maximo Average')),
+      Field("percentaje_income_activity", "integer", default=None, label=T('Porcentaje de actividad')),
+      Field("period_type", "reference period_type", label=T('Tipo Periodo')),
+      Field("period", "reference period", unique=True, label=T('Periodo'), writable=False),
+      Field("period_active", "boolean", notnull=False),
+      format='%(description)s'
+)
 
 """ Relations between tables (remove fields you don't need from requires) """
-db.period_detail.period_type.requires = IS_IN_DB(
-    db, 'period_type.id', '%(description)s')
+db.period_detail.period_type.requires = IS_IN_DB(db, 'period_type.id', '%(description)s')
 
 # emarquez: FIN periodos_multiples
 
 # emarquez: agregando relacion al tipo de periodo
-db.define_table('link',
-                Field('url', 'text', notnull=True, label=T('url/URL')),
-                Field('blank', 'boolean', label=T('blank')),
-                Field('url_text', 'text', notnull=True, label=T('url_text')),
-                Field('visible', 'boolean', notnull=True, label=T('visible')),
-                Field('is_public', 'boolean',
-                      notnull=False, label=T('is_public')),
-                Field("period_type", "reference period_type",
-                      label=T('Tipo Periodo')),
-                format='%(url_text)s')
+db.define_table(
+      'link',
+      Field('url', 'text', notnull=True, label=T('url/URL')),
+      Field('blank', 'boolean', label=T('blank')),
+      Field('url_text', 'text', notnull=True, label=T('url_text')),
+      Field('visible', 'boolean', notnull=True, label=T('visible')),
+      Field('is_public', 'boolean', notnull=False, label=T('is_public')),
+      Field("period_type", "reference period_type",label=T('Tipo Periodo')),
+      format='%(url_text)s'
+)
 
 # Frontend notification
 # emarquez: se agrega tipo d eperiodo
-db.define_table('front_notification',
-                Field('name', 'string', notnull=True, label=T('name')),
-                Field('content_text', 'text', notnull=False,
-                      label=T('content_text')),
-                Field('url', 'string', notnull=False, label=T('url/URL')),
-                Field('visible', 'boolean', notnull=False, label=T('visible')),
-                Field('is_public', 'boolean',
-                      notnull=False, label=T('is_public')),
-                Field('file_data', 'upload', uploadfolder=request.folder +
-                      'static/fn_files', default='', notnull=False, label=T('file_data')),
-                Field('promoted', 'boolean', notnull=False, label=T('promoted')),
-                Field("period_type", "reference period_type",
-                      label=T('Tipo Periodo')),
-                Field('image_file', 'upload', uploadfolder=request.folder +
-                      'static/fn_files', default='', notnull=False, label=T('image_file')),
-                format='%(name)s')
+db.define_table(
+      'front_notification',
+      Field('name', 'string', notnull=True, label=T('name')),
+      Field('content_text', 'text', notnull=False, label=T('content_text')),
+      Field('url', 'string', notnull=False, label=T('url/URL')),
+      Field('visible', 'boolean', notnull=False, label=T('visible')),
+      Field('is_public', 'boolean', notnull=False, label=T('is_public')),
+      Field('file_data', 'upload', uploadfolder=f'{request.folder if "/" in request.folder[len(request.folder) - 1] else request.folder + "/"}static/fn_files', default='', notnull=False, label=T('file_data')),
+      Field('promoted', 'boolean', notnull=False, label=T('promoted')),
+      Field("period_type", "reference period_type", label=T('Tipo Periodo')),
+      Field('image_file', 'upload', uploadfolder=f'{request.folder if "/" in request.folder[len(request.folder) - 1] else request.folder + "/"}static/fn_files', default='', notnull=False, label=T('image_file')),
+      format='%(name)s'
+)
 
 # Published files entity
 # emarquez: se agrega tipo de periodo
-db.define_table('uploaded_file',
-                Field('name', 'string', notnull=True, label=T('name')),
-                Field('visible', 'boolean', label=T('visible')),
-                Field('file_data', 'upload', default='', label=T('file_data')),
-                Field('is_public', 'boolean',
-                      notnull=False, label=T('is_public')),
-                Field("period_type", "reference period_type",
-                      label=T('Tipo Periodo')),
-                format='%(name)s')
+db.define_table(
+      'uploaded_file',
+      Field('name', 'string', notnull=True, label=T('name')),
+      Field('visible', 'boolean', label=T('visible')),
+      Field('file_data', 'upload', default='', label=T('file_data')),
+      Field('is_public', 'boolean', notnull=False, label=T('is_public')),
+      Field("period_type", "reference period_type", label=T('Tipo Periodo')),
+      format='%(name)s'
+)
 
 # User gruops relationships with files, notifications, links
-db.define_table('file_access',
-                Field('user_role', 'reference auth_group', label=T('user_role')),
-                Field('uploaded_file', 'reference uploaded_file', label=T('uploaded_file')))
+db.define_table(
+      'file_access',
+      Field('user_role', 'reference auth_group', label=T('user_role')),
+      Field('uploaded_file', 'reference uploaded_file', label=T('uploaded_file'))
+)
 
-db.define_table('link_access',
-                Field('user_role', 'reference auth_group', label=T('user_role')),
-                Field('link', 'reference link', label=T('link')))
+db.define_table(
+      'link_access',
+      Field('user_role', 'reference auth_group', label=T('user_role')),
+      Field('link', 'reference link', label=T('link'))
+)
 
-db.define_table('notification_access',
-                Field('user_role', 'reference auth_group', label=T('user_role')),
-                Field('front_notification', 'reference front_notification', label=T('front_notification')))
+db.define_table(
+      'notification_access',
+      Field('user_role', 'reference auth_group', label=T('user_role')),
+      Field('front_notification', 'reference front_notification', label=T('front_notification'))
+)
 
 # Reports and Activities structure
-db.define_table('report_restriction',
-                Field('name', 'string', notnull=True,
-                      label=T('name'), length=50),
-                Field('start_date', 'date', notnull=True, label=T('start date')),
-                Field('end_date', 'date', notnull=True, label=T('end date')),
-                Field('is_enabled', 'boolean',
-                      notnull=False, label=T('is enabled')),
-                Field('is_final', 'boolean', notnull=False, label=T('is final')))
+db.define_table(
+      'report_restriction',
+      Field('name', 'string', notnull=True, label=T('name'), length=50),
+      Field('start_date', 'date', notnull=True, label=T('start date')),
+      Field('end_date', 'date', notnull=True, label=T('end date')),
+      Field('is_enabled', 'boolean', notnull=False, label=T('is enabled')),
+      Field('is_final', 'boolean', notnull=False, label=T('is final'))
+)
 
-db.define_table('report_requirement',
-                Field('name', 'string', label=T('name')),
-                format='%(name)s')
+db.define_table(
+      'report_requirement',
+      Field('name', 'string', label=T('name')),
+      format='%(name)s'
+)
 
 # Reports and Activities structure: EMARQUEZ: para periodos variables
-db.define_table('report_restriction_period',
-                Field('name', 'string', notnull=True,
-                      label=T('name'),  length=50),
-                Field('period', 'reference period_detail',
-                      notnull=True, label=T('Periodo')),
-                Field('start_report', 'date', notnull=True, label=T('inicio')),
-                Field('end_report', 'date', notnull=True,  label=T('fin')),
-                Field('start_date', 'date', notnull=True, label=T('start date')),
-                Field('end_date', 'date', notnull=True,  label=T('end date')),
-                Field('is_enabled', 'boolean',
-                      notnull=False,  label=T('is enabled')),
-                Field('is_final', 'boolean',
-                      notnull=False,  label=T('is final')))
+db.define_table(
+      'report_restriction_period',
+      Field('name', 'string', notnull=True, label=T('name'), length=50),
+      Field('period', 'reference period_detail', notnull=True, label=T('Periodo')),
+      Field('start_report', 'date', notnull=True, label=T('inicio')),
+      Field('end_report', 'date', notnull=True, label=T('fin')),
+      Field('start_date', 'date', notnull=True, label=T('start date')),
+      Field('end_date', 'date', notnull=True, label=T('end date')),
+      Field('is_enabled', 'boolean', notnull=False, label=T('is enabled')),
+      Field('is_final', 'boolean', notnull=False,  label=T('is final'))
+)
 
 # emarquez: se agregan los periodos
-db.define_table('area_report_requirement',
-                Field('report_requirement', 'reference report_requirement',
-                      label=T('report requirement')),
-                Field('area_level', 'reference area_level',
-                      label=T('area level')),
-                Field('period_type', 'reference period_type',
-                      label=T('Tipo Periodo')),
-                format='%(report_requirement)s %(area_level)s')
+db.define_table(
+      'area_report_requirement',
+      Field('report_requirement', 'reference report_requirement', label=T('report requirement')),
+      Field('area_level', 'reference area_level', label=T('area level')),
+      Field('period_type', 'reference period_type', label=T('Tipo Periodo')),
+      format='%(report_requirement)s %(area_level)s'
+)
 
-db.define_table('report_status',
-                Field('name', 'string', notnull=True, label=T('name')),
-                Field('description', 'string', notnull=True),
-                Field('order_number', 'integer', notnull=False,
-                      label=T('Order Number')),
-                Field('icon', 'string', notnull=False, label=T('icon')),
-                format='%(name)s')
+db.define_table(
+      'report_status',
+      Field('name', 'string', notnull=True, label=T('name')),
+      Field('description', 'string', notnull=True),
+      Field('order_number', 'integer', notnull=False, label=T('Order Number')),
+      Field('icon', 'string', notnull=False, label=T('icon')),
+      format='%(name)s'
+)
 
-db.define_table('report',
-                Field('created', 'date',
-                      label=T('created')),
-                Field('assignation', 'reference user_project',
-                      label=T('assignation')),
-                Field('report_restriction', 'reference report_restriction',
-                      label=T('report_restriction'), notnull=True),
-                Field('score', 'integer',
-                      label=T('score')),
-                Field('admin_score', 'integer',
-                      label=T('admin_score')),
-                Field('min_score', 'integer',
-                      label=T('min_score')),
-                Field('heading', 'text',
-                      label=T('heading')),
-                Field('footer', 'text',
-                      label=T('footer')),
-                Field('desertion_started', 'integer',
-                      label=T('started')),
-                Field('desertion_gone', 'integer',
-                      label=T('gone')),
-                Field('desertion_continued', 'integer',
-                      label=T('continued')),
-                Field('hours', 'integer',
-                      label=T('hours')),
-                Field('times_graded', 'integer',
-                      label=T('times_graded')),
-                Field('status', 'reference report_status', notnull=True,
-                      label=T('status')),
-                Field('teacher_comment', 'text',
-                      label=T('teacher comment')),
-                Field('admin_comment', 'text',
-                      label=T('admin comment')),
-                Field('score_date', 'date',
-                      label=T('score date')),
-                # DTT Approval can be None, thus means that still hasn't been approved by DTT Admin
-                # Approval is true when approved and false when failed
-                Field('dtt_approval', 'boolean',
-                      label=T('dtt approval')),
-                Field('period', 'reference period_year', \
-                      label=T('period')),
-                Field('never_delivered', 'boolean',
-                      label=T('Never was delivered?')),
-                )
+db.define_table(
+      'report',
+      Field('created', 'date', label=T('created')),
+      Field('assignation', 'reference user_project', label=T('assignation')),
+      Field('report_restriction', 'reference report_restriction', label=T('report_restriction'), notnull=True),
+      Field('score', 'integer', label=T('score')),
+      Field('admin_score', 'integer', label=T('admin_score')),
+      Field('min_score', 'integer', label=T('min_score')),
+      Field('heading', 'text', label=T('heading')),
+      Field('footer', 'text', label=T('footer')),
+      Field('desertion_started', 'integer', label=T('started')),
+      Field('desertion_gone', 'integer', label=T('gone')),
+      Field('desertion_continued', 'integer', label=T('continued')),
+      Field('hours', 'integer', label=T('hours')),
+      Field('times_graded', 'integer', label=T('times_graded')),
+      Field('status', 'reference report_status', notnull=True, label=T('status')),
+      Field('teacher_comment', 'text', label=T('teacher comment')),
+      Field('admin_comment', 'text', label=T('admin comment')),
+      Field('score_date', 'date', label=T('score date')),
+      # DTT Approval can be None, thus means that still hasn't been approved by DTT Admin
+      # Approval is true when approved and false when failed
+      Field('dtt_approval', 'boolean', label=T('dtt approval')),
+      Field('period', 'reference period_year', label=T('period')),
+      Field('never_delivered', 'boolean', label=T('Never was delivered?')),
+)
 
-db.define_table('log_type',
-                Field('name', 'string', notnull=True, label=T('name')),
-                format='%(name)s'
-                )
+db.define_table(
+      'log_type',
+      Field('name', 'string', notnull=True, label=T('name')),
+      format='%(name)s'
+)
 
-db.define_table('log_future',
-                Field('entry_date', 'date', notnull=True,
-                      label=T('entry_date')),
-                Field('description', 'text', notnull=True,
-                      label=T('description')),
-                Field('report', 'reference report', label=T('report')),
-                Field('period', 'reference period_year',
-                      label=T('period')),
-                format='%(entry_date)s'
-                )
+db.define_table(
+      'log_future',
+      Field('entry_date', 'date', notnull=True, label=T('entry_date')),
+      Field('description', 'text', notnull=True, label=T('description')),
+      Field('report', 'reference report', label=T('report')),
+      Field('period', 'reference period_year', label=T('period')),
+      format='%(entry_date)s'
+)
 
-db.define_table('log_entry',
-                Field('idActivity', 'integer',
-                      notnull=False, label=T('Activity')),
-                Field('tActivity', 'boolean',
-                      notnull=False, label=T('tActivity')),
-                Field('log_type', 'reference log_type', label=T('log_type')),
-                Field('entry_date', 'date', notnull=True,
-                      label=T('entry_date')),
-                Field('description', 'text', notnull=True,
-                      label=T('description')),
-                Field('report', 'reference report', label=T('report')),
-                Field('period', 'reference period_year',
-                      label=T('period')),
-                format='%(entry_date)s'
-                )
+db.define_table(
+      'log_entry',
+      Field('idActivity', 'integer', notnull=False, label=T('Activity')),
+      Field('tActivity', 'boolean', notnull=False, label=T('tActivity')),
+      Field('log_type', 'reference log_type', label=T('log_type')),
+      Field('entry_date', 'date', notnull=True, label=T('entry_date')),
+      Field('description', 'text', notnull=True, label=T('description')),
+      Field('report', 'reference report', label=T('report')),
+      Field('period', 'reference period_year', label=T('period')),
+      format='%(entry_date)s'
+)
 
-db.define_table('metrics_type',
-                Field('name', 'string', notnull=True, label=T('name')),
-                format='%(name)s'
-                )
+db.define_table(
+      'metrics_type',
+      Field('name', 'string', notnull=True, label=T('name')),
+      format='%(name)s'
+)
 
 # Frontend notification
 # LTZOC:Se modifico la ruta de almacenamiento
-db.define_table('magazine',
-                Field('name', 'string', notnull=True,
-                      length=150, label=T('name')),
-                Field('content_text', 'text', notnull=False, length=250,
-                      label=T('content_text')),
-                Field('url', 'string', notnull=False, label=T('url/URL')),
-                Field('visible', 'boolean', notnull=False, label=T('visible')),
-                Field('image_file', 'upload', uploadfolder=request.folder+'static/mgz_files', default='', notnull=False, label=T('image_file'),
-                      requires=[IS_IMAGE(extensions=('jpeg', 'png'), maxsize=(320, 480),
-                                         error_message=T('Only files are accepted with extension') +
-                                         ' png|jpg'+" "+T('with 320x480px size')+".")])
-                )
+db.define_table(
+      'magazine',
+      Field('name', 'string', notnull=True, length=150, label=T('name')),
+      Field('content_text', 'text', notnull=False, length=250, label=T('content_text')),
+      Field('url', 'string', notnull=False, label=T('url/URL')),
+      Field('visible', 'boolean', notnull=False, label=T('visible')),
+      Field('image_file', 'upload', uploadfolder=f'{request.folder if "/" in request.folder[len(request.folder) - 1] else request.folder + "/"}static/mgz_files',
+            default='', notnull=False, label=T('image_file'),
+            requires=[
+            #      IS_IN_DB(),
+                  #IS_IMAGE(extensions=('jpeg', 'png'), maxsize=(320, 480), error_message='Sólo se aceptan archivos con extensión png|jpg y con dimensiones (320x480)px.')
+            ]
+      )
+)
 
 # COVALLE
-db.define_table('magazine_edition',
-                Field('nedition', 'integer', notnull=True,
-                      label=T('No Edicion (*)')),
-                Field('name', 'string', notnull=True,
-                      length=150, label=T('Nombre (*)')),
-                Field('content_text', 'text', notnull=True,
-                      length=250, label=T('Descripcion (*)')),
-                Field('url', 'string', notnull=True, label=T('url/URL (*)'))
-                )
+db.define_table(
+      'magazine_edition',
+      Field('nedition', 'integer', notnull=True, label=T('No Edicion (*)')),
+      Field('name', 'string', notnull=True, length=150, label=T('Nombre (*)')),
+      Field('content_text', 'text', notnull=True, length=250, label=T('Descripcion (*)')),
+      Field('url', 'string', notnull=True, label=T('url/URL (*)'))
+)
+
 db.magazine_edition.nedition.requires = [
-    IS_NOT_EMPTY(error_message='Campo obligatorio')]
+    IS_NOT_EMPTY(error_message='Campo obligatorio')
+]
+
 db.magazine_edition.name.requires = [
-    IS_NOT_EMPTY(error_message='Campo obligatorio')]
+    IS_NOT_EMPTY(error_message='Campo obligatorio')
+]
+
 db.magazine_edition.content_text.requires = [
-    IS_NOT_EMPTY(error_message='Campo obligatorio')]
+    IS_NOT_EMPTY(error_message='Campo obligatorio')
+]
+
 db.magazine_edition.url.requires = [
-    IS_NOT_EMPTY(error_message='Campo obligatorio')]
+    IS_NOT_EMPTY(error_message='Campo obligatorio')
+]
 
 # End of semester details of report
-db.define_table('log_final',
-                Field('curso_asignados_actas', 'integer', notnull=True,
-                      label=T('Asignados en Actas')),
-                Field('curso_en_parciales', 'integer', notnull=True,
-                      label=T('Alumnos en Parciales')),
-                Field('curso_en_final', 'integer', notnull=True,
-                      label=T('Alumnos en Examen Final')),
-                Field('curso_en_primera_restrasada', 'integer', notnull=True,
-                      label=T('Alumnos en Primera Retrasada')),
-                Field('curso_en_segunda_restrasada', 'integer', notnull=True,
-                      label=T('Alumnos en Segunda Retrasada')),
-                Field('lab_aprobados', 'integer', notnull=True,
-                      label=T('Aprobados Laboratorio')),
-                Field('lab_reprobados', 'integer', notnull=True,
-                      label=T('Reprobados Laboratorio')),
-                Field('lab_media', 'decimal(8,2)', notnull=True,
-                      label=T('Media Laboratorio')),
-                Field('lab_promedio', 'decimal(8,2)', notnull=True,
-                      label=T('Promedio Laboratorio')),
-                Field('curso_media', 'decimal(8,2)', notnull=True,
-                      label=T('media')),
-                Field('curso_error', 'decimal(8,2)', notnull=True,
-                      label=T('error')),
-                Field('curso_mediana', 'decimal(8,2)', notnull=True,
-                      label=T('mediana')),
-                Field('curso_moda', 'decimal(8,2)', notnull=True,
-                      label=T('moda')),
-                Field('curso_desviacion', 'decimal(8,2)', notnull=True,
-                      label=T('desviacion')),
-                Field('curso_varianza', 'decimal(8,2)', notnull=True,
-                      label=T('varianza')),
-                Field('curso_curtosis', 'decimal(8,2)', notnull=True,
-                      label=T('curtosis')),
-                Field('curso_coeficiente', 'decimal(8,2)', notnull=True,
-                      label=T('coeficiente')),
-                Field('curso_rango', 'decimal(8,2)', notnull=True,
-                      label=T('rango')),
-                Field('curso_minimo', 'decimal(8,2)', notnull=True,
-                      label=T('minimo')),
-                Field('curso_maximo', 'decimal(8,2)', notnull=True,
-                      label=T('maximo')),
-                Field('curso_total', 'integer', notnull=True,
-                      label=T('total')),
-                Field('curso_reprobados', 'integer', notnull=True,
-                      label=T('reprobados')),
-                Field('curso_aprobados', 'integer', notnull=True,
-                      label=T('aprobados')),
-                Field('curso_promedio', 'decimal(8,2)', notnull=True,
-                      label=T('Promedio')),
-                Field('curso_created', 'date', notnull=True,
-                      label=T('entry_date')),
-                Field('report', 'reference report', label=T('report')),
-                )
+db.define_table(
+      'log_final',
+      Field('curso_asignados_actas', 'integer', notnull=True, label='Asignados en Actas'),
+      Field('curso_en_parciales', 'integer', notnull=True, label='Alumnos en Parciales'),
+      Field('curso_en_final', 'integer', notnull=True, label='Alumnos en Examen Final'),
+      Field('curso_en_primera_restrasada', 'integer', notnull=True, label='Alumnos en Primera Retrasada'),
+      Field('curso_en_segunda_restrasada', 'integer', notnull=True, label='Alumnos en Segunda Retrasada'),
+      Field('lab_aprobados', 'integer', notnull=True, label='Aprobados Laboratorio'),
+      Field('lab_reprobados', 'integer', notnull=True, label='Reprobados Laboratorio'),
+      Field('lab_media', 'decimal(8,2)', notnull=True, label='Media Laboratorio'),
+      Field('lab_promedio', 'decimal(8,2)', notnull=True, label='Promedio Laboratorio'),
+      Field('curso_media', 'decimal(8,2)', notnull=True, label='media'),
+      Field('curso_error', 'decimal(8,2)', notnull=True, label='error'),
+      Field('curso_mediana', 'decimal(8,2)', notnull=True, label='mediana'),
+      Field('curso_moda', 'decimal(8,2)', notnull=True, label='moda'),
+      Field('curso_desviacion', 'decimal(8,2)', notnull=True, label='desviacion'),
+      Field('curso_varianza', 'decimal(8,2)', notnull=True, label='varianza'),
+      Field('curso_curtosis', 'decimal(8,2)', notnull=True, label='curtosis'),
+      Field('curso_coeficiente', 'decimal(8,2)', notnull=True, label='coeficiente'),
+      Field('curso_rango', 'decimal(8,2)', notnull=True, label='rango'),
+      Field('curso_minimo', 'decimal(8,2)', notnull=True, label='minimo'),
+      Field('curso_maximo', 'decimal(8,2)', notnull=True, label='maximo'),
+      Field('curso_total', 'integer', notnull=True, label='total'),
+      Field('curso_reprobados', 'integer', notnull=True, label='reprobados'),
+      Field('curso_aprobados', 'integer', notnull=True, label='aprobados'),
+      Field('curso_promedio', 'decimal(8,2)', notnull=True, label='Promedio'),
+      Field('curso_created', 'date', notnull=True, label=T('entry_date')),
+      Field('report', 'reference report', label=T('report')),
+)
 
-db.define_table('log_metrics',
-                Field('description', 'text', notnull=True,
-                      label=T('description')),
-                Field('media', 'decimal(8,2)', notnull=True,
-                      label=T('media')),
-                Field('error', 'decimal(8,2)', notnull=True,
-                      label=T('error')),
-                Field('mediana', 'decimal(8,2)', notnull=True,
-                      label=T('mediana')),
-                Field('moda', 'decimal(8,2)', notnull=True,
-                      label=T('moda')),
-                Field('desviacion', 'decimal(8,2)', notnull=True,
-                      label=T('desviacion')),
-                Field('varianza', 'decimal(8,2)', notnull=True,
-                      label=T('varianza')),
-                Field('curtosis', 'decimal(8,2)', notnull=True,
-                      label=T('curtosis')),
-                Field('coeficiente', 'decimal(8,2)', notnull=True,
-                      label=T('coeficiente')),
-                Field('rango', 'decimal(8,2)', notnull=True,
-                      label=T('rango')),
-                Field('minimo', 'decimal(8,2)', notnull=True,
-                      label=T('minimo')),
-                Field('maximo', 'decimal(8,2)', notnull=True,
-                      label=T('maximo')),
-                Field('total', 'integer', notnull=True,
-                      label=T('total')),
-                Field('reprobados', 'integer', notnull=True,
-                      label=T('reprobados')),
-                Field('aprobados', 'integer', notnull=True,
-                      label=T('aprobados')),
-                Field('created', 'date', notnull=True,
-                      label=T('entry_date')),
-                Field('report', 'reference report', label=T('report')),
-                Field('metrics_type', 'reference metrics_type',
-                      label=T('type')),
-                format='%(created)s'
-                )
+db.define_table(
+      'log_metrics',
+      Field('description', 'text', notnull=True, label=T('description')),
+      Field('media', 'decimal(8,2)', notnull=True, label=T('media')),
+      Field('error', 'decimal(8,2)', notnull=True, label=T('error')),
+      Field('mediana', 'decimal(8,2)', notnull=True, label=T('mediana')),
+      Field('moda', 'decimal(8,2)', notnull=True, label=T('moda')),
+      Field('desviacion', 'decimal(8,2)', notnull=True, label=T('desviacion')),
+      Field('varianza', 'decimal(8,2)', notnull=True, label=T('varianza')),
+      Field('curtosis', 'decimal(8,2)', notnull=True, label=T('curtosis')),
+      Field('coeficiente', 'decimal(8,2)', notnull=True, label=T('coeficiente')),
+      Field('rango', 'decimal(8,2)', notnull=True, label=T('rango')),
+      Field('minimo', 'decimal(8,2)', notnull=True, label=T('minimo')),
+      Field('maximo', 'decimal(8,2)', notnull=True, label=T('maximo')),
+      Field('total', 'integer', notnull=True, label=T('total')),
+      Field('reprobados', 'integer', notnull=True, label=T('reprobados')),
+      Field('aprobados', 'integer', notnull=True, label=T('aprobados')),
+      Field('created', 'date', notnull=True, label=T('entry_date')),
+      Field('report', 'reference report', label=T('report')),
+      Field('metrics_type', 'reference metrics_type', label=T('type')),
+      format='%(created)s'
+)
+
 # Project item requirements structure
-db.define_table('item_type',
-                Field('name', 'string', length=255,
-                      notnull=True, label=T('name')),
-                format='%(name)s'
-                )
+db.define_table(
+      'item_type',
+      Field('name', 'string', length=255, notnull=True, label=T('name')),
+      format='%(name)s'
+)
 
 # emarquez: adaptacion periodos variables
-db.define_table('item_restriction',
-                Field('name', 'string', notnull=False, label=T('Name')),
-                Field('is_public', 'boolean', default=False, notnull=True,
-                      label=T('is public')),
-                Field('is_enabled', 'boolean', notnull=False,
-                      label=T('is enabled')),
-                Field('permanent', 'boolean', notnull=False,
-                      label=T('permanent')),
-                Field('item_type', 'reference item_type',
-                      label=T('item type')),
-                Field('period_type', 'reference period_type',
-                      label=T('Tipo Periodo')),
-                Field('period', 'reference period_year',
-                      label=T('period')),
-                Field('hidden_from_teacher', 'boolean', notnull=False,
-                      label=T('Hidden from teacher')),
-                Field('optional', 'boolean', notnull=False,
-                      label=T('Optional')),
-                Field('limit_days', 'integer', notnull=False,
-                      label=T('limitdays')),
-                Field('min_score', 'integer', notnull=False,
-                      label=T('minscore')),
-                Field('is_unique', 'boolean', notnull=False,
-                      label=T('Is unique')),
-                format='%(name)s'
-                )
+db.define_table(
+      'item_restriction',
+      Field('name', 'string', notnull=False, label=T('Name')),
+      Field('is_public', 'boolean', default=False, notnull=True, label=T('is public')),
+      Field('is_enabled', 'boolean', notnull=False, label=T('is enabled')),
+      Field('permanent', 'boolean', notnull=False, label=T('permanent')),
+      Field('item_type', 'reference item_type', label=T('item type')),
+      Field('period_type', 'reference period_type', label=T('Tipo Periodo')),
+      Field('period', 'reference period_year', label=T('period')),
+      Field('hidden_from_teacher', 'boolean', notnull=False, label=T('Hidden from teacher')),
+      Field('optional', 'boolean', notnull=False, label=T('Optional')),
+      Field('limit_days', 'integer', notnull=False, label=T('limitdays')),
+      Field('min_score', 'integer', notnull=False, label=T('minscore')),
+      Field('is_unique', 'boolean', notnull=False, label=T('Is unique')),
+      format='%(name)s'
+)
 
-db.define_table('item_restriction_area',
-                Field('area_level', 'reference area_level',
-                      label=T('area_level')),
-                Field('item_restriction', 'reference item_restriction',
-                      label=T('item_restriction')),
-                Field('is_enabled', 'boolean', notnull=False,
-                      label=T('is_enabled')),
-                )
+db.define_table(
+      'item_restriction_area',
+      Field('area_level', 'reference area_level', label=T('area_level')),
+      Field('item_restriction', 'reference item_restriction', label=T('item_restriction')),
+      Field('is_enabled', 'boolean', notnull=False, label=T('is_enabled'))
+)
 
-db.define_table('item_restriction_exception',
-                Field('project', 'reference project',
-                      label=T('project')),
-                Field('item_restriction', 'reference item_restriction',
-                      label=T('item_restriction')),
-                )
+db.define_table(
+      'item_restriction_exception',
+      Field('project', 'reference project', label=T('project')),
+      Field('item_restriction', 'reference item_restriction', label=T('item_restriction'))
+)
 
-db.define_table('mail_log',
-                Field('sent_message', 'text', notnull=False,
-                      label=T('sent_message')),
-                Field('roles', 'text', notnull=False,
-                      label=T('roles')),
-                Field('projects', 'text', notnull=False,
-                      label=T('projects')),
-                Field('sent', 'date', notnull=False,
-                      label=T('sent')),
-                )
+db.define_table(
+      'mail_log',
+      Field('sent_message', 'text', notnull=False, label=T('sent_message')),
+      Field('roles', 'text', notnull=False, label=T('roles')),
+      Field('projects', 'text', notnull=False, label=T('projects')),
+      Field('sent', 'date', notnull=False, label=T('sent')),
+)
 
-db.define_table('mailer_log',
-                Field('sent_message', 'text', notnull=True,
-                      label=T('Sent Message')),
-                Field('time_date', 'datetime', notnull=True,
-                      default=datetime.datetime.now(), label=T('Sent Time')),
-                Field('destination', 'text', notnull=True,
-                      label=T('Destination')),
-                Field('result_log', 'text', notnull=False, label=T('Log')),
-                Field('success', 'boolean', notnull=True, label=T('Success')),
-                Field('emisor', 'text', notnull=True, label=T('Emisor')))
+db.define_table(
+      'mailer_log',
+      Field('sent_message', 'text', notnull=True, label=T('Sent Message')),
+      Field('time_date', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Sent Time')),
+      Field('destination', 'text', notnull=True, label=T('Destination')),
+      Field('result_log', 'text', notnull=False, label=T('Log')),
+      Field('success', 'boolean', notnull=True, label=T('Success')),
+      Field('emisor', 'text', notnull=True, label=T('Emisor'))
+)
 
-db.define_table('item',
-                # AFAIK this is_active is for disabled items, true means enabled, false means disabled
-                Field('is_active', 'boolean', notnull=False, \
-                      label=T('is active'), default=True),
-                Field('description', 'text', notnull=False, \
-                      label=T('description')),
-                Field('admin_comment', 'text', notnull=False, \
-                      label=T('admin_comment')),
-                Field('notified_mail', 'boolean', notnull=False, \
-                      label=T('notified mail')),
-                Field('uploaded_file', 'upload', default='', notnull=False, \
-                      label=T('uploaded_file')),
-                Field('done_activity', 'boolean', notnull=False, \
-                      label=T('done_activity')),
-                Field('created', 'reference period_year', \
-                      label=T('created')),
-                Field('item_restriction', 'reference item_restriction', \
-                      label=T('item restriction')),
-                Field('assignation', 'reference user_project', \
-                      label=T('assignation')),
-                Field('score', 'integer', notnull=False, \
-                      label=T('score')),
-                Field('min_score', 'integer', notnull=False, \
-                      label=T('minscore')),
-                format='%(item_restriction)s'
-                )
+db.define_table(
+      'item',
+      # AFAIK this is_active is for disabled items, true means enabled, false means disabled
+      Field('is_active', 'boolean', notnull=False, label=T('is active'), default=True),
+      Field('description', 'text', notnull=False, label=T('description')),
+      Field('admin_comment', 'text', notnull=False, label=T('admin_comment')),
+      Field('notified_mail', 'boolean', notnull=False, label=T('notified mail')),
+      Field('uploaded_file', 'upload', default='', notnull=False, label=T('uploaded_file')),
+      Field('done_activity', 'boolean', notnull=False, label=T('done_activity')),
+      Field('created', 'reference period_year', label=T('created')),
+      Field('item_restriction', 'reference item_restriction', label=T('item restriction')),
+      Field('assignation', 'reference user_project', label=T('assignation')),
+      Field('score', 'integer', notnull=False, label=T('score')),
+      Field('min_score', 'integer', notnull=False, label=T('minscore')),
+      format='%(item_restriction)s'
+)
 
-db.define_table('day_of_week',
-                Field('name', 'string', notnull=True, unique=True, length=255),
-                format='%(name)s')
+db.define_table(
+      'day_of_week',
+      Field('name', 'string', notnull=True, unique=True, length=255),
+      format='%(name)s'
+)
 
-db.define_table('item_schedule',
-                Field('item', 'reference item', notnull=True),
-                Field('physical_location', 'string',
-                      notnull=True, label=T('Location')),
-                Field('day_of_week', 'reference day_of_week',
-                      label=T('Day'), notnull=True),
-                Field('start_time', 'time', label=T(
-                    'Start Hour'), notnull=True),
-                Field('end_time', 'time', label=T('End Hour'), notnull=True))
+db.define_table(
+      'item_schedule',
+      Field('item', 'reference item', notnull=True),
+      Field('physical_location', 'string', notnull=True, label=T('Location')),
+      Field('day_of_week', 'reference day_of_week', label=T('Day'), notnull=True),
+      Field('start_time', 'time', label=T('Start Hour'), notnull=True),
+      Field('end_time', 'time', label=T('End Hour'), notnull=True)
+)
 
-db.define_table('custom_parameters',
-                Field('min_score', 'integer', notnull=False,
-                      label=T('min_score')),
-                Field('rescore_max_count', 'integer', notnull=False,
-                      label=T('rescore_max_count')),
-                Field('rescore_max_days', 'integer', default='',
-                      notnull=False, label=T('rescore_max_days')),
-                Field('coordinator_name', 'string', default='',
-                      notnull=False, label=T('Coordinator Name')),
-                Field('coordinator_title', 'string', default='',
-                      notnull=False, label=T('Coordinator Title')),
-                Field('clearance_logo', 'upload',
-                      label=T('Clearance Logo')),
-                Field('email_signature', 'text',
-                      label=T('Email Signature')),
-                )
+db.define_table(
+      'custom_parameters',
+      Field('min_score', 'integer', notnull=False, label=T('min_score')),
+      Field('rescore_max_count', 'integer', notnull=False, label=T('rescore_max_count')),
+      Field('rescore_max_days', 'integer', default='', notnull=False, label=T('rescore_max_days')),
+      Field('coordinator_name', 'string', default='', notnull=False, label=T('Coordinator Name')),
+      Field('coordinator_title', 'string', default='', notnull=False, label=T('Coordinator Title')),
+      Field('clearance_logo', 'upload', label=T('Clearance Logo')),
+      Field('email_signature', 'text', label=T('Email Signature')),
+)
 
-db.define_table('public_event',
-                Field('name', 'string', label=T(
-                    'Event Name'), length=255, notnull=True),
-                Field('semester', 'reference period_year', notnull=True),
-                Field('assignation', 'reference user_project', notnull=True),
-                format='%(name)s')
+db.define_table(
+      'public_event',
+      Field('name', 'string', label=T('Event Name'), length=255, notnull=True),
+      Field('semester', 'reference period_year', notnull=True),
+      Field('assignation', 'reference user_project', notnull=True),
+      format='%(name)s'
+)
 
-db.define_table('public_event_schedule',
-                Field('public_event', 'reference public_event', notnull=True),
-                Field('physical_location', 'string',
-                      notnull=True, label=T('Location')),
-                Field('start_date', 'datetime',
-                      label=T('Start'), notnull=True),
-                Field('end_date', 'datetime', label=T('End'), notnull=True))
+db.define_table(
+      'public_event_schedule',
+      Field('public_event', 'reference public_event', notnull=True),
+      Field('physical_location', 'string', notnull=True, label=T('Location')),
+      Field('start_date', 'datetime', label=T('Start'), notnull=True),
+      Field('end_date', 'datetime', label=T('End'), notnull=True)
+)
 
 # Tabla de alumnos (no auxiliares)
-db.define_table('academic',
-                Field('carnet', 'string', unique=True,
-                      notnull=True, label=T('carnet')),
-                Field('email', 'string', notnull=True, requires=IS_EMAIL(
-                    error_message='El email no es valido')),
-                Field('id_auth_user', 'integer', notnull=False),
-                format='%(carnet)s')
-
+db.define_table(
+      'academic',
+      Field('carnet', 'string', unique=True, notnull=True, label=T('carnet'), searchable=True),
+      Field('email', 'string', notnull=True, requires=IS_EMAIL(error_message='El email no es valido')),
+      Field('id_auth_user', 'integer', notnull=False),
+      Field('sign_honor_code', 'boolean', notnull=True, default=False),
+      format='%(carnet)s'
+)
 
 # Tabla de asignacion de alumnos al curso
-db.define_table('academic_course_assignation',
-                Field('carnet', 'reference academic',
-                      notnull=True, label=T('carnet')),
-                Field('semester', 'reference period_year', notnull=True),
-                Field('assignation', 'reference project', notnull=True),
-                Field('laboratorio', 'boolean', notnull=True))
+db.define_table(
+      'academic_course_assignation',
+      Field('carnet', 'reference academic', notnull=True, label=T('carnet')),
+      Field('semester', 'reference period_year', notnull=True),
+      Field('assignation', 'reference project', notnull=True),
+      Field('laboratorio', 'boolean', notnull=True)
+)
 
 # Tabla General de avisos
-db.define_table('notification_general_log4',
-                Field('subject', 'text', notnull=True, label=T('Asunto')),
-                Field('sent_message', 'text', notnull=True,
-                      label=T('Sent Message')),
-                Field('time_date', 'datetime', notnull=True,
-                      default=datetime.datetime.now(), label=T('Sent Time')),
-                Field('emisor', 'text', notnull=True, label=T('Emisor')),
-                Field('course', 'text', notnull=True, label=T('Curso')),
-                Field('yearp', 'text', notnull=True, label=T('yearp')),
-                Field('period', 'text', notnull=True, label=T('Periodo')))
+db.define_table(
+      'notification_general_log4',
+      Field('subject', 'text', notnull=True, label=T('Asunto')),
+      Field('sent_message', 'text', notnull=True, label=T('Sent Message')),
+      Field('time_date', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Sent Time')),
+      Field('emisor', 'text', notnull=True, label=T('Emisor')),
+      Field('course', 'text', notnull=True, label=T('Curso')),
+      Field('yearp', 'text', notnull=True, label=T('yearp')),
+      Field('period', 'text', notnull=True, label=T('Periodo'))
+)
 
 # Tabla de avisos
-db.define_table('notification_log4',
-                Field('destination', 'text', notnull=True,
-                      label=T('Destination')),
-                Field('username', 'text', notnull=True, label=T('Username')),
-                Field('result_log', 'text', notnull=False, label=T('Log')),
-                Field('success', 'boolean', notnull=True, label=T('Success')),
-                Field('register', 'reference notification_general_log4', notnull=True, label=T('Register')))
+db.define_table(
+      'notification_log4',
+      Field('destination', 'text', notnull=True, label=T('Destination')),
+      Field('username', 'text', notnull=True, label=T('Username')),
+      Field('result_log', 'text', notnull=False, label=T('Log')),
+      Field('success', 'boolean', notnull=True, label=T('Success')),
+      Field('register', 'reference notification_general_log4', notnull=True, label=T('Register'))
+)
 
-db.define_table('academic_log',
-                Field('user_name', 'text', notnull=False, label=T('Usuario')),
-                Field('roll', 'text', notnull=False, label=T('Rol')),
-                Field('operation_log', 'text',
-                      notnull=False, label=T('Operacion')),
-                Field('before_carnet', 'text', notnull=False,
-                      label=T('Carnet anterior')),
-                Field('after_carnet', 'text', notnull=False,
-                      label=T('Carnet actual')),
-                Field('before_email', 'text', notnull=False,
-                      label=T('Correo anterior')),
-                Field('after_email', 'text', notnull=False,
-                      label=T('Correo actual')),
-                Field('description', 'text', notnull=False,
-                      label=T('Descripcion')),
-                Field('id_academic', 'text', notnull=False,
-                      label=T('id_academic')),
-                Field('id_period', 'integer',
-                      notnull=False, label=T('id_period')),
-                Field('date_log', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Fecha')))
+db.define_table(
+      'academic_log',
+      Field('user_name', 'text', notnull=False, label=T('Usuario')),
+      Field('roll', 'text', notnull=False, label=T('Rol')),
+      Field('operation_log', 'text', notnull=False, label=T('Operacion')),
+      Field('before_carnet', 'text', notnull=False, label=T('Carnet anterior')),
+      Field('after_carnet', 'text', notnull=False, label=T('Carnet actual')),
+      Field('before_email', 'text', notnull=False, label=T('Correo anterior')),
+      Field('after_email', 'text', notnull=False, label=T('Correo actual')),
+      Field('description', 'text', notnull=False, label=T('Descripcion')),
+      Field('id_academic', 'text', notnull=False, label=T('id_academic')),
+      Field('id_period', 'integer', notnull=False, label=T('id_period')),
+      Field('date_log', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Fecha'))
+)
 
-db.define_table('academic_course_assignation_log',
-                Field('user_name', 'text', notnull=False, label=T('Usuario')),
-                Field('roll', 'text', notnull=False, label=T('Rol')),
-                Field('operation_log', 'text',
-                      notnull=False, label=T('Operacion')),
-                Field('before_carnet', 'text', notnull=False,
-                      label=T('Carnet anterior')),
-                Field('after_carnet', 'text', notnull=False,
-                      label=T('Carnet actual')),
-                Field('before_course', 'text', notnull=False,
-                      label=T('Curso anterior')),
-                Field('after_course', 'text', notnull=False,
-                      label=T('Curso actual')),
-                Field('before_year', 'text', notnull=False,
-                      label=T('Año anterior')),
-                Field('after_year', 'text', notnull=False,
-                      label=T('Año actual')),
-                Field('before_semester', 'text', notnull=False,
-                      label=T('Semestre anterior')),
-                Field('after_semester', 'text', notnull=False,
-                      label=T('Semestre actual')),
-                Field('before_laboratory', 'text', notnull=False,
-                      label=T('Laboratorio anterior')),
-                Field('after_laboratory', 'text', notnull=False,
-                      label=T('Laboratorio actual')),
-                Field('description', 'text', notnull=False,
-                      label=T('Descripcion')),
-                Field('id_academic_course_assignation', 'text',
-                      notnull=False, label=T('id_academic_course_assignation')),
-                Field('id_period', 'integer',
-                      notnull=False, label=T('id_period')),
-                Field('date_log', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Fecha')))
+db.define_table(
+      'academic_course_assignation_log',
+      Field('user_name', 'text', notnull=False, label=T('Usuario')),
+      Field('roll', 'text', notnull=False, label=T('Rol')),
+      Field('operation_log', 'text', notnull=False, label=T('Operacion')),
+      Field('before_carnet', 'text', notnull=False, label=T('Carnet anterior')),
+      Field('after_carnet', 'text', notnull=False, label=T('Carnet actual')),
+      Field('before_course', 'text', notnull=False, label=T('Curso anterior')),
+      Field('after_course', 'text', notnull=False, label=T('Curso actual')),
+      Field('before_year', 'text', notnull=False, label=T('Año anterior')),
+      Field('after_year', 'text', notnull=False, label=T('Año actual')),
+      Field('before_semester', 'text', notnull=False, label=T('Semestre anterior')),
+      Field('after_semester', 'text', notnull=False, label=T('Semestre actual')),
+      Field('before_laboratory', 'text', notnull=False, label=T('Laboratorio anterior')),
+      Field('after_laboratory', 'text', notnull=False, label=T('Laboratorio actual')),
+      Field('description', 'text', notnull=False, label=T('Descripcion')),
+      Field('id_academic_course_assignation', 'text', notnull=False, label=T('id_academic_course_assignation')),
+      Field('id_period', 'integer', notnull=False, label=T('id_period')),
+      Field('date_log', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Fecha'))
+)
 
-db.define_table('library',
-                Field('name', 'text', notnull=True,
-                      unique=False, label=T('Name')),
-                Field('file_data', 'upload', notnull=True, label=T('File_data'), requires=[IS_UPLOAD_FILENAME(
-                    extension='(pdf|zip|rar)', error_message='Solo se aceptan archivos con extension zip|pdf|rar'), IS_LENGTH(2097152, error_message='El tamaño máximo del archivo es 2MB')]),
-                Field('description', 'text', notnull=True,
-                      unique=False, label=T('Description')),
-                Field('visible', 'boolean', label=T('Visible')),
-                Field('period', 'reference period_year',
-                      notnull=True, label=T('Period')),
-                Field('project', 'reference project',
-                      notnull=True, label=T('Course')),
-                Field('owner_file', 'reference auth_user', notnull=True, label=T('Owner_file')))
+db.define_table(
+      'library',
+      Field('name', 'text', notnull=True, unique=False, label=T('Name')),
+      Field('file_data', 'upload', notnull=True, label=T('File_data'), 
+            requires=[
+                IS_UPLOAD_FILENAME(extension='(pdf|zip|rar)', error_message='Solo se aceptan archivos con extension zip|pdf|rar'),
+                IS_LENGTH(2097152, error_message='El tamaño máximo del archivo es 2MB')
+            ]
+      ),
+      Field('description', 'text', notnull=True, unique=False, label=T('Description')),
+      Field('visible', 'boolean', label=T('Visible')),
+      Field('period', 'reference period_year', notnull=True, label=T('Period')),
+      Field('project', 'reference project', notnull=True, label=T('Course')),
+      Field('owner_file', 'reference auth_user', notnull=True, label=T('Owner_file'))
+)
 
-db.define_table('activity_category',
-                Field('category', 'string', notnull=True,
-                      unique=False, label=T('category')),
-                Field('description', 'text', notnull=True,
-                      unique=False, label=T('description')),
-                Field('hidden_academic_tutor', 'boolean',
-                      notnull=True, label=T('hidden_academic_tutor')),
-                Field('timeout', 'integer', notnull=True,
-                      unique=False, label=T('timeout')),
-                format='%(category)s')
+db.define_table(
+      'activity_category',
+      Field('category', 'string', notnull=True, unique=False, label=T('category')),
+      Field('description', 'text', notnull=True, unique=False, label=T('description')),
+      Field('hidden_academic_tutor', 'boolean', notnull=True, label=T('hidden_academic_tutor')),
+      Field('timeout', 'integer', notnull=True, unique=False, label=T('timeout')),
+      format='%(category)s'
+)
 
 # Table of weighting
-db.define_table('course_activity_category',
-                Field('category', 'reference activity_category',
-                      notnull=True, label=T('category')),
-                Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
-                Field('specific_grade', 'boolean',
-                      notnull=True, label=T('specific grade')),
-                Field('semester', 'reference period_year', notnull=True),
-                Field('assignation', 'reference project', notnull=True),
-                Field('laboratory', 'boolean',
-                      notnull=True, label=T('laboratory')),
-                Field('teacher_permition', 'boolean',
-                      notnull=True, label=T('teacher permition'))
-                )
+db.define_table(
+      'course_activity_category',
+      Field('category', 'reference activity_category', notnull=True, label=T('category')),
+      Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+      Field('specific_grade', 'boolean', notnull=True, label=T('specific grade')),
+      Field('semester', 'reference period_year', notnull=True),
+      Field('assignation', 'reference project', notnull=True),
+      Field('laboratory', 'boolean', notnull=True, label=T('laboratory')),
+      Field('teacher_permition', 'boolean', notnull=True, label=T('teacher permition'))
+)
 
 # Table of weighting log
-db.define_table('course_activity_category_log',
-                Field('user_name', 'string', notnull=True, label=T('User')),
-                Field('roll', 'string', notnull=True, label=T('Roll')),
-                Field('operation_log', 'string',
-                      notnull=True, label=T('Operation')),
-                Field('before_category', 'string',
-                      notnull=False, label=T('before category')),
-                Field('after_category', 'string',
-                      notnull=False, label=T('after category')),
-                Field('before_grade', 'decimal(5,2)',
-                      notnull=False, label=T('before grade')),
-                Field('after_grade', 'decimal(5,2)',
-                      notnull=False, label=T('after grade')),
-                Field('before_specific_grade', 'boolean',
-                      notnull=False, label=T('before specific grade')),
-                Field('after_specific_grade', 'boolean',
-                      notnull=False, label=T('after specific grade')),
-                Field('semester', 'string', notnull=False, label=T('semester')),
-                Field('yearp', 'string', notnull=False, label=T('year')),
-                Field('assignation', 'string', notnull=False),
-                Field('before_laboratory', 'boolean',
-                      notnull=False, label=T('before laboratory')),
-                Field('after_laboratory', 'boolean',
-                      notnull=False, label=T('after laboratory')),
-                Field('before_teacher_permition', 'boolean',
-                      notnull=False, label=T('before teacher permition')),
-                Field('after_teacher_permition', 'boolean',
-                      notnull=False, label=T('after teacher permition')),
-                Field('description', 'string',
-                      notnull=False, label=T('description'))
-                )
+db.define_table(
+      'course_activity_category_log',
+      Field('user_name', 'string', notnull=True, label=T('User')),
+      Field('roll', 'string', notnull=True, label=T('Roll')),
+      Field('operation_log', 'string', notnull=True, label=T('Operation')),
+      Field('before_category', 'string', notnull=False, label=T('before category')),
+      Field('after_category', 'string', notnull=False, label=T('after category')),
+      Field('before_grade', 'decimal(5,2)', notnull=False, label=T('before grade')),
+      Field('after_grade', 'decimal(5,2)', notnull=False, label=T('after grade')),
+      Field('before_specific_grade', 'boolean', notnull=False, label=T('before specific grade')),
+      Field('after_specific_grade', 'boolean', notnull=False, label=T('after specific grade')),
+      Field('semester', 'string', notnull=False, label=T('semester')),
+      Field('yearp', 'string', notnull=False, label=T('year')),
+      Field('assignation', 'string', notnull=False),
+      Field('before_laboratory', 'boolean', notnull=False, label=T('before laboratory')),
+      Field('after_laboratory', 'boolean', notnull=False, label=T('after laboratory')),
+      Field('before_teacher_permition', 'boolean', notnull=False, label=T('before teacher permition')),
+      Field('after_teacher_permition', 'boolean', notnull=False, label=T('after teacher permition')),
+      Field('description', 'string', notnull=False, label=T('description'))
+)
 
-db.define_table('student_control_period',
-                Field('period_name', 'string', notnull=True,
-                      unique=False, label=T('period name')),
-                Field('date_start', 'datetime', notnull=True,
-                      default=datetime.datetime.now(), label=T('Date Start')),
-                Field('date_finish', 'datetime', notnull=True,
-                      default=datetime.datetime.now(), label=T('Date Finish')),
-                Field('timeout_income_notes', 'integer',
-                      notnull=True,  label=T('timeout_income_notes')),
-                Field('percentage_income_activity', 'integer', notnull=True,
-                      default=35, label=T('Percentage income activity')),
-                Field('min_average', 'decimal(5,2)', notnull=True,
-                      default=61.00, label=T('Min Average')),
-                Field('max_average', 'decimal(5,2)', notnull=True,
-                      default=85.00, label=T('Max Average')),
-                Field('date_start_semester', 'date', notnull=True,
-                      label=T('Date Start Semester')),
-                Field('date_finish_semester', 'date', notnull=True,
-                      label=T('Date Finish Semester'))
-                )
+db.define_table(
+      'student_control_period',
+      Field('period_name', 'string', notnull=True, unique=False, label=T('period name')),
+      Field('date_start', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Date Start')),
+      Field('date_finish', 'datetime', notnull=True, default=datetime.datetime.now(), label=T('Date Finish')),
+      Field('timeout_income_notes', 'integer', notnull=True,  label=T('timeout_income_notes')),
+      Field('percentage_income_activity', 'integer', notnull=True, default=35, label=T('Percentage income activity')),
+      Field('min_average', 'decimal(5,2)', notnull=True, default=61.00, label=T('Min Average')), 
+      Field('max_average', 'decimal(5,2)', notnull=True, default=85.00, label=T('Max Average')),
+      Field('date_start_semester', 'date', notnull=True, label=T('Date Start Semester')),
+      Field('date_finish_semester', 'date', notnull=True, label=T('Date Finish Semester'))
+)
 
-db.define_table('partials',
-                Field('name', 'string', notnull=True,
-                      unique=False, label=T('name')),
-                )
+db.define_table(
+      'partials',
+      Field('name', 'string', notnull=True, unique=False, label=T('name')),
+)
 
-db.define_table('course_activity',
-                Field('course_activity_category', 'reference course_activity_category',
-                      notnull=True, label=T('category')),
-                Field('name', 'string', notnull=True,
-                      unique=False, label=T('name')),
-                Field('description', 'text', notnull=True,
-                      unique=False, label=T('description')),
-                Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
-                Field('semester', 'reference period_year', notnull=True),
-                Field('assignation', 'reference project', notnull=True),
-                Field('laboratory', 'boolean',
-                      notnull=True, label=T('laboratory')),
-                Field('teacher_permition', 'boolean',
-                      notnull=True, label=T('teacher permition')),
-                Field('date_start', 'date', notnull=True,
-                      default=datetime.datetime.now(), label=T('Date Start')),
-                Field('date_finish', 'date', notnull=True,
-                      default=datetime.datetime.now(), label=T('Date Finish'))
-                )
+db.define_table(
+      'course_activity',
+      Field('course_activity_category', 'reference course_activity_category', notnull=True, label=T('category')),
+      Field('name', 'string', notnull=True, unique=False, label=T('name')),
+      Field('description', 'text', notnull=True, unique=False, label=T('description')),
+      Field('grade', 'decimal(5,2)', notnull=False, label=T('grade')),
+      Field('semester', 'reference period_year', notnull=True),
+      Field('assignation', 'reference project', notnull=True),
+      Field('laboratory', 'boolean', notnull=True, label=T('laboratory')),
+      Field('teacher_permition', 'boolean', notnull=True, label=T('teacher permition')),
+      Field('date_start', 'date', notnull=True, default=datetime.datetime.now(), label=T('Date Start')),
+      Field('date_finish', 'date', notnull=True, default=datetime.datetime.now(), label=T('Date Finish'))
+)
 
-db.define_table('course_activity_without_metric',
-                Field('name', 'string', notnull=True,
-                      unique=False, label=T('Name')),
-                Field('description', 'text', notnull=False,
-                      unique=False, label=T('Description')),
-                Field('fileReport', 'upload', notnull=False, label='Reporte', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(
-                    extension='(pdf|zip|rar)', error_message='Solo se aceptan archivos con extension zip|pdf|rar')), IS_LENGTH(2097152, error_message='El tamaño máximo del archivo es 2MB')]),
-                Field('semester', 'reference period_year', notnull=True),
-                Field('assignation', 'reference project', notnull=True),
-                Field('laboratory', 'boolean',
-                      notnull=True, label=T('Laboratory')),
-                Field('teacher_permition', 'boolean',
-                      notnull=True, label=T('Teacher Permition')),
-                Field('date_start', 'date', notnull=True,
-                      default=datetime.datetime.now(), label=T('Date'))
-                )
+db.define_table(
+      'course_activity_without_metric',
+      Field('name', 'string', notnull=True, unique=False, label=T('Name')),
+      Field('description', 'text', notnull=False, unique=False, label=T('Description')),
+      Field('fileReport', 'upload', notnull=False, label='Reporte',
+            requires=[
+                  IS_NULL_OR(IS_UPLOAD_FILENAME(extension='(pdf|zip|rar)', error_message='Solo se aceptan archivos con extension zip|pdf|rar')),
+                  IS_LENGTH(2097152, error_message='El tamaño máximo del archivo es 2MB')
+            ]
+      ),
+      Field('semester', 'reference period_year', notnull=True),
+      Field('assignation', 'reference project', notnull=True),
+      Field('laboratory', 'boolean', notnull=True, label=T('Laboratory')),
+      Field('teacher_permition', 'boolean', notnull=True, label=T('Teacher Permition')),
+      Field('date_start', 'date', notnull=True, default=datetime.datetime.now(), label=T('Date'))
+)
 
-
-db.define_table('course_activity_log',
-                Field('user_name', 'string', notnull=False, label='Usuario'),
-                Field('roll', 'string', notnull=False, label='Rol'),
-                Field('operation_log', 'string',
-                      notnull=False, label='Operacion'),
-                Field('course', 'string', notnull=False, label='Curso'),
-                Field('yearp', 'string', notnull=False, label='yearp'),
-                Field('period', 'string', notnull=False, label='Periodo'),
-                Field('metric', 'boolean', notnull=False, label='Metrica'),
-                Field('before_course_activity_category', 'string',
-                      notnull=False, label='Categoria Anterior'),
+db.define_table(
+      'course_activity_log',
+      Field('user_name', 'string', notnull=False, label='Usuario'),
+      Field('roll', 'string', notnull=False, label='Rol'),
+      Field('operation_log', 'string', notnull=False, label='Operacion'),
+      Field('course', 'string', notnull=False, label='Curso'),
+      Field('yearp', 'string', notnull=False, label='yearp'),
+      Field('period', 'string', notnull=False, label='Periodo'),
+      Field('metric', 'boolean', notnull=False, label='Metrica'),
+      Field('before_course_activity_category', 'string', notnull=False, label='Categoria Anterior'),
                 Field('after_course_activity_category', 'string',
                       notnull=False, label='Categoria Actual'),
                 Field('before_name', 'string', notnull=False,
@@ -1152,23 +1024,21 @@ db.define_table('request_change_w_detail_log',
                 )
 
 
-db.define_table('course_laboratory_exception',
-                Field('project', 'reference project', notnull=True,
-                      unique=True, label=T('Course')),
-                Field('t_edit_lab', 'boolean', notnull=True,
-                      label=T('Teacher can edit laboratory')),
-                Field('s_edit_course', 'boolean', notnull=True,
-                      label=T('Student can edit course'))
-                )
+db.define_table(
+      'course_laboratory_exception',
+      Field('project', 'reference project', notnull=True, unique=True, label=T('Course')),
+      Field('t_edit_lab', 'boolean', notnull=True, label=T('Teacher can edit laboratory')),
+      Field('s_edit_course', 'boolean', notnull=True, label=T('Student can edit course')),
+      format='%(project)s'
+)
 
-db.define_table('course_limit_exception',
-                Field('project', 'reference project', notnull=True,
-                      unique=True, label=T('Course')),
-                Field('semester_repet', 'boolean', notnull=True,
-                      label=T('Repeat Each Semester')),
-                Field('date_finish', 'datetime',
-                      notnull=True, label=T('Date Finish'))
-                )
+db.define_table(
+      'course_limit_exception',
+      Field('project', 'reference project', notnull=True, unique=True, label=T('Course')),
+      Field('semester_repet', 'boolean', notnull=True, label=T('Repeat Each Semester')),
+      Field('date_finish', 'datetime', notnull=True, label=T('Date Finish')),
+      format='%(project)s'
+)
 
 # emaquez: excepciones por periodo
 db.define_table('course_limit_exception_period',
@@ -2455,9 +2325,9 @@ db.define_table('rec_solicitud',
                       notnull=True, label=T('IdUsuario')),
                 Field('anio', 'integer', notnull=True, label=T('Anio')),
                 Field('periodo', 'integer', notnull=True, label=T('Periodo')),
-                Field('curriculum', 'upload', uploadfolder=request.folder+'static/pdf', notnull=True, unique=False, label='Curriculum', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(
+                Field('curriculum', 'upload', uploadfolder=f'{request.folder if "/" in request.folder[len(request.folder) - 1] else request.folder + "/"}static/pdf', notnull=True, unique=False, label='Curriculum', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(
                     extension='(pdf)', error_message='Solo se aceptan archivos con extension pdf')), IS_LENGTH(2097152, error_message='El tamaño máximo del archivo es 2MB')]),
-                Field('listado_cursos', 'upload', uploadfolder=request.folder+'static/pdf', notnull=True, unique=False, label='Listado_de_cursos', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(
+                Field('listado_cursos', 'upload', uploadfolder=f'{request.folder if "/" in request.folder[len(request.folder) - 1] else request.folder + "/"}static/pdf', notnull=True, unique=False, label='Listado_de_cursos', requires=[IS_NULL_OR(IS_UPLOAD_FILENAME(
                     extension='(pdf)', error_message='Solo se aceptan archivos con extension pdf')), IS_LENGTH(2097152, error_message='El tamaño máximo del archivo es 2MB')]),
                 Field('intentos', 'integer', notnull=True, label=T('Intentos')),
                 Field('asignado', 'boolean', notnull=True, label=T('Asignado')),
@@ -2509,7 +2379,7 @@ db.define_table('rec_registro',
                 Field('apellido', 'string', notnull=True, label=T('Apellido')),
                 Field('correo', 'string', notnull=True, requires=IS_EMAIL(
                     error_message='El email no es valido')),
-                Field('fotografia', 'upload', uploadfolder=request.folder+'static/img_nvo', notnull=True, label=T('Photo'),
+                Field('fotografia', 'upload', uploadfolder=f'{request.folder if "/" in request.folder[len(request.folder) - 1] else request.folder + "/"}static/img_nvo', notnull=True, label=T('Photo'),
                       requires=[IS_IMAGE(extensions=('jpeg', 'png'), maxsize=(200, 300),
                                          error_message=T('Only files are accepted with extension') +
                                          ' png|jpg'+" "+T('with 200x300px size')+".")]),

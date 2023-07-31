@@ -1,0 +1,179 @@
+{{extend 'dashboard.html'}}
+{{step_count = 0}}
+{{row_count = 1}}
+<div class="mt-4">
+	<div class="row">
+		<div class="col-12">
+			<div class="well">
+				<center>
+					{{if auth.has_membership('Super-Administrator') or (auth.has_membership('Ecys-Administrator')):}}
+						<h2>Resultados evaluación de desempeño 360 grados<br>
+						<small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small></h2>
+					{{pass}}
+				</center>
+				<table class="table-responsive">
+					<tr>
+						<td>
+							<div data-step="{{step_count+=1}}{{=step_count}}" data-intro="En esta sección podrá seleccionar el semestre que desea visualizar.">
+								<form class="form-inline" action="{{=URL('evaluation','results_search')}}" method='get'>
+									<select name="period" class="form-control">
+									{{for period in periods:}}
+										{{if str(period.id) == str(periodo.id):}}
+											{{var_sel="selected='selected'"}}
+										{{else:}}
+											{{var_sel=''}}
+										{{pass}}
+									  	<option value="{{=period.id}}" {{=var_sel}}>
+									  		{{=T(period.period.name)}}-{{=period.yearp}}
+									  	</option>
+									{{pass}}
+									</select>
+									<select name="group" class="form-control">
+									{{for group in groups:}}
+										{{if str(group.id) == str(grupo.id):}}
+											{{var_sel_g="selected='selected'"}}
+										{{else:}}
+											{{var_sel_g=''}}
+										{{pass}}
+									  	<option value="{{=group.id}}" {{=var_sel_g}}>
+											{{if group.role == 'Student':}}
+												{{=T('Rol Student')}}
+											{{else:}}
+												{{=T(group.role)}}
+											{{pass}}
+									  	</option>
+									{{pass}}
+									</select>
+									<input class="btn btn-primary" type="submit" value="{{=T('Go')}}">
+								</form>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="col-12 col-md-6">
+			<div class=table-responsive align="left">
+				<table>
+					<tr>
+						<td>
+							<table class="table table-bordered table-striped table-sm">
+								<thead>
+									<tr>
+										<th scope="row">#</th>
+										<th>Aspecto evaluado</th>
+										<th>Nota promedio</th>
+									</tr>
+								</thead>
+								<tbody>
+									{{for row in rows:}}
+										<tr>
+											<th scope="row">{{=row_count}}</th>
+											<td>{{=row.question_repository.question}}</td>
+											<td>
+												{{if int(row.total) < min_average:}}		
+													<span class = "badge badge-danger">
+														{{=int(row.total)}}
+													</span>		
+												{{elif int(row.total) >= min_average and int(row.total) <= max_average:}}
+													<span class = "badge badge-warning">
+														{{=int(row.total)}}
+													</span>
+												{{else:}}
+													<span class = "badge badge-success">
+														{{=int(row.total)}}
+													</span>
+												{{pass}}
+											</td>
+										</tr>
+										{{row_count += 1}}
+									{{pass}}
+										<tr>
+											<th scope="row"></th>
+											<th scope="row">Promedio Total</th>
+											<td>
+												{{if promedio < min_average:}}		
+													<span class = "badge badge-danger">
+														{{=promedio}}
+													</span>		
+												{{elif promedio >= min_average and promedio <= max_average:}}
+													<span class = "badge badge-warning">
+														{{=promedio}}
+													</span>
+												{{else:}}
+													<span class = "badge badge-success">
+														{{=promedio}}
+													</span>
+												{{pass}}
+											</td>
+										</tr>
+										<tr>
+											<th scope="row"></th>
+											<th scope="row">Personas de evaluaron</th>
+											<td>
+												<span class = "badge badge-success">
+														{{=evaluators}}
+													</span>
+											</td>
+										</tr>
+								</tbody>
+							</table>
+						</td>
+						<td width="10%"></td>
+						<td width="30%">
+							<div align="right" width="100%">
+								<small>
+									<table id="answ" class="table table-condensed table-bordered table-striped">
+										<thead>
+											<tr>
+												<th>{{=T('Nota')}}</th>
+												<th>{{=T('Respuesta')}}</th>
+											</tr>
+										</thead>
+										<tbody>
+											{{for ans in grid_answer:}}
+											<tr>
+												<td>
+													{{if ans.grade < min_average:}}		
+														<span class = "badge badge-danger">
+															{{=ans.grade}}
+														</span>		
+													{{elif ans.grade >= min_average and ans.grade <= max_average:}}
+														<span class = "badge badge-warning">
+															{{=ans.grade}}
+														</span>
+													{{else:}}
+														<span class = "badge badge-success">
+															{{=ans.grade}}
+														</span>
+													{{pass}}
+												</td>
+												<td>{{=T(ans.answer)}}</td>
+											</tr>
+											{{pass}}		
+										</tbody>
+									</table>
+								</small>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="col-12 col-md-5">
+			<div id="body">
+				<div id="chart"></div>
+			</div>
+		</div>
+	</div>
+</div>
+{{block page_js}}
+<script type="text/javascript" src="{{=URL('static','js/d3/d3.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','js/d3/d3.js')}}"></script>
+<script src="{{=URL('static','js/RadarChart.js')}}"></script>
+<script src="{{=URL('static','js/Pruebas360.js')}}"></script>
+<script type="text/javascript">
+	Pruebas360.draw("{{=res_graph}}");
+</script>
+{{end page_js}}
+

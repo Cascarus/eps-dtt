@@ -1,0 +1,61 @@
+{{extend 'dashboard.html'}}
+{{import cpfecys}}
+
+
+<div class="col-12 mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>
+                Carga de foros semanales
+                <br>
+                <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+            </h2>
+        </div>
+    </div>
+</div>
+
+
+<br>
+
+
+<div class="col-6 offset-3">
+    <div class="row-fluid">
+        <div class="well span11">
+            <form>
+                <div class="col">
+                    <div class="card" style="width: 100%;">
+                        <div class="card-body">
+                            <div class="row-fluid reports">
+    
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Nombre Foro</label>
+                                    <input type="email" class="form-control" id="exampleInputEmail1"
+                                        aria-describedby="emailHelp" placeholder="Enter email">
+                                    <small id="emailHelp" class="form-text text-muted">We'll never share your email
+                                        with
+                                        anyone
+                                        else.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputPassword1">Password</label>
+                                    <input type="date" class="form-control" id="exampleInputPassword1" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="archivo">Selecciona un archivo</label>
+                                    <br>
+                                    <input type="file" id="archivo" name="archivo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-success">Cargar foro</button>
+                    <button type="submit" class="btn btn-danger">Regresar</button>
+                </div>
+                
+            </form>
+
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h1>Incidentes</h1>
+        </div>
+        <div class="col-12">
+            <div>
+                <form class="form-inline" action="{{=URL('iso_reporte_incidente', 'listar_incidentes')}}">
+                    <label for="periodo">Seleccione un periódo:&nbsp;</label>
+                    <select name="periodo" class="form-control">
+                        {{for period in periodos:}}
+                            <option {{if period.id == id_periodo:}} selected {{pass}} value="{{=period.id}}">
+                                {{=str(period.yearp)}} - {{=str(period.period)}}
+                            </option>
+                        {{pass}}
+                    </select>
+                    <input type="submit" value="ir" class="btn btn-outline-primary" />
+                </form>
+                {{if len(incidentes) > 0: }}
+                    <div class="web2py_grid">
+                        <div class="web2py_table">
+                            <div class="web2py_htmltable" style="width: 100%; overflow-x: auto; -ms-overflow-x: scroll;">
+                                <table>
+                                    <thead>
+                                        <th class=""><a href="#">#</a></th>
+                                        <th class=""><a href="#">Carné</a></th>
+                                        <th class=""><a href="#">Nombre</a></th>
+                                        <th class=""><a href="#">Curso</a></th>
+                                        <th class=""><a href="#">Incidentes</a></th>
+                                        <th class=""></th>
+                                    </thead>
+                                    <tbody>
+                                        {{for incidente in incidentes:}}
+                                            <tr>
+                                                <td>{{=incidente[4]}}</td>
+                                                <td>{{=incidente[1]}}</td>
+                                                <td>{{=incidente[2]}} {{=incidente[3]}}</td>
+                                                <td>{{=incidente[5]}}</td>
+                                                <td>{{=incidente[6]}}</td>
+                                                <td>
+                                                    <a href="{{=URL('iso_reporte_incidente', 'reportar', vars={'periodo': id_periodo, 'project': incidente[0]})}}"
+                                                        class="button btn btn-default">
+                                                        <span class="icon pen icon-pencil glyphico glyphico-arrow pencil"></span>
+                                                        <span class="buttontext button" title="Reportar">Reportar</span>
+                                                    </a>
+                                                    {{if incidente[6]:}}
+                                                        <a href="{{=URL('iso_reporte_incidente', 'listar_incidentes_curso', vars={'periodo': id_periodo, 'project': incidente[0], 'id_tutor':  incidente[7]})}}"
+                                                            class="button btn btn-default">
+                                                            <span class="icon magnifier icon-zomm-in glyphicon glyphicon-arrow-zoom-in"></span>
+                                                            <span class="buttontext button" title="Ver">Ver</span>
+                                                        </a>
+                                                    {{pass}}
+                                                </td>
+                                            </tr>
+                                        {{pass}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {{else:}}
+                    <h4>No se encontraron incidentes</h4>
+                {{pass}}
+            </div>
+        </div>
+    </div>
+</div>

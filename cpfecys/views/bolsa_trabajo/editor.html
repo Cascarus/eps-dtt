@@ -1,0 +1,675 @@
+{{extend 'dashboard.html'}}
+
+<div class="mt-4">
+    <div class='row p-0 m-0'>
+        <div class='d-flex w-100 justify-content-center py-3 px-0'>
+            <h2>
+                Editor de tablas
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                    <span class="fa fa-question-circle"></span>
+                </button>
+            </h2>
+        </div>
+    </div>
+
+    <div class="row m-3 p-3">
+        <form action='/cpfecys/bolsa_trabajo/editor' method="GET">
+            <label class="h3">Seleccione tabla para editar</label>
+            <select class="form-control" id="tabla" name='tabla' onchange="this.form.submit()">
+                <option value="">Seleccione uno</option>
+                <option value="Especialidad">Habilidades</option>
+                <option value="especialidad">Área de especialidad</option>
+                <option value="registro">Estado de registro de empresa</option>
+                <option value="oferta">Estado de oferta laboral</option>
+                <option value="Tamanio-Archivos">Tamaño Banner y Certificado</option>
+            </select>
+        </form>
+    </div>
+
+    {{if new_dict["selected"] == True:}}
+        <div class='row p-0 m-0'>
+            <div class='d-flex w-100 justify-content-center py-3 px-0'>
+                <h3>
+                    {{if new_dict["tabla"] == "Habilidad":}}
+                        {{=T('tabla - Habilidades a Especialidad:')}} {{=new_dict["nombre_espe"]}}
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                            <span class="fa fa-question-circle"></span>
+                        </button>
+                    {{else:}}
+                        tabla - {{=new_dict["tabla"]}}
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                            <span class="fa fa-question-circle"></span>
+                        </button>
+                    {{pass}}
+                </h3>
+            </div>
+        </div>
+        {{if new_dict["tabla"] == "Especialidad":}}
+            <div class="row m-0 p-0 mx-3 px-3">
+                <label class="h4"> {{=T('Seleccione o modifique Area de Especialidad al que se le agregara Habilidad')}}</label> 
+                <br>
+                <form class="form-inline" action='/cpfecys/bolsa_trabajo/editor?tabla={{=new_dict["tabla"]}}' method="POST">
+                    <input type="text" id="new" name='new' class="form-control mr-3" placeholder="Agregar a tabla" required />
+                    <button type="submit" class="btn btn-primary">Agregar - {{=new_dict["tabla"]}}</button>
+                </form>
+            
+            </div>
+            <div class="row m-3 p-3">
+                <table class="table table-hover">
+                    <thead style="background-color: #EAEAEA;">
+                        <tr>
+                            <th scope="col" style="width: 50px">
+                                #
+                                <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=id&ordertype=asc'>
+                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                </a>
+                                <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=id&ordertype=desc'>
+                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                </a>
+                            </th>
+                            <th scope="col">
+                                Valor
+                                <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=value&ordertype=asc'>
+                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                </a>
+                                <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=value&ordertype=desc'>
+                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                </a>
+                            </th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td scope="row"></td>
+                            <td>
+                                <form action='/cpfecys/bolsa_trabajo/editor' method="GET">
+                                    <input type="hidden" id="tabla" name='tabla' value='{{=new_dict["tabla"]}}' />
+                                    <input type="text" id="value" name='value' class="form-control" />
+                                </form>
+                            </td>
+                            <td></td>
+                        </tr>
+                        {{for value in new_dict['values']:}}
+                            <tr>
+                                <td scope="row">{{=value["id"]}}</td>
+                                <td>{{=value["value"]}}</td>
+                                <td class="text-center">
+                                    <a class="btn btn-default btn" href="#"
+                                        onclick="cambiarValor({{=value['id']}}, '{{=value['value']}}', '{{=new_dict['tabla']}}')">
+                                        <i class="fa fa-fw fa fa-edit"></i> {{=T('Editar')}}
+                                    </a>
+                                    <a  class="btn btn-danger" href="#" onclick="eliminar({{=value['id']}}, '{{=value['value']}}')">
+                                        <i class="fa fa-fw fa fa-trash"></i> {{=T('Eliminar')}}
+                                    </a>
+                                    <a title="{{=T('Seleccione al que desea agregar nueva Habilidad')}}" class="btn btn-secondary" href='#'
+                                        onclick="seleccionarEspecialidad({{=value['id']}}, '{{=value['value']}}')">
+                                        <i class="fa fa-fw fa fa-edit"></i> {{=T('Agregar Habilidad')}}
+                                    </a>
+                                </td>
+                            </tr>
+                        {{pass}}
+                    </tbody>
+                    <tfoot style="background-color: #EAEAEA;">
+                        <tr>
+                            <th scope="col" colspan="2" class="text-right">
+                                {{=new_dict["inicio_valores"]}} - {{=new_dict["fin_valores"]}} de {{=new_dict["cantidad_valores"]}}
+                            </th>
+                            <th scope="col" class="d-flex justify-content-around">
+                                <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                    <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                                </a>
+                                {{if new_dict["prev_page"] != 0:}}
+                                <a class=" btn btn-primary btn"
+                                    href='?page={{=new_dict["prev_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                </a>
+                                {{else:}}
+                                <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}'>
+                                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                </a>
+                                {{pass}}
+                                {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} <a class=" btn btn-primary btn"
+                                    href='?page={{=new_dict["next_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                    </a>
+                                    {{else:}}
+                                    <a class=" btn btn-primary btn"
+                                        href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                    </a>
+                                    {{pass}}
+                                    <a class=" btn btn-primary btn"
+                                        href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                    </a>
+                            </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        {{else:}}
+            {{if new_dict["tabla"] == "Tamanio-Archivos":}}
+                <div class="row m-3 p-3">
+                    <table class="table table-hover">
+                        <thead style="background-color: #EAEAEA;">
+                            <tr>
+                                <th scope="col" style="width: 50px">
+                                    #
+                                    <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=id&ordertype=asc'>
+                                        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                    </a>
+                                    <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=id&ordertype=desc'>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                    </a>
+                                </th>
+                                <th scope="col">
+                                    Valor - {{=new_dict["tabla"]}}
+                                    <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=value&ordertype=asc'>
+                                        <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                    </a>
+                                    <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=value&ordertype=desc'>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                    </a>
+                                </th>
+                                <th scope="col">TAMANIO EN MEGABYTES</th>
+                                <th scope="col"> EDICION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td scope="row"></td>
+                                <td>
+                                    <form action='/cpfecys/bolsa_trabajo/editor' method="GET">
+                                        <input type="hidden" id="tabla" name='tabla' value='{{=new_dict["tabla"]}}' />
+                                        <input type="hidden" id="espe" name='espe' value='{{=new_dict["espe"]}}' />
+                                        <input type="text" id="value" name='value' class="form-control" />
+                                    </form>
+                                </td>
+                                <td></td>
+                            </tr>
+                            {{for value in new_dict['values']:}}
+                            <tr>
+                                <td scope="row">{{=value["id"]}}</td>
+                                <td class = "h5">{{=T('size for cv documents')}}</td>
+                                <td class = "h5">{{=value["value"]}} MB</td>
+                                <td class="text-center">
+                                    <a class="btn btn-default btn" href="#"
+                                        onclick="cambiarValorTamanio({{=value['id']}}, '{{=value['value']}}','Curriculum', '{{=new_dict['tabla']}}',1 )">
+                                        <i class="fa fa-fw fa fa-edit"></i> Editar
+                                    </a>
+                                    <a  class="btn btn-danger" href="#" onclick="eliminar({{=value['id']}}, 'Max. Tamaño Para Curriculum',{{=new_dict['espe']}})">
+                                        <i class="fa fa-fw fa fa-trash"></i> Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td scope="row">{{=T('2')}}</td>
+                                <td class = "h5">{{=T('Size for Banner')}}</td>
+                                <td class = "h5">{{=value["value2"]}} MB</td>
+                                <td class="text-center">
+                                    <a class="btn btn-default btn" href="#"
+                                        onclick="cambiarValorTamanio({{=value['id']}}, '{{=value['value2']}}','Banner','{{=new_dict['tabla']}}',2 )">
+                                        <i class="fa fa-fw fa fa-edit"></i> Editar
+                                    </a>
+                                    <a  class="btn btn-danger" href="#" onclick="eliminar({{=value['id']}}, 'Max.Tamaño Para Banner',{{=new_dict['espe']}})">
+                                        <i class="fa fa-fw fa fa-trash"></i> Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                            {{pass}}
+                        </tbody>
+                        <tfoot style="background-color: #EAEAEA;">
+                            <tr>
+                                <th scope="col" colspan="2" class="text-right">
+                                    {{=new_dict["inicio_valores"]}} - {{=new_dict["fin_valores"]}} de {{=new_dict["cantidad_valores"]}}
+                                </th>
+                                <th scope="col"></th>
+                                <th scope="col" class="d-flex justify-content-around">
+                                    <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                        <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                                    </a>
+                                    {{if new_dict["prev_page"] != 0:}}
+                                    <a class=" btn btn-primary btn"
+                                        href='?page={{=new_dict["prev_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                    </a>
+                                    {{else:}}
+                                    <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}'>
+                                        <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                    </a>
+                                    {{pass}}
+                                    {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} <a class=" btn btn-primary btn"
+                                        href='?page={{=new_dict["next_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                        <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                        </a>
+                                        {{else:}}
+                                        <a class=" btn btn-primary btn"
+                                            href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                        </a>
+                                        {{pass}}
+                                        <a class=" btn btn-primary btn"
+                                            href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                        </a>
+                                </th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            {{else:}}
+                {{if new_dict["tabla"] == "Habilidad":}}
+                    <div class="row m-0 p-0 mx-3 px-3">
+                        <form class="form-inline" action='/cpfecys/bolsa_trabajo/editor?tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}' method="POST">
+                            <input type="text" id="new" name='new' class="form-control mr-3" placeholder="Agregar a tabla" required />
+                            <input type="hidden" id="new2" name='new2' class="form-control mr-3" value='{{=new_dict["espe"]}}' />
+                            <button type="submit" class="btn btn-primary">Agregar - {{=new_dict["tabla"]}} </button>
+                        </form>
+                    
+                    </div>
+                    <div class="row m-3 p-3">
+                        <table class="table table-hover">
+                            <thead style="background-color: #EAEAEA;">
+                                <tr>
+                                    <th scope="col" style="width: 50px">
+                                        #
+                                        <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby=id&ordertype=asc'>
+                                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                        </a>
+                                        <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby=id&ordertype=desc'>
+                                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        </a>
+                                    </th>
+                                    <th scope="col">
+                                        Valor - {{=new_dict["tabla"]}}
+                                        <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby=value&ordertype=asc'>
+                                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                        </a>
+                                        <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby=value&ordertype=desc'>
+                                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        </a>
+                                    </th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td scope="row"></td>
+                                    <td>
+                                        <form action='/cpfecys/bolsa_trabajo/editor' method="GET">
+                                            <input type="hidden" id="tabla" name='tabla' value='{{=new_dict["tabla"]}}' />
+                                            <input type="hidden" id="espe" name='espe' value='{{=new_dict["espe"]}}' />
+                                            <input type="text" id="value" name='value' class="form-control" />
+                                        </form>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                {{for value in new_dict['values']:}}
+                                <tr>
+                                    <td scope="row">{{=value["id"]}}</td>
+                                    <td>{{=value["value"]}}</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-default btn" href="#"
+                                            onclick="cambiarValor({{=value['id']}}, '{{=value['value']}}', '{{=new_dict['tabla']}}',{{=new_dict['espe']}} ,'{{=new_dict['nombre_espe']}}' )">
+                                            <i class="fa fa-fw fa fa-edit"></i> Editar
+                                        </a>
+                                        <a  class="btn btn-danger" href="#" onclick="eliminar({{=value['id']}}, '{{=value['value']}}',{{=new_dict['espe']}},'{{=new_dict['nombre_espe']}}')">
+                                            <i class="fa fa-fw fa fa-trash"></i> Eliminar
+                                        </a>
+                                    </td>
+                                </tr>
+                                {{pass}}
+                            </tbody>
+                            <tfoot style="background-color: #EAEAEA;">
+                                {{if  new_dict["cantidad_paginas"] >= 1:}}
+                                <tr>
+                                    <th scope="col" colspan="2" class="text-right">
+                                        {{=new_dict["inicio_valores"]}} - {{=new_dict["fin_valores"]}} de {{=new_dict["cantidad_valores"]}}
+                                    </th>
+                                    <th scope="col" class="d-flex justify-content-around">
+                                        <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                            <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                                        </a>
+                                        {{if new_dict["prev_page"] != 0:}}
+                                        <a class=" btn btn-primary btn"
+                                            href='?page={{=new_dict["prev_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                        </a>
+                                        {{else:}}
+                                        <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}'>
+                                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                        </a>
+                                        {{pass}}
+                                        {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} <a class=" btn btn-primary btn"
+                                            href='?page={{=new_dict["next_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                            </a>
+                                            {{else:}}
+                                            <a class=" btn btn-primary btn"
+                                                href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                            </a>
+                                            {{pass}}
+                                            <a class=" btn btn-primary btn"
+                                                href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&espe={{=new_dict["espe"]}}&nombre_espe={{=new_dict["nombre_espe"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                            </a>
+                                    </th>
+                                </tr>
+                                {{pass}}
+                            </tfoot>
+                        </table>
+                    </div>
+                {{else:}}
+                    <div class="row m-0 p-0 mx-3 px-3">
+                        <form class="form-inline" action='/cpfecys/bolsa_trabajo/editor?tabla={{=new_dict["tabla"]}}' method="POST">
+                            <input type="text" id="new" name='new' class="form-control mr-3" placeholder="Agregar a tabla" required />
+                            <input type="hidden" id="new2" name='new2' class="form-control mr-3" value='{{=new_dict["espe"]}}' />
+                            <button type="submit" class="btn btn-primary">Agregar - {{=new_dict["tabla"]}} </button>
+                        </form>    
+                    </div>
+
+                        <div class="row m-3 p-3">
+                            <table class="table table-hover">
+                                <thead style="background-color: #EAEAEA;">
+                                    <tr>
+                                        <th scope="col" style="width: 50px">
+                                            #
+                                            <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=id&ordertype=asc'>
+                                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                            </a>
+                                            <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=id&ordertype=desc'>
+                                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                            </a>
+                                        </th>
+                                        <th scope="col">
+                                            Valor - {{=new_dict["tabla"]}}
+                                            <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=value&ordertype=asc'>
+                                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                            </a>
+                                            <a href='?page={{=new_dict["page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby=value&ordertype=desc'>
+                                                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                            </a>
+                                        </th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td scope="row"></td>
+                                        <td>
+                                            <form action='/cpfecys/bolsa_trabajo/editor' method="GET">
+                                                <input type="hidden" id="tabla" name='tabla' value='{{=new_dict["tabla"]}}' />
+                                                <input type="text" id="value" name='value' class="form-control" />
+                                            </form>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    {{for value in new_dict['values']:}}
+                                    <tr>
+                                        <td scope="row">{{=value["id"]}}</td>
+                                        <td>{{=value["value"]}}</td>
+                                        <td class="text-center">
+                                            <a class="btn btn-default btn" href="#"
+                                                onclick="cambiarValor({{=value['id']}}, '{{=value['value']}}', '{{=new_dict['tabla']}}'  )">
+                                                <i class="fa fa-fw fa fa-edit"></i> Editar
+                                            </a>
+                                            <a  class="btn btn-danger" href="#" onclick="eliminar({{=value['id']}}, '{{=value['value']}}')">
+                                                <i class="fa fa-fw fa fa-trash"></i> Eliminar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {{pass}}
+                                </tbody>
+                                <tfoot style="background-color: #EAEAEA;">
+                                    <tr>
+                                        <th scope="col" colspan="2" class="text-right">
+                                            {{=new_dict["inicio_valores"]}} - {{=new_dict["fin_valores"]}} de {{=new_dict["cantidad_valores"]}}
+                                        </th>
+                                        <th scope="col" class="d-flex justify-content-around">
+                                            <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+                                            </a>
+                                            {{if new_dict["prev_page"] != 0:}}
+                                            <a class=" btn btn-primary btn"
+                                                href='?page={{=new_dict["prev_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                            </a>
+                                            {{else:}}
+                                            <a class=" btn btn-primary btn" href='?page=1&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}'>
+                                                <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                            </a>
+                                            {{pass}}
+                                            {{if new_dict["next_page"] < new_dict["cantidad_paginas"]:}} <a class=" btn btn-primary btn"
+                                                href='?page={{=new_dict["next_page"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                                </a>
+                                                {{else:}}
+                                                <a class=" btn btn-primary btn"
+                                                    href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                                </a>
+                                                {{pass}}
+                                                <a class=" btn btn-primary btn"
+                                                    href='?page={{=new_dict["cantidad_paginas"]}}&value={{=new_dict["value"]}}&tabla={{=new_dict["tabla"]}}&orderby={{=new_dict["orderby"]}}&ordertype={{=new_dict["ordertype"]}}'>
+                                                    <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                                                </a>
+                                        </th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                {{pass}}
+            {{pass}}
+        {{pass}}
+    {{pass}}
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="myModalLabel">Modulo de edicion de bolsa trabajos</h5>
+                </div>
+                <div class="modal-body">
+                    Modulo para edicion de las variables del modulo de bolsa de trabajo
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function cambiarValor(id, valor, tabla, espe, valor2) {
+        Swal.fire({
+            title: `¿Cuál es el nuevo nombre?`,
+            input: 'text',
+            inputLabel: `Valor Actual: ${valor}`,
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debe colocar un nuevo nombre';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    "id_valor": Number(id),
+                    "tabla": tabla,
+                    "valor": result.value,
+                    "espe":espe,
+                    "valor2":valor2
+                }
+                $.ajax({
+                    type: 'post',
+                    url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/actualizar_valor`,
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Actualizado!',
+                                text: res.msg,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/editor?tabla={{=new_dict["tabla"]}}&espe=${espe}&nombre_espe=${valor2}`;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log(xhr, status, errorThrown);
+                        Swal.fire({
+                            title: 'Error!!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        })
+    }
+
+    function cambiarValorTamanio(id, valor,valor2, tabla, tipo) {
+        Swal.fire({
+            title: `¿Ingrese en MB el nuevo tamanio max. para ${valor2}?`,
+            input: 'text',
+            inputLabel: `Valor Actual: ${valor}`,
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (!value) {
+                    return 'Debe colocar un nuevo valor';
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    "id_valor": Number(id),
+                    "tabla": tabla,
+                    "valor": result.value,
+                    "tipo": tipo
+                }
+                $.ajax({
+                    type: 'post',
+                    url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/actualizar_valor`,
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Actualizado!',
+                                text: res.msg,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/editor?tabla={{=new_dict["tabla"]}}`;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log(xhr, status, errorThrown);
+                        Swal.fire({
+                            title: 'Error!!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        })
+    }
+
+    function eliminar(id, nombre, espe, valor2) {
+        Swal.fire({
+            title: 'Eliminar',
+            text: `Seguro que desea eliminar: ${nombre}`,
+            icon: 'question',
+            showDenyButton: true,
+            confirmButtonText: 'Eliminar',
+            denyButtonText: `Cancelar`,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const data = {
+                    "id_valor": Number(id),
+                    "tabla": "{{=new_dict['tabla']}}",
+                    "espe":espe,
+                    "valor2":valor2
+                }
+                $.ajax({
+                    type: 'post',
+                    url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/eliminar_valor`,
+                    data: `array=${JSON.stringify(data)}`,
+                    success: function (res) {
+                        res = JSON.parse(res);
+                        if (res.success) {
+                            Swal.fire({
+                                title: 'Eliminado!',
+                                text: res.msg,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/editor?tabla={{=new_dict["tabla"]}}&espe=${espe}&nombre_espe=${valor2}`;
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, errorThrown) {
+                        console.log(xhr, status, errorThrown);
+                        Swal.fire({
+                            title: 'Error!!',
+                            text: 'Hubo un problema, intente más tarde',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    function seleccionarEspecialidad(id, valor) {
+        Swal.fire({
+            title: `¿Desea agregar nuevas habilidades a: ${valor} ?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ir a',
+            denyButtonText: `Cancelar`,
+
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'get',
+                    url: `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/editor?tabla=Habilidad`,
+                    success: function (res) {
+                        if (res) {
+                            window.location = `${location.protocol}//${location.hostname}:${location.port}/cpfecys/bolsa_trabajo/editor?tabla=Habilidad&espe=${id}&value=${id}&nombre_espe=${valor}`;
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: res.msg,
+                                icon: 'error'
+                            });
+                        }
+                    }
+                });
+
+            }
+        });
+    }
+</script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>

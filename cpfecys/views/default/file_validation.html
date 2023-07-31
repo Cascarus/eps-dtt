@@ -1,0 +1,278 @@
+{{extend 'layout-index.html'}}
+
+<br /><br /><br />
+<div class="text-center">
+    <h1>Validación de Entregables</h1>
+</div>
+<div class="text-center">
+    <h4>Datos Generales del Estudiante</h4>
+</div>
+
+<div class="mt-4">
+	<div class="col-12">
+        <div class="row-fluid">
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-10">
+                    <table class="table table-md table-striped">
+                        <thead class="table-dark">
+                            <tr><th colspan="6">DATOS DEL ESTUDIANTE</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width:100px;" rowspan="4"></td>
+                                <td rowspan="4" style="width:250px;">
+                                    {{if action['item'][0]['photo'] is not None:}}
+                                        <img id="img_img" src="{{= URL('default', 'download', args=action['item'][0]['photo'])}}" alt="User" width="160" height="160">
+                                    {{else:}}
+                                        <img id="img_img" src="/static/build/images/autoridades/humn.png" alt="No photo" width="160" height="160">
+                                    {{pass}}
+                                </td>
+                                <td style="width:70px;" rowspan="4"></td>
+                                <td style="width:400px;"><strong>NOMBRE:</strong></td>
+                                <td style="width:400px;"><strong>APELLIDO:</strong></td>
+                                <td style="width:400px;"><strong>CARNE:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>{{=action['item'][0]['first_name']}}</td>
+                                <td>{{=action['item'][0]['last_name']}}</td>
+                                <td>{{=action['item'][0]['username']}}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>CUI:</strong></td>
+                                <td><strong>TELEFONO:</strong></td>
+                                <td><strong>CORREO:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>{{=action['item'][0]['cui'] if action['item'][0]['cui'] is not None else '-----'}}</td>
+                                <td>{{=action['item'][0]['phone'] if action['item'][0]['phone'] is not None else '-----'}}</td>
+                                <td>{{=action['item'][0]['email'] if action['item'][0]['email'] is not None else '-----'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-md table-striped">
+                        <thead class="table-dark">
+                            <tr><th colspan="3">DATOS DEL PROYECTO</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width:410px;"><strong>NOMBRE:</strong></td>
+                                <td style="width:200px;"><strong>INICIA:</strong></td>
+                                <td style="width:200px;"><strong>PERIODOS:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>{{=action['item'][0]['proyecto']}}</td>
+                                <td>{{=action['item'][0]['yearp']}} - {{=T(action['item'][0]['periodo'])}}</td>
+                                <td>{{=action['item'][0]['periods']}} {{=T('Semesters')}}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>AREA:</strong></td>
+                                <td><strong>ESTADO:</strong></td>
+                                <td><strong>HORAS:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>{{=action['item'][0]['area']}}</td>
+                                <td>
+                                    {{if action['item'][0]['name_status'] is not None:}}
+                                        {{if action['item'][0]['name_status'] == 'Successful':}}
+                                            <span class="badge badge-success">
+                                                {{=T(str(action['item'][0]['name_status']))}}
+                                            </span>
+                                        {{else:}}
+                                            <span class="badge badge-danger">
+                                                {{=T(str(action['item'][0]['name_status']))}}
+                                            </span>
+                                        {{pass}}
+                                    {{else:}}
+                                        <span class="badge badge-info">{{=T('Active')}}</span>
+                                    {{pass}}
+                                </td>
+                                <td>{{=action['item'][0]['hours']}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-md table-striped">
+                        <thead class="table-dark">
+                            <tr><th colspan="3">DATOS DEL ENTREGABLE</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="width:410px;"><strong>NOMBRE:</strong></td>
+                                <td style="width:200px;"><strong>TIPO:</strong></td>
+                                <td style="width:200px;"><strong>ESTADO:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>{{=action['item'][0]['entregable']}}</td>
+                                <td>
+                                    {{if action['item'][0]['doc_type'] is not None:}}
+                                        {{='Práctica inicia' if action['item'][0]['doc_type']=='Practice Start' else 'Práctica finaliza'}}
+                                    {{pass}}
+                                </td>
+                                <td>
+                                    {{if action['item'][0]['status']=='Pending':}}
+                                        <span class="badge badge-secondary">Pendiente</span>
+                                    {{elif action['item'][0]['status']=='Delivered':}}
+                                        <span class="badge badge-success">Entregado</span>
+                                    {{elif action['item'][0]['status']=='Rejected':}}
+                                        <span class="badge badge-danger">Rechazado</span>
+                                    {{elif action['item'][0]['status']=='Revised':}}
+                                        <span class="badge badge-warning">Revisado</span>
+                                    {{elif action['item'][0]['status']=='Signed':}}
+                                        <span class="badge badge-info">Firmado</span>
+                                    {{pass}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>DESCRIPCION:</strong></td>
+                                <td><strong>FECHA ENTREGA:</strong></td>
+                                <td><strong>ARCHIVO ENTREGADO/FIRMADO:</strong></td>
+                            </tr>
+                            <tr>
+                                <td>{{=action['item'][0]['description']}}</td>
+                                <td>
+                                    {{if action['item'][0]['uploaded_at'] is not None:}}
+                                        {{=action['item'][0]['uploaded_at'].strftime('%A, %d %B %Y, %H:%M:%S')}}
+                                    {{pass}}
+                                </td>
+                                <td>
+                                    {{if action['item'][0]['signed_file'] is not None and action['item'][0]['status'] == 'Signed':}}
+                                        <a href="{{=URL('default', 'download_deliverable',
+                                        args=[action['item'][0]['signed_file']])}}">
+                                            <button class="btn btn-primary btn-sm">
+                                                <span class="fa fa-search"></span>
+                                                &nbsp;Ver item
+                                            </button></a>
+                                    {{else:}}
+                                        <a href="{{=URL('default', 'download_deliverable',
+                                        args=[action['item'][0]['file_uploaded']])}}">
+                                            <button class="btn btn-primary btn-sm">
+                                                <span class="fa fa-search"></span>
+                                                &nbsp;Ver item
+                                            </button></a>
+                                    {{pass}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                    <ul class="nav nav-tabs" id="tabHistory" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="assign-tab" data-bs-toggle="tab"
+                                    onclick="selectTab(this);" data-bs-target="#assign" type="button"
+                                    role="tab" aria-controls="assign">
+                                Historial de Asignación
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reject-tab" data-bs-toggle="tab"
+                                    onclick="selectTab(this);" data-bs-target="#reject" type="button"
+                                    role="tab" aria-controls="reject">
+                                Rechazo de Entregas
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="tabHistoryContent">
+                        <div class="tab-pane fade show active" id="assign" role="tabpanel" aria-labelledby="assign-tab">
+                            <table class="table table-sm table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width:85px;">No.</th>
+                                        <th style="width:125px;">Período</th>
+                                        <th style="width:80px;">Año</th>
+                                        <th style="width:200px;">Área</th>
+                                        <th style="width:340px;">Proyecto</th>
+                                        <th style="width:100px;">Duración</th>
+                                        <th style="width:80px;">Horas</th>
+                                        <th style="width:100px;">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {{assignations = history_assignations(action['item'][0]['assigned_user'])}}
+                                {{cont = 1}}
+                                {{for assignation in assignations:}}
+                                    <tr>
+                                        <td>{{=cont}}</td>
+                                        <td>{{=T(assignation['periodo'])}}</td>
+                                        <td>{{=assignation['yearp']}}</td>
+                                        <td>{{=assignation['area']}}</td>
+                                        <td>{{=assignation['proyecto']}}</td>
+                                        <td>{{=assignation['periods']}} {{=T('Semesters')}}</td>
+                                        <td>{{=assignation['hours']}}</td>
+                                        <td>
+                                            {{if assignation['name_status'] is not None:}}
+                                                {{if assignation['name_status'] == 'Successful':}}
+                                                    <span class="badge badge-success">
+                                                        {{=T(str(assignation['name_status']))}}
+                                                    </span>
+                                                {{else:}}
+                                                    <span class="badge badge-danger">
+                                                        {{=T(str(assignation['name_status']))}}
+                                                    </span>
+                                                {{pass}}
+                                            {{else:}}
+                                                <span class="badge badge-info">{{=T('Active')}}</span>
+                                            {{pass}}
+                                        </td>
+                                    </tr>
+                                    {{cont = cont + 1}}
+                                {{pass}}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="reject" role="tabpanel" aria-labelledby="reject-tab">
+                            <table class="table table-sm table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th style="width:100px;">No.</th>
+                                        <th style="width:200px;">Fecha</th>
+                                        <th style="width:600px;">Comentario</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {{rejections = history_rejections(action['item'][0]['id'], action['ref'])}}
+                                {{cont = 1}}
+                                {{for rejects in rejections:}}
+                                    <tr>
+                                        <td>{{=cont}}</td>
+                                        <td>{{=rejects['created_at'].strftime('%A, %d %B %Y, %H:%M:%S')}}</td>
+                                        <td>{{=rejects['comment']}}</td>
+                                    </tr>
+                                    {{cont = cont + 1}}
+                                {{pass}}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-1"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<br /><br /><br />
+
+<script type="text/javascript">
+    function selectTab(tab_selected){
+        let active_field = 'assign';
+        let fade_field = 'reject';
+
+        if(tab_selected.getAttribute('aria-controls') == 'reject'){
+            active_field = 'reject';
+            fade_field = 'assign';
+        }
+        //creando id-tab
+        let id_active = active_field + '-tab'
+        let id_fade = fade_field + '-tab'
+        //removiendo class active
+        $('#'+id_active).removeClass('active');
+        $('#'+id_fade).removeClass('active');
+        //agregando class active
+        $('#'+id_active).addClass('active');
+
+        //removiendo class active a tab-content
+        $('#'+active_field).removeClass('show active');
+        $('#'+fade_field).removeClass('show active');
+        //agregando
+        $('#'+active_field).addClass('show active');
+    }
+</script>

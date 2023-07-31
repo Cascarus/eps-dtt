@@ -1,0 +1,73 @@
+{{extend 'dashboard.html'}}
+<div class="dttContainer">
+    <center>
+        <h2>Reportar faltas de practicantes
+            <br>
+        </h2>
+    </center>
+    <div class="row">
+        <div class="col-5 mx-auto">
+            <form action="{{=URL('infringements_and_sanctions', 'report_infringement')}}" method="get"
+                class="center-block form-inline">
+                <div class="form-group">
+                    <label for="estudiante">Estudiante</label>
+                    <select name="estudiante" id="estudiante" class="form-control" required>
+                        {{for estudiante in estudiantes:}}
+                        <option value="{{=estudiante['id']}}">
+                            {{=estudiante['carnet']}} - {{=estudiante['nombre']}}
+                        </option>
+                        {{pass}}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info">Seleccionar</button>
+            </form>
+        </div>
+        {{if len(cursos) > 0:}}
+            <div class="col-12">
+                <form action="{{=URL('infringements_and_sanctions', 'report_infringement')}}" method="post">
+                    <div class="form-group">
+                        <label for="estudiante_d">Estudiante</label>
+                        <input type="text" name="estudiante" id="estudiante" class="form-control"
+                            value="{{=estudiante_actual['carnet']}} - {{=estudiante_actual['nombre']}}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select name="tipo" id="tipo" class="form-control" required>
+                            {{for tipo in tipos_infracciones:}}
+                                <option value="{{=tipo['id']}}">
+                                    {{=tipo['name']}}
+                                </option>
+                            {{pass}}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="curso">Curso</label>
+                        {{if len(cursos) != 1:}}
+                            <select name="curso" id="curso" class="form-control" required>
+                                {{for curso in cursos:}}
+                                    <option value="{{=curso['id']}}">
+                                        {{=curso['name']}}
+                                    </option>
+                                {{pass}}
+                            </select>
+                        {{else:}}
+                        <input type="text" name="curso_d" id="curso_d" class="form-control" value="{{=cursos[0]['name']}}"
+                            readonly>
+                        <input type="hidden" name="curso" id="curso" value="{{=cursos[0]['id']}}">
+                        {{pass}}
+                    </div>
+                    <div class="form-group">
+                        <label for="descripcion">Descripción</label>
+                        <textarea name="descripcion" id="descripcion" rows="5" class="form-control" maxlength="255"
+                            required></textarea>
+                    </div>
+                    <input type="hidden" name="practicante" id="practicante" value="{{=estudiante_actual['id']}}">
+                    <input type="hidden" name="periodo" id="periodo" value="{{=periodo.id}}">
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block btn-info">Reportar</button>
+                    </div>
+                </form>
+            </div>
+        {{pass}}
+    </div>
+</div>

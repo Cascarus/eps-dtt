@@ -1,0 +1,99 @@
+{{extend 'dashboard.html'}}
+<div class="mt-4">
+    <div class="col-12 text-center">
+        <h1>Listar evaluaciones</h1>
+    </div>
+    <div class="col-12">
+        <label for="periodo">Seleccione un periódo</label>
+        <form class="form-inline" action="{{=URL('iso_ev_rendimiento', 'listar_evaluaciones')}}">
+            <select name="periodo" class="form-control">
+                {{for period in periodos:}}
+                    <option {{if period.id==id_periodo:}}selected{{pass}} value="{{=period.id}}">
+                        {{=f'{T(period.period.name)} - {period.yearp}'}}
+                    </option>
+                {{pass}}
+            </select>
+            <input type="submit" value="ir" class="btn btn-outline-primary" />
+        </form>
+        <br />
+        {{if len(evaluaciones):}}
+            <div class="web2py_grid">
+                <div class="web2py_table">
+                    <div class="web2py_htmltable" style="width:100%; overflow-x: autos; -ms-overflow-x: scroll;">
+                        <table>
+                            <thead>
+                                <tr class="">
+                                    <th class=""><a href="#">Id</a></th>
+                                    <th class=""><a href="#">Nombre</a></th>
+                                    <th class=""><a href="#">Fecha Inicio</a></th>
+                                    <th class=""><a href="#">Fecha Fin</a></th>
+                                    <th class=""></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ for ev in evaluaciones: }}
+                                    <tr>
+                                        <td>{{=ev.id}}</td>
+                                        <td>{{=ev.nombre}}</td>
+                                        <td>{{=ev.fecha_inicio}}</td>
+                                        <td>{{=ev.fecha_fin}}</td>
+                                        <td class="row_buttons" nowrap="nowrap">
+                                            <a href="{{=URL('iso_ev_rendimiento', 'editar_fecha')}}/?id_ev={{=ev.id}}">
+                                                <span />
+                                                <span class="buttontext button" title="Editar Fecha">
+                                                    Editar Fecha
+                                                </span>
+                                            </a>
+                                            <a href="{{=URL('iso_ev_rendimiento', 'editar_evaluacion')}}/{{=ev.id}}">
+                                                <span />
+                                                <span class="buttontext button" title="Editar Preguntas">
+                                                    Editar Preguntas
+                                                </span>
+                                            </a>
+                                            <a href="{{=URL('iso_ev_rendimiento', 'copiar_evaluacion')}}/{{=ev.id}}">
+                                                <span />
+                                                <span class="buttontext button" title="Copiar">
+                                                    Copiar
+                                                </span>
+                                            </a>
+                                            <a href="{{=URL('iso_ev_rendimiento', 'mostrar_top')}}?iso_encuesta_id={{=ev.id}}">
+                                                <span />
+                                                <span class="buttontext button" title="Mostrar Top">
+                                                    Mostrar Top
+                                                </span>
+                                            </a>
+                                            <a
+                                                href="{{=URL('iso_ev_rendimiento', 'mostrar_participantes')}}?iso_encuesta_id={{=ev.id}}">
+                                                <span />
+                                                <span class="buttontext button" title="Mostrar Participantes">
+                                                    Mostrar Participantes
+                                                </span>
+                                            </a>
+                                            <a href="{{=URL('iso_ev_rendimiento', 'resultados_dinamicos')}}">
+                                                <span />
+                                                <span class="buttontext button" title="Resultados Dinámicos">
+                                                    Resultados Dinámicos
+                                                </span>
+                                            </a>
+                                            <a
+                                                href="{{=URL('iso_ev_rendimiento', 'mostrar_resultados')}}?iso_encuesta_id={{=ev.id}}">
+                                                <span />
+                                                <span class="buttontext button" title="Resultados">
+                                                    Resultados
+                                                </span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{pass}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {{else:}}
+            <div>
+                <h1>No se encontro ninguna evaluación</h1>
+            </div>
+        {{pass}}
+    </div>
+</div>

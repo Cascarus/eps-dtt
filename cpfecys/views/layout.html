@@ -15,20 +15,16 @@
     <link rel="stylesheet" href="/static/build/css/{{=school}}.css">
     {{include 'web2py_ajax.html'}}  
 </head>
-<body>
-    {{if school == 'ecys':}}
-        {{include 'schools/ecys/header.html'}}  
-    {{elif school == 'emi':}}
-        {{include 'schools/emi/header.html'}}         
-    {{pass}}
 
+{{if school == 'ecys':}}
+    {{include 'schools/ecys/header.html'}}  
+{{elif school == 'emi':}}
+    {{include 'schools/emi/header.html'}}         
+{{pass}}
+
+<body>
     {{include}}
 
-    {{if school == 'ecys':}}
-        {{include 'schools/ecys/footer.html'}}  
-    {{elif school == 'emi':}}
-        {{include 'schools/emi/footer.html'}}         
-    {{pass}}
 
     <script type="text/javascript">
         var _URLPERIOD_VARIABLE = "/cpfecys/admin/get_periodos_variables"
@@ -46,28 +42,36 @@
     <script src="{{=URL('static','build/js/web2py-bootstrap4.js')}}"></script>
     <script src="{{=URL('static','build/js/home-min.js')}}"></script>
     <script src="{{=URL('static','js/bootstrap-toggle.min.js')}}"></script>
-    {{if school == 'ecys':}}
-    <script>
-        (function(d, s, id) {
-            var js, fjs = d.getElementsByTagName(s)[0];
-            if (d.getElementById(id)) return;
-            js = d.createElement(s); js.id = id;
-            js.src = 'https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.1&appId=255919408374225&autoLogAppEvents=1';
-            fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'facebook-jssdk'));
-    </script>  
     
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+    {{if school == 'ecys':}}
+        <script>
+            (function(d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s); js.id = id;
+                js.src = 'https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v3.1&appId=255919408374225&autoLogAppEvents=1';
+                fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));
+        </script>  
+        
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-143827878-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
 
-        gtag('config', 'UA-143827878-1');
-    </script>    
+            gtag('config', 'UA-143827878-1');
+        </script>    
     {{pass}}
     
     {{block page_js}}{{end page_js}}
     
 </body>
+
+{{if school == 'ecys':}}
+{{include 'schools/ecys/footer.html'}}  
+{{elif school == 'emi':}}
+{{include 'schools/emi/footer.html'}}         
+{{pass}}
+
 </html>

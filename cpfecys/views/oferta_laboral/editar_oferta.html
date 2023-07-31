@@ -1,0 +1,318 @@
+{{extend 'dashboard.html'}}
+
+<div class='row p-0 m-0'>
+    <div class='d-flex w-100 justify-content-center py-3 px-0'>
+        <h1 class='p-0 m-0'>Actualizar Oferta Laboral</h1>
+    </div>
+</div>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/cpfecys/oferta_laboral/seguimiento_ofertas">Ofertas Laborales</a></li>
+        <li class="breadcrumb-item"><a
+                href="/cpfecys/oferta_laboral/view_oferta?id={{=new_dict['trabajo']['id_oferta_laboral']}}">{{=new_dict["trabajo"]["puesto"]}}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Editar Oferta Laboral</li>
+    </ol>
+</nav>
+<form id="formOferta" class="m-0 p-0" action='/cpfecys/oferta_laboral/editarTrabajo' method="POST">
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="puestoInput" class="form-label">Puesto</label>
+            <input type="text" class="form-control" id="puestoInput" required
+                value="{{=new_dict['trabajo']['puesto']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="salario" class="form-label">Salario Apróximado</label>
+            <input type="number" min=0 class="form-control" id="salario" name="salario" required
+                value="{{=new_dict['trabajo']['salario_aproximado']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="descInput" class="form-label">Descripción</label>
+            <textarea class="form-control" id="descInput" rows="3"
+                required>{{=new_dict['trabajo']['descripcion']}}</textarea>
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-12">
+            <label for="reqInput" class="form-label">Requerimientos</label>
+            <textarea class="form-control" id="reqInput" rows="3"
+                required>{{=new_dict['trabajo']['requerimientos']}}</textarea>
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+            <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required
+                value="{{=new_dict['trabajo']['fecha_inicio']}}" />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="fecha_vigencia" class="form-label">fecha_vigencia</label>
+            <input type="date" class="form-control" id="fecha_vigencia" name="fecha_vigencia" required
+                value="{{=new_dict['trabajo']['fecha_vigencia']}}" />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="periodo" class="form-label">Periodo Creado</label>
+            <input type="text" class="form-control" id="periodo" disabled
+                value='Semestre {{=new_dict["trabajo"]["period"]}} - Año {{=new_dict["trabajo"]["yearp"]}}' />
+            <input type="text" class="form-control" id="periodo_id" hidden value='{{=new_dict["trabajo"]["id"]}}' />
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="empresa" class="form-label">Empresa Encargada</label>
+            <input type="text" class="form-control" id="empresa" disabled
+                value='{{=new_dict["trabajo"]["nombre_empresa"]}} - Tel. {{=new_dict["trabajo"]["telefono"]}}' />
+            <input type="text" class="form-control" id="periodo_id" hidden
+                value='{{=new_dict["trabajo"]["id_empresa"]}}' />
+        </div>
+    </div>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="area" class="form-label">Área Especialidad</label>
+            <select class="form-control" id="area">
+                {{for area in new_dict['area_especialidad']:}}
+                {{if area['id_area_especialidad'] == new_dict['trabajo']['id_area_especialidad']:}}
+                <option value="{{=area['id_area_especialidad']}}" selected>{{=area["area_especialidad"]}}</option>
+                {{else:}}
+                <option value="{{=area['id_area_especialidad']}}">{{=area["area_especialidad"]}}</option>
+                {{pass}}
+                {{pass}}
+            </select>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <label for="empresa" class="form-label">Banner</label><br />
+            <a class="btn btn-default btn-sm"
+                href="/cpfecys/static/bolsa_trabajo/ofertas/{{=new_dict['trabajo']['banner']}}" target="_blank">
+                <i class="fa fa-fw fa fa-eye"></i> Ver Banner
+            </a>
+        </div>
+    </div>
+    <!-------- sirve solo para guardar datos -------->
+    <div style="visibility:hidden">
+        <input type="text" name="tamanio_imagen" id="tamanio_imagen" value="{{=new_dict['tamanio_imagen']}}" />
+    </div>
+    <!------------------------------------------------>
+    <div class="row m-0 p-0 mb-3">
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            <div role="form" data-toggle="validator">
+                <form id="frm_banner" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="inp_banner">Cambiar Banner:</label>
+                            <input id="inp_banner" class="form-control" name="inp_banner" type="file" class="file"
+                                onchange="onChange(event)">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class='row m-0 p-0 mb-3'>
+        <div class='col-12 d-flex justify-content-end'>
+            <button type="button" class="btn btn-primary w-auto mr-3" onclick="submit()">Actualizar</button>
+            <button type="button" class="btn btn-danger w-auto" onclick="cancelUpdate()">Cancelar</button>
+        </div>
+    </div>
+</form>
+
+{{block page_js}}
+    <script src="https://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+    <script type="text/javascript" src="{{=URL('static','markitup')}}/jquery.markitup.pack.js"></script>
+    <script type="text/javascript" src="{{=URL('static','markitup')}}/sets/markmin/set.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/skins/markitup/style.css" />
+    <link rel="stylesheet" type="text/css" href="{{=URL('static','markitup')}}/sets/markmin/style.css" />
+    <script>
+        jQuery(document).ready(function () {
+            jQuery('textarea').css('width', '100%').css('height', '200px').markItUp(mySettings);
+        });
+    </script>
+    <!-- Include SmartWizard CSS -->
+    <link href="{{=URL('static', 'sources/css/smart_wizard.min.css')}}" rel="stylesheet" type="text/css" />
+    <!-- Optional SmartWizard theme -->
+    <link href="{{=URL('static', 'sources/css/smart_wizard_theme_arrows.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{=URL('static', 'sources/css/validators.css')}}" rel="stylesheet" type="text/css" />
+    <!-- Include SmartWizard JavaScript source -->
+    <script src="{{=URL('static', 'sources/js/jquery.smartWizard.min.js')}}"></script>
+    <!-- Include jQuery Validator plugin -->
+    <script type="text/javascript" src="{{=URL('static', 'sources/js/jquery.validate.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static', 'sources/js/additional-methods.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static','sources/js/accion.js')}}"></script>
+    <script type="text/javascript" src="{{=URL('static','sources/js/cv.js')}}"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+        jQuery.validator.setDefaults({
+            debug: true,
+            success: "valid",
+        });
+
+        var cv, lst;
+        var extension, nombre, documento, dimx, dimy, tamanio;
+        async function modal() {
+            return text;
+        }
+        async function enviarForm(data) {
+            
+            $.ajax({
+                type: 'post',
+                url: '/cpfecys/oferta_laboral/actualizar_trabajo',
+                data: data,
+                success: function (res) {
+                    res = JSON.parse(res);
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Actualizado!',
+                            text: res.msg,
+                            icon: 'success'
+                        }).then(() => window.location = '/cpfecys/oferta_laboral/seguimiento_ofertas');
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: res.msg,
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function (xhr, status, errorThrown) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Hubo un problema, intente más tarde',
+                        icon: 'error'
+                    });
+                }
+            });
+            
+        }
+        function quitarAcentos(cadena) {
+            const acentos = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'Á': 'A', 'É': 'E', 'Í': 'I', 'Ó': 'O', 'Ú': 'U', 'ñ': 'n', 'Ñ': 'N' };
+            cadena = cadena.split('').map(letra => acentos[letra] || letra).join('').toString();
+            return cadena = cadena.replace(/[^\w\s ?,:.!%()-_"@/]/gi, '');
+        }
+        // document.getElementById("fecha_vigencia")
+
+        async function submit() {
+            e = { target: undefined }
+            a = document.getElementById("formOferta")
+            e.target = a;
+            const data = {
+                id_oferta: Number("{{=new_dict['trabajo']['id_oferta_laboral']}}"),
+                puesto: quitarAcentos(e.target[0].value),
+                salario: Number(e.target[1].value),
+                descripcion: quitarAcentos(e.target[2].value),
+                requerimientos: quitarAcentos(e.target[3].value),
+                fecha_inicio: e.target[4].value,
+                fecha_vigencia: e.target[5].value,
+                periodo: Number(e.target[7].value),
+                empresa: Number("{{=new_dict['trabajo']['id_empresa']}}"),
+                area: Number(e.target[10].value),
+                estado: Number(e.target[11].value),
+                nombre_empresa: "{{=new_dict['trabajo']['nombre_empresa']}}",
+                motivo: null,
+                banner: documento,
+                archivo: "{{=new_dict['trabajo']['banner']}}"
+            }
+            enviarForm(data);        
+        }
+
+        function cancelUpdate() {
+            window.location = '/cpfecys/oferta_laboral/seguimiento_ofertas'
+        }
+
+        function onChange(event) {
+            var reader = new FileReader();
+            var file = event.target.files[0];
+            reader.onload = function (e) {
+                nombre = file.name;
+                documento = e.target.result;
+                tamanio = file.size;
+            }
+            reader.readAsDataURL(event.target.files[0])
+        }
+
+        $.validator.addMethod('startdate', function (v, el, startDate) {
+            if (this.optional(el)) {
+                return true;
+            }
+            var selectedDate = new Date($(el).val());
+            startDate = new Date(startDate.value)
+            return startDate <= selectedDate;
+        }, 'La fecha de fin de vigencia debe ser mayor a la fecha de inicio');
+
+        $.validator.addMethod('enddate', function (v, el, endDate) {
+            if (this.optional(el)) {
+                return true;
+            }
+            if (endDate.value == "") {
+                return true;
+            }
+            var selectedDate = new Date($(el).val());
+            endDate = new Date(endDate.value)
+            return endDate >= selectedDate;
+        }, 'La fecha de inicio de vigencia debe ser menor a la fecha de fin');
+
+        $.validator.addMethod('imgdimensions', function (v, el, dimensions) {
+            if (this.optional(el)) {
+                return true;
+            }
+            return dimx >= 1000 && dimy >= 600;
+        }, 'El banner debe tener como minimo las siguientes dimensiones: 1000*600px ');
+
+
+        $.validator.addMethod('imgformat', function (v, el, testExt) {
+            if (this.optional(el)) {
+                return true;
+            }
+            var fileUpload = document.getElementById("inp_banner");
+            var regex = new RegExp("([a-zA-Z0-9\s_\\.\-:])+(.jpg|.png|.jpeg)$");
+            return regex.test(fileUpload.value.toLowerCase());
+        }, 'Los formatos admitidos son .PNG .JPEG .JPG ');
+
+        var tamanio_permitido = document.getElementById("tamanio_imagen").value // consultar de la base
+        $.validator.addMethod('imgSize', function (v, el, tamanio_permitido) {
+            if (this.optional(el)) {
+                return true;
+            }
+            return tamanio <= tamanio_permitido;
+        }, 'El tamaño de la imagen debe ser menor a ' +  String(Math.round(tamanio_permitido / (1024 * 1024))) + ' MB');
+
+        var obj_frm_info_adicional = $("#formOferta");
+        obj_frm_info_adicional.validate({
+            rules: {
+                salario: {
+                    required: true,
+                    range: [1, 100000]
+                },
+                fecha_inicio: {
+                    required: true,
+                    date: true,
+                    enddate: document.getElementById("fecha_vigencia")
+                },
+                fecha_vigencia: {
+                    required: true,
+                    date: true,
+                    startdate: document.getElementById("fecha_inicio")
+                },
+                inp_banner: {
+                    required: false,
+                    //imgdimensions: [dimx,dimy],
+                    imgformat: "",
+                    imgSize: tamanio_permitido
+                }
+            },
+            messages: {
+                salario: "*Este campo es obligatorio / El salario ingresado debe ser mayor a 0 / No puede exceder los Q 100000",
+                fecha_incio: {
+                    required: "*Este campo es obligatorio"
+                },
+                fecha_vigencia: {
+                    required: "*Este campo es obligatorio"
+                },
+                inp_banner: {
+                    required: "*Subir una imagen de tamaño menor a " + String(Math.round(tamanio_permitido / (1024 * 1024))) + " MB"
+                }
+            }
+        });
+
+    </script>
+{{end page_js}}

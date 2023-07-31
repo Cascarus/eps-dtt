@@ -62,6 +62,7 @@
 	</div>
 </div>
 
+{{block page_js}}
 <script type="text/javascript" src="{{=URL('static','js/quiz-js/quiz.js')}}"></script>
 <script type="text/javascript" src="{{=URL('static','js/quiz-js/super.js')}}"></script>
 <script type="text/javascript">
@@ -74,3 +75,4 @@
 	function GetID() { idp += 1; }
 	function GetIDR() { idr += 1; }
 </script>
+{{end page_js}}

@@ -1,42 +1,39 @@
 {{extend 'dashboard.html'}}
-{{activityPermition=db((db.course_requirement.semester==year.id)&(db.course_requirement.project==project.id)&(db.course_requirement.teacher_permition==True)).count()}}
-<div class="navbar navbar-fixed-bottom ">
+{{activity_permition = db((db.course_requirement.semester == year.id) & (db.course_requirement.project == project.id)
+                        & (db.course_requirement.teacher_permition == True)).count()}}
+<div class="navbar navbar-fixed-bottom mt-4">
     <div class="navbar-inner">
-        <a class="brand" href="#">
-            
-        </a>
-        <ul class="nav pull-right">
-            {{if (request.vars['op']  == '2') and (((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or ((auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True))))) and (course_ended == True)):}}
+        <a class="brand" href="#"></a>
+        <ul class="nav pull-left">
+            {{if (request.vars['op'] == '2') and (((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or ((auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var) and (tutor_access))))) and (course_ended)):}}
                 <li>
-                    <a  style="color:white;text-shadow:none;background:#01A9DB;" class="btn-btn btn-primary" href="{{=URL('activity_control', 'course_first_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
+                    <a style="color:white;text-shadow:none;background:#01A9DB;" class="btn-btn btn-primary" href="{{=URL('activity_control', 'course_first_recovery_test', vars=dict(project=request.vars['project'], year=request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
                         {{=T('First Recovery Test')}}
                     </a>
                 </li>
             {{pass}}
 
-
-            {{if (request.vars['op']  == '3') and (((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or ((auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var == True) and (tutor_access == True))))) and (course_ended == True)):}}
+            {{if (request.vars['op']  == '3') and (((auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')) or ((auth.has_membership('Teacher') or (request.vars['type'] == 'class' and auth.has_membership('Student') and (exception_s_var) and (tutor_access))))) and (course_ended)):}}
                 <li>
-                    <a  style="color:white;text-shadow:none;background:#04B4AE;" class="btn-btn btn-primary" href="{{=URL('activity_control', 'course_second_recovery_test',vars=dict(project = request.vars['project'], year = request.vars['period']))}}">
+                    <a style="color:white;text-shadow:none;background:#04B4AE;" class="btn-btn btn-primary" href="{{=URL('activity_control', 'course_second_recovery_test', vars=dict(project=request.vars['project'], year=request.vars['period']))}}">
                         <span class="icon-white icon-cog"></span>
                         {{=T('Second Recovery Test')}}
                     </a>
                 </li>
             {{pass}}
 
-
             {{if cpfecys.current_year_period().id == year.id:}}
-                {{if (request.vars['type'] == 'class') and (course_ended == False) and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access == True and (exception_s_var == True or activityPermition>0))):}}
+                {{if (request.vars['type'] == 'class') and (not course_ended) and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access and (exception_s_var or activity_permition > 0))):}}
                     <li>
-                        <a  style="color:white;text-shadow:none;" class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                        <a style="color:white;text-shadow:none;" class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement', vars=dict(project=request.vars['project'], period=request.vars['period']))}}">
                             <span class="fa fa-pencil"></span>
                             {{=T('Course requirement')}}
                         </a>
                     </li>
                 {{elif (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
                     <li>
-                        <a style="color:white;text-shadow:none;" class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                        <a style="color:white;text-shadow:none;" class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement', vars=dict(project=request.vars['project'], period=request.vars['period']))}}">
                             <span class="fa fa-pencil"></span>
                             {{=T('Course requirement')}}
                         </a>
@@ -45,7 +42,7 @@
             {{else:}}
                 {{if (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator')):}}
                     <li>
-                        <a style="color:white;text-shadow:none;" class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement',vars=dict(project = request.vars['project'], period = request.vars['period']))}}">
+                        <a style="color:white;text-shadow:none;" class="btn btn-primary" href="{{=URL('activity_control', 'course_requirement', vars=dict(project=request.vars['project'], period=request.vars['period']))}}">
                             <span class="fa fa-pencil"></span>
                             {{=T('Course requirement')}}
                         </a>
@@ -55,31 +52,31 @@
             
             {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator') or auth.has_membership('Teacher') or auth.has_membership('Student') or auth.has_membership('Academic')):}}
                 <li>
-                {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
-                    <a style="color:white;text-shadow:none;" class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type'],op='1'))}}"><i class="icon-download icon-white"></i>
-                {{elif request.vars['op']  == '2':}}
-                    <a style="color:white;text-shadow:none;" class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type'],op='2'))}}"><i class="icon-download icon-white"></i>
-                {{elif request.vars['op']  == '3':}}
-                    <a style="color:white;text-shadow:none;" class="btn btn-success" href="{{=URL(vars=dict(project = project.id, period = year.id, list='True', type=request.vars['type'],op='3'))}}"><i class="icon-download icon-white"></i>
+                {{if (request.vars['op'] is None) or (request.vars['op'] == '1') or (request.vars['op'] == '0'):}}
+                    <a style="color:white;text-shadow:none;" class="btn btn-success" href="{{=URL(vars=dict(project=project.id, period=year.id, list='True', type=request.vars['type'],op='1'))}}"><i class="icon-download icon-white"></i>
+                {{elif request.vars['op'] == '2':}}
+                    <a style="color:white;text-shadow:none;" class="btn btn-success" href="{{=URL(vars=dict(project=project.id, period=year.id, list='True', type=request.vars['type'],op='2'))}}"><i class="icon-download icon-white"></i>
+                {{elif request.vars['op'] == '3':}}
+                    <a style="color:white;text-shadow:none;" class="btn btn-success" href="{{=URL(vars=dict(project=project.id, period=year.id, list='True', type=request.vars['type'],op='3'))}}"><i class="icon-download icon-white"></i>
                 {{pass}}
-                         {{=T('Export Report')}} (CSV)
+                        {{=T('Export Report')}} (CSV)
                     </a>
                 </li>
             {{pass}}
                 
-            {{if  (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')) and (course_ended == True):}}
+            {{if (auth.has_membership('Super-Administrator') or auth.has_membership('Ecys-Administrator')) and course_ended:}}
                 <li>
-                    <a style="color:white;text-shadow:none;" class="btn btn-danger" href="{{=URL(vars=dict(project = project.id, period = year.id, list='cancel', type=request.vars['type']))}}"><i class="icon-ok icon-white"></i> 
+                    <a style="color:white;text-shadow:none;" class="btn btn-danger" href="{{=URL(vars=dict(project=project.id, period=year.id, list='cancel', type=request.vars['type']))}}"><i class="icon-ok icon-white"></i> 
                         {{=T('Enable Course')}}
                     </a>
                 </li>    
             {{pass}}                
             
-            {{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var == True and tutor_access == True)):}}
+            {{if request.vars['type'] == 'class' and (auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and exception_s_var and tutor_access)):}}
                 <li>
                     <a style="color:white;text-shadow:none; cursor:pointer;" class="btn btn-warning" onclick="click_botton();"><i class="icon-warning-sign icon-white"></i> 
                         {{=T('Generate Document')}} {{=T('Format Technical School')}} (CSV)  
-                        {{if course_ended == False:}}
+                        {{if not course_ended:}}
                             | <small>{{=T('Finish course')}}</small>
                         {{pass}}
                     </a>
@@ -89,49 +86,47 @@
     </div>
 </div>
 
-
 <div class="row-fluid">
     <div class="well span12"  style="overflow:auto;">
-        <a href="{{=URL('activity_control', 'students_control', vars=dict(project = project.id, period = year.id))}}" class="btn btn-primary" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
-        
+        <a href="{{=URL('activity_control', 'students_control', vars=dict(project=project.id, period=year.id))}}" class="btn btn-primary" ><i class="icon-arrow-left"></i> {{=T('Back')}}</a>
         <table>
             <tr>
                 <td colspan="4">
-                    <b>{{=T('General Report of Activities')}}
+                    <b>
+                        Reporte general de actividades
                         {{if request.vars['type'] == 'class':}}
-                            - {{=T('Course')}}
+                            - Curso
                         {{else:}}
-                            - {{=T('Laboratory')}}
+                            - Laboratorio
                         {{pass}}
                     </b>
                 </td>
             </tr>
             <tr>
                 <td colspan="4">
-                    <b>{{=T('General Course Data')}}</b>
+                    <b>Datos generales del curso</b>
                 </td>
             </tr>
             <tr>
-                <td><b>{{=T('Course')}}</b></td>
+                <td><b>Curso</b></td>
                 <td>{{=project.name}}</td>
             
-                <td><b>{{=T('Semester')}}</b></td>
-                <td>{{=T(year.period.name)}} {{=str(year.yearp)}}</td>
+                <td><b>Semestre</b></td>
+                <td>{{=T(year.period.name)}} {{=year.yearp}}</td>
             </tr>
             <tr>
-                <td><b>{{=T('Teacher')}}</b></td>
+                <td><b>Catedrático</b></td>
                 {{if teacher is not None:}}
-                    <td>{{=str(teacher.first_name)}} {{=str(teacher.last_name)}}</td>
+                    <td>{{=teacher.first_name}} {{=teacher.last_name}}</td>
                 {{else:}}
                     <td>{{=T('Not Assigned')}}</td>
                 {{pass}}
-                <td><b>{{=T('Rol Student')}}</b></td>
+                <td><b>Tutor académico</b></td>
                 {{for t1 in practice:}}
-                    <td>{{=str(t1.first_name)}} {{=str(t1.last_name)}}</td>
-                    <br>
+                    <td>{{=t1.first_name}} {{=t1.last_name}}</td>
                 {{pass}}
             </tr>
-            {{if auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access == True):}}
+            {{if auth.has_membership('Ecys-Administrator') or auth.has_membership('Super-Administrator') or auth.has_membership('Teacher') or (auth.has_membership('Student') and tutor_access):}}
                 <tr>
                     <td>
                         <b>{{=T('Laboratory')}}</b>
@@ -145,172 +140,168 @@
                 </tr>
             {{pass}}
         </table>
-        
-
-        {{if request.vars['type']  == 'class':}}
-        <br>
+        {{if request.vars['type'] == 'class':}}
+            <br>
             <ul class="nav nav-tabs">
-                {{if (request.vars['op'] == None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
+                {{if (request.vars['op'] is None) or (request.vars['op']  == '1') or (request.vars['op']  == '0'):}}
                     <li class="nav-item active">
                 {{else:}}
                     <li>
                 {{pass}}  
-                        <a class="nav-link" href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '1'))}}">
+                        <a class="nav-link" href="{{=URL(vars=dict(period=request.vars['period'], project=request.vars['project'], type=request.vars['type'], op='1'))}}">
                             {{=T(year.period.name)}} {{=str(year.yearp)}}
                         </a>
                     </li>
-                    {{if request.vars['op']  == '2':}}
-                        <li class="nav-item active">
-                    {{else:}}
-                        <li>
-                    {{pass}}  
-                        {{if (course_ended == False):}}
-                            <a class="nav-link" href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '0'))}}">
+                
+                {{if request.vars['op'] == '2':}}
+                    <li class="nav-item active">
+                {{else:}}
+                    <li>
+                {{pass}}  
+                        {{if not course_ended:}}
+                            <a class="nav-link" href="{{=URL(vars=dict(period=request.vars['period'], project=request.vars['project'], type=request.vars['type'], op='0'))}}">
                         {{else:}}          
-                            <a class="nav-link" href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '2'))}}">
+                            <a class="nav-link" href="{{=URL(vars=dict(period=request.vars['period'], project=request.vars['project'], type=request.vars['type'], op='2'))}}">
                         {{pass}}
                                 {{=T('First recovery test')}}
                             </a>
-                        </li>
-                    {{if request.vars['op']  == '3':}}
-                        <li class="nav-item active">
-                    {{else:}}
-                        <li>
-                    {{pass}}                
-                         {{if (course_ended == False):}}
-                            <a class="nav-link" href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '0'))}}">
+                    </li>
+
+                {{if request.vars['op'] == '3':}}
+                    <li class="nav-item active">
+                {{else:}}
+                    <li>
+                {{pass}}                
+                        {{if not course_ended:}}
+                            <a class="nav-link" href="{{=URL(vars=dict(period=request.vars['period'], project=request.vars['project'], type=request.vars['type'], op='0'))}}">
                         {{else:}}          
-                            <a class="nav-link" href="{{=URL(vars=dict(period= request.vars['period'], project = request.vars['project'], type = request.vars['type'], op = '3'))}}">
+                            <a class="nav-link" href="{{=URL(vars=dict(period=request.vars['period'], project=request.vars['project'], type=request.vars['type'], op='3'))}}">
                         {{pass}}
                                 {{=T('Second recovery test')}}
                             </a>
-                        </li>
-                
+                    </li>
             </ul>
-            {{pass}}
-
-            
-
-
-                    {{totalColumnsTable=0}}
-                    <table class="table table-bordered ">
-                        <THEAD>
-                            <tr>
-                                <td bgcolor="#E6E6E6">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
-                                    <b>
-                                        {{=T('Carnet')}}
-                                        <br>
-                                        &nbsp;
-                                    </b>
-                                </td>
-                                <td bgcolor="#E6E6E6">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
-                                    <b>
-                                        {{=T('Nombre')}}
-                                        <br>
-                                        &nbsp;
-                                    </b>
-                                </td>
-                                {{posVCC=0}}
-                                {{if request.vars['type'] == 'class':}}
-                                    {{for category in CourseCategory:}}
-                                        {{if category.category.category!="Laboratorio":}}
-                                            {{for c in CourseActivities[posVCC]:}}
-                                            <td bgcolor="#E6E6E6" class="rcat{{=category.category}}" style="display:none;">
-                                                {{totalColumnsTable=totalColumnsTable+1}}
-                                                <center>
-                                                    <b>
-                                                        {{=str(c.name)}}
-                                                        <br>
-                                                        &nbsp;
-                                                    </b>
-                                                </center>
-                                            </td>
-                                            {{pass}}
-                                            <td bgcolor="#E6E6E6">
-                                                {{totalColumnsTable=totalColumnsTable+1}}
-                                                <center>
-                                                    <b>
-                                                        <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
-                                                            {{=str(category.category.category)}}
-                                                            <br>
-                                                            {{=str(category.grade)}} pts
-                                                        </a>
-                                                        <a id="btnNV_{{=str(category.category)}}" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('{{=str(category.category)}}');">
-                                                            {{=str(category.category.category)}}
-                                                            <br>
-                                                            {{=str(category.grade)}} pts
-                                                        </a>
-                                                    </b>
-                                                </center>
-                                            </td>
-                                            {{posVCC=posVCC+1}}
-                                        {{pass}}
-                                    {{pass}}
-                                {{else:}}
-                                    {{for category in LabCategory:}}
-                                        {{if category.category.category!="Laboratorio":}}
-                                            {{for c in LabActivities[posVCC]:}}
-                                            <td bgcolor="#E6E6E6" class="rcat{{=str(category.category)}}" style="display:none;">
-                                                {{totalColumnsTable=totalColumnsTable+1}}
-                                                <center>
-                                                    <b>
-                                                        {{=str(c.name)}}
-                                                        <br>
-                                                        &nbsp;
-                                                    </b>
-                                                </center>
-                                            </td>
-                                            {{pass}}
-                                            <td bgcolor="#E6E6E6">
-                                                {{totalColumnsTable=totalColumnsTable+1}}
-                                                <center>
-                                                    <b>
-                                                        <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
-                                                            {{=str(category.category.category)}}
-                                                            <br>
-                                                            {{=str(category.grade)}} pts
-                                                        </a>
-                                                        <a id="btnNV_{{=str(category.category)}}" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('{{=str(category.category)}}');">
-                                                            {{=str(category.category.category)}}
-                                                            <br>
-                                                            {{=str(category.grade)}} pts
-                                                        </a>
-                                                    </b>
-                                                </center>
-                                            </td>
-                                            {{posVCC=posVCC+1}}
-                                        {{pass}}
-                                    {{pass}}
-                                {{pass}}
-                                {{if request.vars['type'] == 'class' and existLab==True:}}
-                                    <td bgcolor="#E6E6E6">
-                                        {{totalColumnsTable=totalColumnsTable+1}}
+        {{pass}}
+        {{total_columns_table = 0}}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <td bgcolor="#E6E6E6">
+                        {{total_columns_table += 1}}
+                        <b>
+                            Carnet
+                            <br>
+                            &nbsp;
+                        </b>
+                    </td>
+                    <td bgcolor="#E6E6E6">
+                        {{total_columns_table += 1}}
+                        <b>
+                            Nombre
+                            <br>
+                            &nbsp;
+                        </b>
+                    </td>
+                    {{pos_vcc = 0}}
+                    {{if request.vars['type'] == 'class':}}
+                        {{for category in course_category:}}
+                            {{if category.category.category != "Laboratorio":}}
+                                {{for c in course_activities[pos_vcc]:}}
+                                    <td bgcolor="#E6E6E6" class="rcat{{=category.category}}" style="display:none;">
+                                        {{total_columns_table += 1}}
                                         <center>
                                             <b>
-                                                {{=T('Laboratory')}}
+                                                {{=c.name}}
                                                 <br>
-                                                {{=str(totalLab)}} pts
+                                                &nbsp;
                                             </b>
                                         </center>
                                     </td>
                                 {{pass}}
-                                {{if request.vars['type'] == 'class' and requirement is not None:}}
-                                    <td bgcolor="#E6E6E6">
-                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                <td bgcolor="#E6E6E6">
+                                    {{total_columns_table += 1}}
+                                    <center>
+                                        <b>
+                                            <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=category.category.category}}
+                                                <br>
+                                                {{=category.grade}} pts
+                                            </a>
+                                            <a id="btnNV_{{=str(category.category)}}" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=category.category.category}}
+                                                <br>
+                                                {{=category.grade}} pts
+                                            </a>
+                                        </b>
+                                    </center>
+                                </td>
+                                {{pos_vcc += 1}}
+                            {{pass}}
+                        {{pass}}
+                    {{else:}}
+                        {{for category in lab_category:}}
+                            {{if category.category.category != "Laboratorio":}}
+                                {{for c in lab_activities[pos_vcc]:}}
+                                    <td bgcolor="#E6E6E6" class="rcat{{=str(category.category)}}" style="display:none;">
+                                        {{total_columns_table += 1}}
                                         <center>
                                             <b>
-                                                {{#T('Course Requeriment')}}
-                                                
-                                                {{=requirement.name}}
+                                                {{=c.name}}
+                                                <br>
+                                                &nbsp;
                                             </b>
                                         </center>
                                     </td>
                                 {{pass}}
+                                <td bgcolor="#E6E6E6">
+                                    {{total_columns_table += 1}}
+                                    <center>
+                                        <b>
+                                            <a id="btV_{{=str(category.category)}}" style="cursor:pointer;" onclick="visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=str(category.category.category)}}
+                                                <br>
+                                                {{=str(category.grade)}} pts
+                                            </a>
+                                            <a id="btnNV_{{=str(category.category)}}" style="cursor:pointer; display:none;" onclick="no_visible_activities_gr('{{=str(category.category)}}');">
+                                                {{=str(category.category.category)}}
+                                                <br>
+                                                {{=str(category.grade)}} pts
+                                            </a>
+                                        </b>
+                                    </center>
+                                </td>
+                                {{pos_vcc += 1}}
+                            {{pass}}
+                        {{pass}}
+                    {{pass}}
+                    
+                    {{if request.vars['type'] == 'class' and exist_lab:}}
+                        <td bgcolor="#E6E6E6">
+                            {{total_columns_table += 1}}
+                            <center>
+                                <b>
+                                    {{=T('Laboratory')}}
+                                    <br>
+                                    {{=str(totalLab)}} pts
+                                </b>
+                            </center>
+                        </td>
+                    {{pass}}
+                    
+                    {{if request.vars['type'] == 'class' and requirement is not None:}}
+                        <td bgcolor="#E6E6E6">
+                            {{total_columns_table += 1}}
+                            <center>
+                                <b>
+                                    {{#T('Course Requeriment')}}
+                                    {{=requirement.name}}
+                                </b>
+                            </center>
+                        </td>
+                    {{pass}}
                                 {{if (request.vars['type'] == 'class' and request.vars['op']  == '2'):}}
                                     <td bgcolor="#E6E6E6" class="rcatfirst_r_t" style="display:none;">
-                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        {{total_columns_table=total_columns_table+1}}
                                         <center>
                                             <b>
                                                     {{=T("First recovery test")}}
@@ -320,7 +311,7 @@
                                         </center>
                                     </td>
                                     <td bgcolor="#E6E6E6">
-                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        {{total_columns_table=total_columns_table+1}}
                                         <center>
                                             <b>
                                                 <a id="btV_first_r_t" style="cursor:pointer;" onclick="visible_activities_gr('first_r_t');">
@@ -339,7 +330,7 @@
                                 {{pass}}
                                 {{if (request.vars['type'] == 'class' and request.vars['op']  == '3'):}}
                                     <td bgcolor="#E6E6E6" class="rcatsecond_r_t" style="display:none;">
-                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        {{total_columns_table=total_columns_table+1}}
                                         <center>
                                             <b>
                                                     {{=T("Second recovery test")}}
@@ -349,7 +340,7 @@
                                         </center>
                                     </td>
                                     <td bgcolor="#E6E6E6">
-                                        {{totalColumnsTable=totalColumnsTable+1}}
+                                        {{total_columns_table=total_columns_table+1}}
                                         <center>
                                             <b>
                                                 <a id="btV_second_r_t" style="cursor:pointer;" onclick="visible_activities_gr('second_r_t');">
@@ -367,9 +358,8 @@
                                     </td>
                                 {{pass}}
                                 <td bgcolor="#2282A5">
-                                    {{totalColumnsTable=totalColumnsTable+1}}
+                                    {{total_columns_table=total_columns_table+1}}
                                     <center>
-
                                         <b>
                                             <font Color="White">
                                                 {{=T('Final Grade')}}
@@ -381,7 +371,7 @@
                                 </td>
                                 
                             </tr>
-                        </THEAD>
+                        </thead>    
                         <TBODY>
                             {{for t1 in students:}}
                                 {{if request.vars['type'] == 'class':}}
@@ -399,18 +389,18 @@
 
 
                                         <!--Position in the vector of activities-->
-                                        {{posVCC=0}}
+                                        {{pos_vcc=0}}
                                         <!--Vars to the control of grade of the student-->
                                         {{totalCategory=float(0)}}
                                         {{totalActivities=0}}
                                         {{totalCarry=float(0)}}
                                         <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
                                         <!--COURSE ACTIVITIES-->
-                                        {{for category in CourseCategory:}}
+                                        {{for category in course_category:}}
                                             {{if category.category.category!="Laboratorio" and category.category.category!="Examen Final":}}
                                                 {{totalCategory=float(0)}}
                                                 {{totalActivities=0}}
-                                                {{for c in CourseActivities[posVCC]:}}
+                                                {{for c in course_activities[pos_vcc]:}}
                                                     <td class="rcat{{=str(category.category)}}" style="display:none;" bgcolor="#EEF6F9">
                                                         <center>
                                                             {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
@@ -474,12 +464,12 @@
                                                     {{totalCarry=totalCarry+totalCategory}}
                                                     </center>
                                                 </td>
-                                                {{posVCC=posVCC+1}}
+                                                {{pos_vcc=pos_vcc+1}}
                                             {{elif category.category.category=="Examen Final":}}
                                                 {{totalCarry=int(round(totalCarry,0))}}
                                                 {{totalCategory=float(0)}}
                                                 {{totalActivities=0}}
-                                                {{for c in CourseActivities[posVCC]:}}
+                                                {{for c in course_activities[pos_vcc]:}}
                                                     <td class="rcat{{=str(category.category)}}" style="display:none;" bgcolor="#EEF6F9">
                                                         <center>
                                                             {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
@@ -544,11 +534,11 @@
                                                     {{totalCarry=totalCarry+totalCategory}}
                                                     </center>
                                                 </td>
-                                                {{posVCC=posVCC+1}}
+                                                {{pos_vcc=pos_vcc+1}}
                                             {{pass}}
 
                                         {{pass}}
-                                        {{if request.vars['type'] == 'class' and existLab==True:}}
+                                        {{if request.vars['type'] == 'class' and exist_lab==True:}}
                                             <td>
                                                 <center>
                                                     {{totalCategory=float(0)}}
@@ -573,10 +563,10 @@
 
                                                         <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
                                                         <!--LAB ACTIVITIES-->
-                                                        {{for category_Lab in LabCategory:}}
+                                                        {{for category_Lab in lab_category:}}
                                                             {{totalCategory_Lab=float(0)}}
                                                             {{totalActivities_Lab=0}}
-                                                            {{for c_Lab in LabActivities[posVCC_Lab]:}}
+                                                            {{for c_Lab in lab_activities[posVCC_Lab]:}}
                                                                         {{studentGrade = db((db.grades.activity==c_Lab.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
                                                                         {{if studentGrade is None:}}
                                                                             {{totalCategory_Lab=totalCategory_Lab+float(0)}}
@@ -636,29 +626,28 @@
                                             </td>
                                         {{pass}}
 
-                                        {{if request.vars['type'] == 'class' and request.vars['op'] =='2':}}
+                                        {{if request.vars['type'] == 'class' and request.vars['op'] == '2':}}
                                             <td class="rcatfirst_r_t" width="100px" style="display:none;" bgcolor="#EEF6F9">
                                                 <center>
-                                                    
-                                                        {{var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==period.id)&(db.course_first_recovery_test.project==project.id)).select().first()}}
-                                                        {{if var_first_recovery_test is not None:}}
-                                                            {{if var_first_recovery_test.grade < float(controlP.min_average):}}
-                                                                <FONT COLOR="#FA4545">
-                                                            {{elif var_first_recovery_test.grade>=float(controlP.min_average) and var_first_recovery_test.grade <= float(controlP.max_average):}}
-                                                                <FONT STYLE="color: #C5B911;">
-                                                            {{else:}}
-                                                                <FONT STYLE="color: Green; ">
-                                                            {{pass}}
-                                                                {{=round( (var_first_recovery_test.grade),2)}}                                                                
-                                                            </font>
+                                                    {{var_first_recovery_test = db((db.course_first_recovery_test.carnet == t1.carnet) & (db.course_first_recovery_test.semester == int(request.vars['period']))
+                                                                                & (db.course_first_recovery_test.project == int(request.vars['project']))).select().first()}}
+                                                    {{if var_first_recovery_test is not None:}}
+                                                        {{if var_first_recovery_test.grade < float(controlP.min_average):}}
+                                                            <FONT COLOR="#FA4545">
+                                                        {{elif var_first_recovery_test.grade>=float(controlP.min_average) and var_first_recovery_test.grade <= float(controlP.max_average):}}
+                                                            <FONT STYLE="color: #C5B911;">
+                                                        {{else:}}
+                                                            <FONT STYLE="color: Green; ">
                                                         {{pass}}
-                                                    
+                                                            {{=round( (var_first_recovery_test.grade),2)}}                                                                
+                                                        </font>
+                                                    {{pass}}
                                                 </center>
                                             </td>
                                             <td width="100px" >
                                                 <center>
                                                     
-                                                        {{var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==period.id)&(db.course_first_recovery_test.project==project.id)).select().first()}}
+                                                        {{var_first_recovery_test =db((db.course_first_recovery_test.carnet==t1.carnet)&(db.course_first_recovery_test.semester==int(request.vars['period']))&(db.course_first_recovery_test.project==int(request.vars['project']))).select().first()}}
                                                         {{if var_first_recovery_test is not None:}}
                                                             {{if var_first_recovery_test.grade < float(controlP.min_average):}}
                                                                 <FONT COLOR="#FA4545">
@@ -681,7 +670,7 @@
                                             <td class="rcatsecond_r_t" width="100px" style="display:none;" bgcolor="#EEF6F9">
                                                 <center>
                                                     
-                                                        {{var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==period.id)&(db.course_second_recovery_test.project==project.id)).select().first()}}
+                                                        {{var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==int(request.vars['period']))&(db.course_second_recovery_test.project==int(request.vars['project']))).select().first()}}
                                                         {{if var_second_recovery_test is not None:}}
                                                             {{if var_second_recovery_test.grade < float(controlP.min_average):}}
                                                                 <FONT COLOR="#FA4545">
@@ -699,7 +688,7 @@
                                             <td width="100px" >
                                                 <center>
                                                     
-                                                        {{var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==period.id)&(db.course_second_recovery_test.project==project.id)).select().first()}}
+                                                        {{var_second_recovery_test =db((db.course_second_recovery_test.carnet==t1.carnet)&(db.course_second_recovery_test.semester==int(request.vars['period']))&(db.course_second_recovery_test.project==int(request.vars['project']))).select().first()}}
                                                         {{if var_second_recovery_test is not None:}}
                                                             {{if var_second_recovery_test.grade < float(controlP.min_average):}}
                                                                 <FONT COLOR="#FA4545">
@@ -720,7 +709,7 @@
 
                                         <td>
                                             <center>
-                                                {{if request.vars['type'] == 'class' and existLab==True:}}
+                                                {{if request.vars['type'] == 'class' and exist_lab==True:}}
                                                     {{if request.vars['type'] == 'class' and requirement is None:}}
                                                         {{if totalCategory>=float((61*totalLab)/100):}}
                                                             {{if round(totalCarry,0) < float(controlP.min_average):}}
@@ -792,7 +781,7 @@
                                             </center>
                                         </td>
                                     </tr>
-                                    {{posVCC=0}}
+                                    {{pos_vcc=0}}
                                     {{totalCategory=float(0)}}
                                     {{totalActivities=0}}
                                     {{totalCarry=float(0)}}
@@ -809,17 +798,17 @@
                                             {{pass}}
                                         </td>
                                         <!--Position in the vector of activities-->
-                                        {{posVCC=0}}
+                                        {{pos_vcc=0}}
                                         <!--Vars to the control of grade of the student-->
                                         {{totalCategory=float(0)}}
                                         {{totalActivities=0}}
                                         {{totalCarry=float(0)}}
                                         <!--****************************************FILL THE GRADES OF THE STUDENT****************************************-->
                                         <!--COURSE ACTIVITIES-->
-                                        {{for category in LabCategory:}}
+                                        {{for category in lab_category:}}
                                             {{totalCategory=float(0)}}
                                             {{totalActivities=0}}
-                                            {{for c in LabActivities[posVCC]:}}
+                                            {{for c in lab_activities[pos_vcc]:}}
                                                 <td class="rcat{{=str(category.category)}}" style="display:none;"  bgcolor="#EEF6F9">
                                                     <center>
                                                         {{studentGrade = db((db.grades.activity==c.id)&(db.grades.academic_assignation==t1.id)).select().first()}}
@@ -886,7 +875,7 @@
                                                 {{totalCarry=totalCarry+totalCategory}}
                                                 </center>
                                             </td>
-                                            {{posVCC=posVCC+1}}
+                                            {{pos_vcc=pos_vcc+1}}
                                         {{pass}}
                                         <td>
                                             <center>
@@ -902,7 +891,7 @@
                                             </center>
                                         </td>
                                     </tr>
-                                    {{posVCC=0}}
+                                    {{pos_vcc=0}}
                                     {{totalCategory=float(0)}}
                                     {{totalActivities=0}}
                                     {{totalCarry=float(0)}}
@@ -911,7 +900,7 @@
                         </TBODY>
                         <TFOOT>
                             <tr>
-                                <td colspan="{{=totalColumnsTable}}">
+                                <td colspan="{{=total_columns_table}}">
                                     <center>
                                         <table class="table table-striped table-bordered">
                                             <tr>
@@ -944,11 +933,10 @@
     </div>
 </div>
 
-
 <script type="text/javascript">
     function no_visible_activities_gr(var_name){
         {{if request.vars['type'] == 'class':}}
-            {{for category in CourseCategory:}}
+            {{for category in course_category:}}
                 {{if category.category.category!="Laboratorio":}}
                     if (var_name=="{{=str(category.category)}}"){
                         $("#btnNV_{{=str(category.category)}}").css("display", "none");
@@ -970,19 +958,19 @@
                     }
                 }    
         {{else:}}
-            {{for category in LabCategory:}}
+            {{for category in lab_category:}}
                 if (var_name=="{{=str(category.category)}}"){
                     $("#btnNV_{{=str(category.category)}}").css("display", "none");
                     $("#btV_{{=str(category.category)}}").css("display", "");
                     $(".rcat{{=str(category.category)}}").css("display", "none");
                 }
             {{pass}}
-        {{pass}}
+        {{pass}}>
     }
 
     function visible_activities_gr(var_name){
         {{if request.vars['type'] == 'class':}}
-            {{for category in CourseCategory:}}
+            {{for category in course_category:}}
                 {{if category.category.category!="Laboratorio":}}
                     if (var_name=="{{=str(category.category)}}"){
                         $("#btnNV_{{=str(category.category)}}").css("display", "");
@@ -1005,7 +993,7 @@
                     }
                 }  
         {{else:}}
-            {{for category in LabCategory:}}
+            {{for category in lab_category:}}
                 if (var_name=="{{=str(category.category)}}"){
                     $("#btnNV_{{=str(category.category)}}").css("display", "");
                     $("#btV_{{=str(category.category)}}").css("display", "none");
