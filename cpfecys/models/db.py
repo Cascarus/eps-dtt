@@ -2987,6 +2987,27 @@ db.define_table('conferencia',
     Field('observaciones', 'string'),
     Field('descripcion', 'string'))
 
+db.define_table('rubrica',
+    Field('fecha_creacion', 'datetime'),
+    Field('estado', 'string'),
+    Field('tipo', 'string'))
+
+db.define_table('seccion_rubrica',
+    Field('seccion', 'string'),
+    Field('puntos', 'decimal(5,2)'),
+    Field('estado', 'string'),
+    Field('tipo', 'string'))
+
+db.define_table('rubrica_detalle',
+    Field('id_rubrica', 'reference rubrica'),
+    Field('id_seccion', 'reference seccion_rubrica' ))
+
+db.define_table('penalizacion',
+    Field('nombre', 'string'),
+    Field('descripcion', 'string' ),
+    Field('penalizacion', 'decimal(5,2)'),
+    Field('estado', 'string'))
+
 # ------------------------END---------------------------------------------------
 # after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)

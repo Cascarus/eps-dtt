@@ -1,0 +1,210 @@
+{{extend 'dashboard.html'}}
+{{import cpfecys}}
+
+<div class="col-12 mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>
+                Calificacion
+                <br>
+                Foros semanales
+                <br>
+            </h2>
+            <h3>
+                <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+            </h3>
+        </div>
+
+        <div class="col-12 text-center">
+            <!--
+                <h2>
+                    <small>{{=rubrica}}</small>
+                </h2>
+            -->
+        </div>
+        <br>
+        <div class="col-12">
+            <div class="card-group">
+                <div class="card">
+                    <h5 class="card-header">Datos del Estudiante</h5>
+                    <div class="card-body">
+                        <div class="ml-3">
+                            <ul>
+                                <li><b>Estudiante:</b> {{=estudiante_info.username}}</li>
+                                <li><b>Nombres:</b> {{=estudiante_info.first_name}}</li>
+                                <li><b>Apellidos:</b> {{=estudiante_info.last_name}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h5 class="card-header">Datos del Projecto</h5>
+                    <div class="card-body">
+                        <div class="ml-3">
+                            <ul>
+                                <li><b>Cod. Proyecto:</b> {{=proyecto_info.project_id}}</li>
+                                <li><b>Proyecto:</b> {{=proyecto_info.name}}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-sm-7">
+
+            <center class="table-responsive">
+                <div class="card">
+                    <h5 class="card-header">
+                        <div class="row">
+                            <div class="col-7 text-right">
+                                Detalle calificacion
+                            </div>
+                            <div class="col text-right">
+                                <a type="button" class="btn btn-outline-danger text-right btn-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                                    <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+                                  </svg>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        
+                        
+                    </h5>
+                    <div class="card-body">
+                        <div class="row-fluid reports">
+
+                            <div class="table-responsive">
+                                <table style="width:100%;" class="table table-striped table-bordered">
+                                    <tr>
+                                        <th style="width:40%">Seccion</th>
+                                        <th>Ponderacion</th>
+                                        <th style="width:40%">Acciones</th>
+                                        <th>Sub total</th>
+                                    </tr>
+                                    {{ for row in rubrica:}}
+                                    <tr>
+                                        <td>{{=row.seccion}}</td>
+                                        <td class="puntos" id="puntos-{{=row.id}}">{{=row.puntos}}</td>
+                                        <td>
+                                            <div class="container">
+                                                <div class="row text-center">
+                                                    <div class="col-md"><input type="radio" class="radio-tipo" name="tipo_{{=row['id']}}" value="completa" data-row="{{=row['id']}}"> Nota Completa</div>
+                                                    <div class="col-md"><input type="radio" class="radio-tipo" name="tipo_{{=row['id']}}" value="penalizacion" data-row="{{=row['id']}}"> Penalización</div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md text-center">
+                                                        <select id="selector-{{=row.id}}" class="selector" data-row="{{=row.id}}" disabled>
+                                                            {{var_sel = ''}}
+                                                            {{for penalizacion in penalizaciones:}}
+                                                            {{if str(penalizacion.id) == str(penalizacion.id):}}
+                                                            {{var_sel = "selected='selected'"}}
+                                                            {{else:}}
+                                                            {{var_sel = ''}}
+                                                            {{pass}}
+                                                            <option value="{{=penalizacion.id}}" {{=var_sel}} data-row="{{=penalizacion.penalizacion}}">
+                                                                {{=penalizacion.nombre}}-{{=penalizacion.penalizacion}}%
+                                                            </option>
+                                                            {{pass}}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="sub-total" data-row="{{=row['id']}}">0</td>
+                                    </tr>
+                                    {{pass}}
+                                    <tr>
+                                        <td colspan="3" class="text-right"><h6><b>Nota Final</b></h6></td>
+                                        <td id="total">0</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            
+                            <div class="form-group text-left">
+                                <label for="floatingTextarea">Observaciones</label>
+                                <textarea class="form-control" id="floatingTextarea" style="height: 150px; resize: none" cols="100" maxlength="500"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Cargar calificacion</button>
+                        &nbsp&nbsp&nbsp
+                        <a type="button" class="btn btn-danger" href="/dsi_dsi/foro_view"">Regresar</a>
+                        
+                    </div>
+                </div>
+            </center>
+            
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <object data="/cpfecys/static/Tarea-Temperatura-Grupo-8.pdf" type="application/pdf" width="100%"
+                        height="700px">
+                        <p>Unable to display PDF file. <a
+                                href="/cpfecys/static/Tarea-Temperatura-Grupo-8.pdf">Download</a> instead.</p>
+                    </object>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<br>
+
+{{block page_js}}
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const radios = document.querySelectorAll(".radio-tipo");
+        const selectores = document.querySelectorAll(".selector");
+        const sub_totales = document.querySelectorAll(".sub-total");
+        const total = document.getElementById("total");
+        const temp_total = 0;
+
+        radios.forEach(radio => {
+            const rowId = radio.getAttribute("data-row");
+            const selector = document.querySelector(`.selector[data-row="${rowId}"]`);
+            const sub_total = document.querySelector(`.sub-total[data-row="${rowId}"]`)
+            const nota_temp = document.getElementById(`puntos-${rowId}`)
+            radio.addEventListener("change", function () {
+                if (radio.value === "penalizacion") {
+                    selector.disabled = false;
+                } else {
+                    selector.disabled = true;
+                    sub_total.textContent = nota_temp.textContent;
+                    updateTotal();
+                }
+            });
+
+            selector.addEventListener("change", function () {
+                if (selector.value !== "0") {
+                    radios.forEach(r => {
+                        if (r.getAttribute("data-row") === rowId && r.value === "penalizacion") {
+                            let sub_t = 0;
+                            penalizacion = parseFloat(selector.options[selector.selectedIndex].getAttribute("data-row"));
+                            sub_t = parseFloat(nota_temp.textContent) - (parseFloat(nota_temp.textContent) * penalizacion / 100.00);
+                            sub_total.textContent = sub_t.toFixed(2);
+                            updateTotal();
+                        }
+                    });
+                }
+            });
+        });
+
+        selectores.forEach(selector_ =>{
+            const rowId = radio.getAttribute("data-row");
+        });
+
+        function updateTotal() {
+            let sum = 0;
+            sub_totales.forEach(sub_t => {
+            sum += parseFloat(sub_t.textContent);
+            });
+            total.textContent = sum.toFixed(2);
+        }
+    });
+</script>
+{{end page_js}}

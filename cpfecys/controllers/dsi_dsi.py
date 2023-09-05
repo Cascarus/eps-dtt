@@ -1117,8 +1117,71 @@ def foro_view():
         periods=periods,
     )
 
+#cascarus -- FOROS-RATING
+@auth.requires_login()
+@auth.requires_membership('DSI')
+def forum_rating():
+    periodo = cpfecys.current_year_period()
+    rubrica_id = cpfecys.current_rubric_forum().id
+    rubrica = get_rubric_detail(rubrica_id)
 
-#cascarus -- CONVERENCIA-VIEW
+    temp = request.vars['txt']
+    id_student = 0
+    estudiante_info = ''
+    project_info = ''
+    penalizaciones = ''
+    if request.vars['id']:
+        id_student = request.vars['id']
+        foro_info = db(db.foro.id == id_student).select(db.foro.id_estudiante,db.foro.id_proyecto).first()
+        estudiante_info = db(db.auth_user.id == foro_info.id_estudiante).select(db.auth_user.id, db.auth_user.first_name, db.auth_user.last_name, db.auth_user.username).first()
+        project_info = db(db.project.id == foro_info.id_proyecto).select(db.project.project_id,db.project.name).first()
+        penalizaciones = db(db.penalizacion.estado == 'activo').select()
+
+
+    if (request.args(0) == 'send'):
+        temp = request.vars['txt']
+        temp += 'este es el agregado del argumento'
+        cont = request.vars['id']
+        redirect(URL('dsi_dsi', 'forum_rating', vars=dict(txt=temp, id=cont)))
+        return
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN period p on p.id = py.period
+        ORDER BY py.id DESC;
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.foro.estado == 'pendiente').select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select()
+
+    return dict(
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+        temp = temp,
+        contenido = id_student,
+        estudiante_info = estudiante_info,
+        proyecto_info = project_info,
+        rubrica = rubrica,
+        penalizaciones = penalizaciones,
+    )
+
+
+#cascarus -- CONFERENCIA-VIEW
 @auth.requires_login()
 @auth.requires_membership('DSI')
 def conferencia_view():
@@ -1134,7 +1197,7 @@ def conferencia_view():
         ORDER BY py.id DESC;
     """.format(auth.user.id))
 
-    periods = [];
+    periods = []
     
     for p in periods_temp:
         period_temp = {
@@ -1155,3 +1218,79 @@ def conferencia_view():
         periodo = periodo,
         periods=periods,
     )
+
+#cascarus -- FOROS-RATING
+@auth.requires_login()
+@auth.requires_membership('DSI')
+def conferencia_rating():
+    periodo = cpfecys.current_year_period()
+    rubrica_id = cpfecys.current_rubric_conference().id
+    rubrica = get_rubric_detail(rubrica_id)
+
+    temp = request.vars['txt']
+    id_student = 0
+    estudiante_info = ''
+    project_info = ''
+    conferencia_info = ''
+    penalizaciones = ''
+    if request.vars['id']:
+        id_student = request.vars['id']
+        conferencia_info = db(db.conferencia.id == id_student).select(db.conferencia.id_estudiante,db.conferencia.id_proyecto).first()
+        estudiante_info = db(db.auth_user.id == conferencia_info.id_estudiante).select(db.auth_user.id, db.auth_user.first_name, db.auth_user.last_name, db.auth_user.username).first()
+        project_info = db(db.project.id == conferencia_info.id_proyecto).select(db.project.project_id,db.project.name).first()
+        penalizaciones = db(db.penalizacion.estado == 'activo').select()
+        conferencia_info = db(db.conferencia.id == id_student).select().first()
+        conferencia_info.prueba = 'esta es la prueba quemada'
+
+
+    if (request.args(0) == 'send'):
+        temp = request.vars['txt']
+        temp += 'este es el agregado del argumento'
+        cont = request.vars['id']
+        redirect(URL('dsi_dsi', 'forum_rating', vars=dict(txt=temp, id=cont)))
+        return
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN period p on p.id = py.period
+        ORDER BY py.id DESC;
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.foro.estado == 'pendiente').select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select()
+
+    return dict(
+        rows = rows,
+        periodo = periodo,
+        periods=periods,
+        contenido = id_student,
+        estudiante_info = estudiante_info,
+        conferencia_info = conferencia_info,
+        proyecto_info = project_info,
+        rubrica = rubrica,
+        penalizaciones = penalizaciones,
+    )
+
+def get_rubric_detail(rubrica_id):
+    seccion = []
+    id_secciones = db(db.rubrica_detalle.id_rubrica == rubrica_id).select(db.rubrica_detalle.id_seccion)
+
+    for sec in id_secciones:
+        temp = db(db.seccion_rubrica.id == sec.id_seccion).select().first()
+        seccion.append(temp)
+
+    return seccion

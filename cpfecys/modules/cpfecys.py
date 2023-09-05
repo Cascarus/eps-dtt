@@ -490,3 +490,11 @@ def teacher_validation_report_access(report):
     project = report.assignation.project
     assignation = db((db.user_project.assigned_user == auth.user.id) & (db.user_project.project == project.id)).select(db.user_project.id).first()
     return assignation is not None
+
+def current_rubric_forum():
+    db = _db
+    return db((db.rubrica.tipo == 'foro') & (db.rubrica.estado == 'activo')).select(db.rubrica.id, orderby=~db.rubrica.fecha_creacion).first()
+
+def current_rubric_conference():
+    db = _db
+    return db((db.rubrica.tipo == 'conferencia') & (db.rubrica.estado == 'activo')).select(db.rubrica.id, orderby=~db.rubrica.fecha_creacion).first()
