@@ -1,0 +1,99 @@
+{{extend 'layout.html'}}
+<body style="background-color: #C4C3C3;"></body>
+
+<div class="col-12 mt-4">
+    <div class="row align-item-center">
+        <div class="col text-center">
+            <h2><b>Directorio de profesores</b></h2>
+        </div>
+    </div>
+    <br>
+    <div class="row align-items-middle">
+        <div class="col-md-2">
+            &nbsp;
+        </div>
+      <div class="col-md-8">
+        <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+      </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-2">
+            <div class="row align-item-center">
+                    <h3><b>Cursos</b></h3>
+            </div>
+            {{for curso in cursos:}}
+            <div class="row">
+                <div class="form-check">
+                    {{if curso.cheked == 'true':}}
+                        <input class="check-clase" type="checkbox" value="{{curso.nombre}}" id="ck_{{=curso.nombre.replace(" ", "_")}}" data-row="{{=curso.nombre}}" checked>
+                    {{else:}}
+                        <input class="check-clase" type="checkbox" value="{{curso.nombre}}" id="ck_{{=curso.nombre.replace(" ", "_")}}" data-row="{{=curso.nombre}}">
+                    {{pass}}
+                        <label class="form-check-label" for="ck_{{=curso.nombre.replace(" ", "_")}}">
+                        {{=curso.nombre}}
+                    </label>
+                </div>
+            </div>
+            {{pass}}
+        </div>
+        <div class="col-10">
+            {{contador = 0}}
+            {{for catedratico in catedraticos:}}
+            {{if contador == 3:}}
+                <br>
+                <br>
+                <button type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px">{{=catedratico.nombre}} {{=catedratico.apellido}}</button>
+                {{contador = 0}}
+            {{else:}}
+            <button type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px">{{=catedratico.nombre}} {{=catedratico.apellido}}</button>
+            {{pass}}
+            {{contador += 1}}
+            {{pass}}
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const checks = document.querySelectorAll(".check-clase");
+        const filtros = [];
+
+        checks.forEach(check => {
+            check.addEventListener("change", function () {
+                if (check.checked) {
+                    filtros.push(check.getAttribute("data-row"));
+                    console.log('Checkbox seleccionado');
+                } else {
+                    const index = filtros.indexOf(check.getAttribute("data-row"));
+                    if (index !== -1) {
+                        filtros.splice(index, 1);
+                    }
+                    console.log('Checkbox deseleccionado');
+                }
+
+                console.log(filtros);
+
+                // Realizar una solicitud POST al servidor con la lista actualizada
+                fetch('/teacher_directory/home_teacher_directory', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ filtros: filtros }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Respuesta del servidor:', data);
+                })
+                .catch(error => {
+                    console.error('Error al enviar la solicitud:', error);
+                });
+                
+            });
+        });
+
+    });
+</script>
+{{end page_js}}
