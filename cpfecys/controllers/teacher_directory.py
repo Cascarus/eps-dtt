@@ -31,16 +31,34 @@ def home_teacher_directory():
             objeto = type('Objeto', (object,), curso_temp)
             cursos.append(objeto)
     
-    
-    if request.post_vars.filtros:  #aqui se realiza el filtrado
-        filtros_parametro = request.post_vars.filtros
+    prueba = 'no llego nada'
+    busqueda = ''
+    if (request.vars['filtros[]'] and request.vars['busqueda']):
+        filtros_parametro = request.vars.getlist('filtros[]')
+        busqueda = request.vars['busqueda']
+        prueba = 'vienen ambos -> busqueda: ' + busqueda
         for fil in filtros_parametro:
             for cur in cursos:
                 if(cur.nombre == fil):
                     cur.cheked = 'true'
 
+    elif request.vars['busqueda']:
+        prueba = 'viene solo busqueda'
+        busqueda = request.vars['busqueda']
+
+    elif request.vars['filtros[]']:  #aqui se realiza el filtrado
+        prueba = 'si valido los filtros'
+        filtros_parametro = request.vars.getlist('filtros[]')
+        for fil in filtros_parametro:
+            for cur in cursos:
+                if(cur.nombre == fil):
+                    cur.cheked = 'true'
+                    prueba = 'si cambio datos'
+
     
     return dict(
         catedraticos = catedraticos,
         cursos = cursos,
+        busqueda = busqueda,
+        prueba = prueba,
     )

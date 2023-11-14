@@ -3008,6 +3008,21 @@ db.define_table('penalizacion',
     Field('penalizacion', 'decimal(5,2)'),
     Field('estado', 'string'))
 
+db.define_table('perfil_catedratico',
+    Field('user_id', 'integer'),
+    Field('nombre', 'string' ),
+    Field('apellido', 'string' ),
+    Field('foto', 'string' ),
+    Field('correo', 'string' ),
+    Field('semblanza', 'string' ),
+    Field('formacion', 'string' ),
+    Field('estado', 'string'))
+
+db.define_table('perfil_clases_impartidas',
+    Field('id_perfil', 'reference perfil_catedratico'),
+    Field('id_proyecto', 'reference user_project' ),
+    Field('estado', 'string'))
+
 # ------------------------END---------------------------------------------------
 # after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
