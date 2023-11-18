@@ -1,0 +1,152 @@
+{{extend 'layout.html'}}
+<body style="background-color: #C4C3C3;"></body>
+
+<div class="col-12 mt-4">
+    <div class="row align-item-center">
+        <div class="col text-center">
+            <h2><b>Directorio de profesores</b></h2>
+        </div>
+    </div>
+    <br>
+    <div class="row align-item-center">
+        <div class="col text-center">
+            <h4><b>{{=prueba}}</b></h2>
+        </div>
+    </div>
+    <br>
+    <div class="row align-items-middle">
+        <div class="col-md-3">
+            &nbsp;
+        </div>
+      <div class="col-md-6">
+        <input id="txtSearch" type="search" class="form-control" placeholder="Search..." aria-label="Search" value="{{=busqueda}}">
+      </div>
+      <a id="btn-buscar" type="button" class="btn btn-primary btn-sm" method="post" >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-pencil-square" viewBox="0 0 16 16">
+            <path
+                d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+            <path fill-rule="evenodd"
+                d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+        </svg>
+    </a>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-3">
+            <div class="row align-item-center">
+                    <h3><b>Cursos</b></h3>
+            </div>
+            {{for curso in cursos:}}
+            <div class="row">
+                <div class="form-check">
+                    {{if curso.cheked == 'true':}}
+                        <input class="check-clase" type="checkbox" value="{{curso.nombre}}" id="ck_{{=curso.nombre.replace(" ", "_")}}" data-row="{{=curso.nombre}}" checked>
+                    {{else:}}
+                        <input class="check-clase" type="checkbox" value="{{curso.nombre}}" id="ck_{{=curso.nombre.replace(" ", "_")}}" data-row="{{=curso.nombre}}">
+                    {{pass}}
+                        <label class="form-check-label" for="ck_{{=curso.nombre.replace(" ", "_")}}">
+                        {{=curso.nombre}}
+                    </label>
+                </div>
+            </div>
+            {{pass}}
+        </div>
+        <div class="col-9">
+            {{contador = 0}}
+            {{for catedratico in catedraticos:}}
+            {{if contador == 3:}}
+                <br>
+                <br>
+                <button type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px">{{=catedratico.nombre}} {{=catedratico.apellido}}</button>
+                {{contador = 0}}
+            {{else:}}
+            <button type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px">{{=catedratico.nombre}} {{=catedratico.apellido}}</button>
+            {{pass}}
+            {{contador += 1}}
+            {{pass}}
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const checks = document.querySelectorAll(".check-clase");
+        const filtros = [];
+        let busqueda = "";
+
+        checks.forEach(check => {
+            if (check.checked) {
+                    filtros.push(check.getAttribute("data-row"));
+                }
+        })
+
+        checks.forEach(check => {
+
+            check.addEventListener("change", function () {
+                if (check.checked) {
+                    filtros.push(check.getAttribute("data-row"));
+                    console.log('Checkbox seleccionado');
+                } else {
+                    const index = filtros.indexOf(check.getAttribute("data-row"));
+                    if (index !== -1) {
+                        filtros.splice(index, 1);
+                    }
+                    console.log('Checkbox deseleccionado');
+                }
+
+                console.log(filtros);
+                enviarSolicitud();
+
+            });
+        });
+
+        // Manejar cambios en la barra de búsqueda
+        const txtSearch = document.getElementById("txtSearch");
+        txtSearch.addEventListener("input", function (event) {
+            busqueda = event.target.value;
+        });
+
+        // Manejar clic en el botón de búsqueda
+        const btnBuscar = document.getElementById("btn-buscar");
+        btnBuscar.addEventListener("click", function () {
+            busqueda = document.getElementById("txtSearch").value;
+            //console.log(busqueda);
+            enviarSolicitud();
+        });
+
+        // Manejar presionar Enter en la barra de búsqueda
+        txtSearch.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                busqueda = document.getElementById("txtSearch").value;
+                //console.log(busqueda);
+                enviarSolicitud();
+            }
+        });
+
+        function enviarSolicitud() {
+            // Construir la nueva URL con los parámetros actualizados
+            const nuevaURL = "/teacher_directory/home_teacher_directory";
+
+            // Agregar los filtros como parámetros en la cadena de consulta
+            const parametros = new URLSearchParams();
+            filtros.forEach(filtro => {
+                parametros.append('filtros[]', filtro);
+            });
+
+            // Agregar la búsqueda como parámetro en la cadena de consulta
+            if (busqueda.trim() !== "") {
+                parametros.append('busqueda', busqueda);
+            }
+            
+            // Agregar los parámetros a la URL
+            const urlConParametros = `${nuevaURL}?${parametros.toString()}`;
+            
+            // Redirigir a la nueva URL
+            window.location.href = urlConParametros;
+        }
+
+    });
+</script>
+{{end page_js}}
