@@ -35,7 +35,20 @@
     <div class="row">
         <div class="col-3">
             <div class="row align-item-center">
+                <div class="col-6">
                     <h3><b>Cursos</b></h3>
+                </div>
+                <div class="col-4">
+                    <a id="btn-limpiar-filtros" type="button" class="btn btn-danger btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
+                            <path
+                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z" />
+                        </svg>
+                    </a>
+                </div>
             </div>
             {{for curso in cursos:}}
             <div class="row">
@@ -58,10 +71,10 @@
             {{if contador == 3:}}
                 <br>
                 <br>
-                <button type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px">{{=catedratico.nombre}} {{=catedratico.apellido}}</button>
+                <a type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px" href="{{=URL('teacher_directory', 'teacher_view', vars = dict(id=str(catedratico.id)))}}">{{=catedratico.nombre}} {{=catedratico.apellido}}</a>
                 {{contador = 0}}
             {{else:}}
-            <button type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px">{{=catedratico.nombre}} {{=catedratico.apellido}}</button>
+            <a type="button" class="btn btn-primary" style="height: 150px; width:300px; margin-right: 50px; font-size: 40px" href="{{=URL('teacher_directory', 'teacher_view', vars = dict(id=str(catedratico.id)))}}">{{=catedratico.nombre}} {{=catedratico.apellido}}</a>
             {{pass}}
             {{contador += 1}}
             {{pass}}
@@ -74,6 +87,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         const checks = document.querySelectorAll(".check-clase");
         const filtros = [];
+        const txtSearch = document.getElementById("txtSearch");
         let busqueda = "";
 
         checks.forEach(check => {
@@ -81,6 +95,9 @@
                     filtros.push(check.getAttribute("data-row"));
                 }
         })
+
+        busqueda = txtSearch.value;
+
 
         checks.forEach(check => {
 
@@ -103,7 +120,6 @@
         });
 
         // Manejar cambios en la barra de búsqueda
-        const txtSearch = document.getElementById("txtSearch");
         txtSearch.addEventListener("input", function (event) {
             busqueda = event.target.value;
         });
@@ -146,6 +162,14 @@
             // Redirigir a la nueva URL
             window.location.href = urlConParametros;
         }
+
+        // Manejar clic en el botón de limpiar
+        const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+        btnBuscar.addEventListener("click", function () {
+            filtros = [];
+            //console.log(busqueda);
+            enviarSolicitud();
+        });
 
     });
 </script>
