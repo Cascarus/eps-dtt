@@ -2961,6 +2961,13 @@ db.define_table('iso_vw_incidentes',
     Field('project_id','integer'))
 
 # --------------------------- tablas cascarus --------------------------------#
+db.define_table('foro_semestre',
+    Field('nombre_foro', 'string'),
+    Field('fecha_corte', 'datetime'),
+    Field('fecha_apertura', 'datetime'),
+    Field('estado', 'string'),
+    Field('id_periodo', 'integer'))
+
 db.define_table('foro',
     Field('id_proyecto', 'reference project'),
     Field('id_estudiante', 'reference auth_user' ),

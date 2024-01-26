@@ -47,13 +47,12 @@ def home_teacher_directory():
         busqueda = request.vars['busqueda']
 
     elif request.vars['filtros[]']:  #aqui se realiza el filtrado
-        prueba = 'si valido los filtros'
+        prueba = 'vienen filtros'
         filtros_parametro = request.vars.getlist('filtros[]')
         for fil in filtros_parametro:
             for cur in cursos:
                 if(cur.nombre == fil):
                     cur.cheked = 'true'
-                    prueba = 'si cambio datos'
 
     
     return dict(
@@ -61,4 +60,17 @@ def home_teacher_directory():
         cursos = cursos,
         busqueda = busqueda,
         prueba = prueba,
+    )
+
+def teacher_view():
+    teacher_info = ''
+    if request.vars['id']:
+        id_teacher = request.vars['id']
+        teacher_info = db((db.perfil_catedratico.id == id_teacher) &
+                          (db.perfil_catedratico.estado == 'activo')).select().first()
+        lista_formacion = teacher_info.formacion.split(',')
+        teacher_info.formacion = lista_formacion
+
+    return dict(
+        teacher_info = teacher_info,
     )

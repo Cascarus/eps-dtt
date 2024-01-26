@@ -1,0 +1,128 @@
+{{extend 'dashboard.html'}}
+{{import cpfecys}}
+
+
+<div class="col-12 mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <h2>
+                Creacion de foros semanales
+                <br>
+                <small>{{=T(periodo.period.name)}} {{=str(periodo.yearp)}}</small>
+            </h2>
+        </div>
+    </div>
+</div>
+
+
+<br>
+
+
+<div class="col-6 offset-3">
+    <div class="row-fluid">
+        <div class="well span11">
+            <form>
+                <div class="col">
+                    <div class="card" style="width: 100%;">
+                        <div class="card-body">
+                            <div class="row-fluid reports">
+    
+                                <div class="form-group">
+                                    <label for="txtNombre">Nombre Foro</label>
+                                    <input type="input" class="form-control" id="txtNombre" placeholder="Ingrese el nombre del foro">
+                                </div>
+                                <div class="form-group">
+                                    <label for="fechaApertura">Fecha de apertura</label>
+                                    <input type="datetime-local" class="form-control" id="fechaApertura" >
+                                </div>
+                                <div class="form-group">
+                                    <label for="fechaCorte">Fecha de corte</label>
+                                    <input type="datetime-local" class="form-control" id="fechaCorte" >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <button id="btnCargar1" type="submit" class="btn btn-success">Cargar foro</button>
+                    <button id="btnCargar" type="button" class="btn btn-success">Cargar foro</button>
+                    <button id="btnRegresar" type="submit" class="btn btn-danger">Regresar</button>
+                </div>
+                
+            </form>
+        </div>
+
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <strong>¡Error!</strong>&nbsp;asdfasdfasf
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+{{block page_js}}
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const txtNombre = document.getElementById("txtNombre");
+        const txtFechaApertura = document.getElementById("fechaApertura");
+        const txtFechaCorte = document.getElementById("fechaCorte");
+
+        let NombreForo = '';
+        let FechaApertura = '';
+        let FechaCorte = '';
+
+        // Manejar cambios en el input del nombre
+        txtNombre.addEventListener("input", function (event) {
+            NombreForo = event.target.value;
+        });
+
+        // Manejar cambios en los date-picker
+        txtFechaApertura.addEventListener("change", function(){
+            FechaApertura = txtFechaApertura.value;
+        });
+
+        // Manejar cambios en los date-picker
+        txtFechaCorte.addEventListener("change", function(){
+            fechaCorte = txtFechaCorte.value;
+        });
+
+        
+        // Manejar clic en el botón de búsqueda
+        const btnCargar = document.getElementById("btnCargar");
+        btnCargar.addEventListener("click", function () {
+            enviarSolicitud();
+        });
+
+        function enviarSolicitud() {
+            // Construir la nueva URL con los parámetros actualizados
+            const nuevaURL = "/teacher_directory/home_teacher_directory";
+
+            // Agregar los filtros como parámetros en la cadena de consulta
+            const parametros = new URLSearchParams();
+            
+            // Agregar la búsqueda como parámetro en la cadena de consulta
+            if (NombreForo.trim() !== "") {
+                parametros.append('nombreForo', NombreForo);
+            }
+
+            // Agregar la búsqueda como parámetro en la cadena de consulta
+            if (FechaApertura.trim() !== "") {
+                parametros.append('fechaApertura', FechaApertura);
+            }
+
+            // Agregar la búsqueda como parámetro en la cadena de consulta
+            if (FechaCorte.trim() !== "") {
+                parametros.append('fechaCorte', FechaCorte);
+            }
+            
+            // Agregar los parámetros a la URL
+            const urlConParametros = `${nuevaURL}?${parametros.toString()}`;
+            
+            // Redirigir a la nueva URL
+            //window.location.href = urlConParametros;
+            console.log(urlConParametros);
+        }
+
+    });
+</script>
+{{end page_js}}

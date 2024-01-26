@@ -59,3 +59,96 @@
         </div>
     </div>
 </div>
+
+{{block page_js}}
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const checks = document.querySelectorAll(".check-clase");
+        const filtros = [];
+        const txtSearch = document.getElementById("txtSearch");
+        let busqueda = "";
+
+        checks.forEach(check => {
+            if (check.checked) {
+                    filtros.push(check.getAttribute("data-row"));
+                }
+        })
+
+        busqueda = txtSearch.value;
+
+
+        checks.forEach(check => {
+
+            check.addEventListener("change", function () {
+                if (check.checked) {
+                    filtros.push(check.getAttribute("data-row"));
+                    console.log('Checkbox seleccionado');
+                } else {
+                    const index = filtros.indexOf(check.getAttribute("data-row"));
+                    if (index !== -1) {
+                        filtros.splice(index, 1);
+                    }
+                    console.log('Checkbox deseleccionado');
+                }
+
+                console.log(filtros);
+                enviarSolicitud();
+
+            });
+        });
+
+        // Manejar cambios en la barra de búsqueda
+        txtSearch.addEventListener("input", function (event) {
+            busqueda = event.target.value;
+        });
+
+        // Manejar clic en el botón de búsqueda
+        const btnBuscar = document.getElementById("btn-buscar");
+        btnBuscar.addEventListener("click", function () {
+            busqueda = document.getElementById("txtSearch").value;
+            //console.log(busqueda);
+            enviarSolicitud();
+        });
+
+        // Manejar presionar Enter en la barra de búsqueda
+        txtSearch.addEventListener("keyup", function (event) {
+            if (event.key === "Enter") {
+                busqueda = document.getElementById("txtSearch").value;
+                //console.log(busqueda);
+                enviarSolicitud();
+            }
+        });
+
+        function enviarSolicitud() {
+            // Construir la nueva URL con los parámetros actualizados
+            const nuevaURL = "/teacher_directory/home_teacher_directory";
+
+            // Agregar los filtros como parámetros en la cadena de consulta
+            const parametros = new URLSearchParams();
+            filtros.forEach(filtro => {
+                parametros.append('filtros[]', filtro);
+            });
+
+            // Agregar la búsqueda como parámetro en la cadena de consulta
+            if (busqueda.trim() !== "") {
+                parametros.append('busqueda', busqueda);
+            }
+            
+            // Agregar los parámetros a la URL
+            const urlConParametros = `${nuevaURL}?${parametros.toString()}`;
+            
+            // Redirigir a la nueva URL
+            window.location.href = urlConParametros;
+        }
+
+        // Manejar clic en el botón de limpiar
+        const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+        btnBuscar.addEventListener("click", function () {
+            filtros = [];
+            //console.log(busqueda);
+            enviarSolicitud();
+        });
+
+    });
+</script>
+{{end page_js}}
