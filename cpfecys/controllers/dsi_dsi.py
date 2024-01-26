@@ -1180,6 +1180,43 @@ def forum_rating():
         penalizaciones = penalizaciones,
     )
 
+#cascarus -- FOROS_FORMS
+@auth.requires_login()
+@auth.requires_membership('Student')
+def foros_create():
+    periodo = cpfecys.current_year_period()
+    if request.vars['period']:
+        periodo_parametro = request.vars['period']
+        periodo = db(db.period_year.id == periodo_parametro).select().first()
+
+    periods_temp = db.executesql("""
+        SELECT py.id, py.yearp, p.name
+        FROM period_year py
+        INNER JOIN user_project uspj ON uspj.period = py.id
+        INNER JOIN period p on p.id = py.period
+        WHERE uspj.ASSIGNED_USER = {0};
+    """.format(auth.user.id))
+
+    periods = [];
+    
+    for p in periods_temp:
+        period_temp = {
+            'id': p[0],
+            'yearp': p[1],
+            'name': p[2]
+        }
+        objeto = type('Objeto', (object,), period_temp)()
+        periods.append(objeto)
+
+    rows = db(db.foro.id_estudiante == auth.user.id).select()
+
+    rows_temp = db((db.user_project.assigned_user == auth.user.id) &
+                   (db.user_project.period == periodo.id)).select().first()
+
+    return dict(
+        periodo = periodo,
+    )
+
 
 #cascarus -- CONFERENCIA-VIEW
 @auth.requires_login()
