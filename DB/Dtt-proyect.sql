@@ -449,12 +449,12 @@ select * from auth_user where first_name like '%mario%' and last_name like '%bau
 -- 13858 6257
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
-VALUES(228, 'Herman Igor', 'Veliz Linares', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
+VALUES(228, 'Herman Igor', 'Veliz Linares', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
-VALUES(6257, 'Álvaro Giovanni', 'Longo', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
+VALUES(6257, 'Álvaro Giovanni', 'Longo', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
@@ -479,7 +479,7 @@ que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
-VALUES(6257, 'Álvaro Giovanni', 'Longo', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
+VALUES(6257, 'Álvaro Giovanni', 'Longo', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
@@ -493,7 +493,7 @@ Maestro en Ciencias en Ingeniería Mecánica - University of Washington,
 Ingeniero Electronico - USAC', 'activo', 21);
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
-VALUES(1521, 'Jose Anibal', 'Silva', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
+VALUES(1521, 'Jose Anibal', 'Silva', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
@@ -503,7 +503,7 @@ que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
-VALUES(252, 'Otto Amilcar', 'Rodriguez', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
+VALUES(252, 'Otto Amilcar', 'Rodriguez', 'Defecto.png', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
 Ut nec dui ac ligula lacinia imperdiet. Nam nec nunc eu justo efficitur mattis. Nullam a tellus sit amet libero laoreet venenatis.
 Fusce aliquam velit vel quam tristique cursus. Suspendisse potenti. Sed eu nunc velit.', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
@@ -514,7 +514,7 @@ Ut nec dui ac ligula lacinia imperdiet. Nam nec nunc eu justo efficitur mattis. 
 Fusce aliquam velit vel quam tristique cursus. Suspendisse potenti. Sed eu nunc velit.', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
-VALUES(245, 'Mario Jose', 'Bautista', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
+VALUES(245, 'Mario Jose', 'Bautista', 'Defecto.png', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
 Ut nec dui ac ligula lacinia imperdiet. Nam nec nunc eu justo efficitur mattis. Nullam a tellus sit amet libero laoreet venenatis.
 Fusce aliquam velit vel quam tristique cursus. Suspendisse potenti. Sed eu nunc velit.', 'formacion1, formacion 2, formacion 3', 'activo', 21);
 
