@@ -325,8 +325,9 @@ insert into mdtt_forum_semester(nombre_foro, fecha_corte, fecha_apertura,estado,
 values('Foro 4', '2024-03-31 23:59:59', '2024-02-15', 'activo', 21);
 
 select * from mdtt_forum_semester;
-delete from mdtt_forum_semester where id = 4;
+delete from mdtt_forum_semester where id > 1;
 
+select * from mdtt_forum;
 delete from mdtt_forum where id > 0;
 insert into mdtt_forum(id_proyecto, id_estudiante, id_foro_semestre, nombre_foro, reporte, estado)
 values(9,3330, 1, 'reporte prueba','PDF reporte de prueba', 'pendiente');
@@ -439,6 +440,10 @@ UPDATE auth_user
 SET password = (SELECT password FROM auth_user WHERE id = 3330)
 WHERE id = 6257;
 
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE id = 5214;
+
 select CURDATE();
 -- 947 --- 201325533
 -- 1529 -- 198830600
@@ -449,8 +454,9 @@ select CURDATE();
 -- 272 --- 9516463
 -- 6788 -- 20050320
 -- 3371 --- 201602723
+-- 5214 --- 201905743
 
-select * from auth_user where first_name like '%alvaro%' and last_name like '%longo%';
+select * from auth_user where first_name like '%JOSÉ VALERIO%' and last_name like '%CHOC MIJANGOS%';
 -- 13858 6257
 
 INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
@@ -672,7 +678,18 @@ SELECT * FROM period_year;
 SELECT asi.id, asi.ASSIGNED_USER, pj.name
 FROM user_project asi
 INNER JOIN project pj ON asi.project = pj.id
+WHERE asi.assigned_user = 5214;
+
+
+SELECT *
+FROM user_project asi
+INNER JOIN project pj ON asi.project = pj.id
 WHERE asi.assigned_user = 3330;
+
+SELECT *
+FROM user_project asi
+INNER JOIN project pj ON asi.project = pj.id
+WHERE pj.id = 9  AND asi.period = 21;
 
 SELECT * FROM academic_course_assignation_log;
 SELECT * FROM DSA_DOCUMENT_DELIVERED;
@@ -756,6 +773,8 @@ select * from auth_user;
 select * from user_project where period = 21; -- detalle
 select * from project;
 select * from period_year;
+select * from mdtt_forum;
+select * from mdtt_professor_profile;
 
 
 -- ---------------------------------------------------------------------------------------------------------------------
