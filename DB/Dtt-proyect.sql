@@ -162,24 +162,18 @@ CREATE TABLE mdtt_rubric( -- rubrica
 	id INT AUTO_INCREMENT PRIMARY KEY,
     fecha_creacion DATE,
     estado VARCHAR(30), --  a-> activo, i->inactivo, e->eliminado
-    tipo VARCHAR(30) -- f->foro, c->conferencias
+    tipo VARCHAR(30), -- f->foro, c->conferencias
+	periodo INT -- id periodo
 );
 
-CREATE TABLE mdtt_rubric_seccion( -- seccion_rubrica
+CREATE TABLE mdtt_rubric_seccion( -- rubrica_detalle
 	id INT AUTO_INCREMENT PRIMARY KEY,
+    id_rubrica INT,
     seccion VARCHAR(100),
     puntos DECIMAL(5,2),
     estado VARCHAR(30), --  a-> activo, i->inactivo, e->eliminado
-    tipo VARCHAR(30) -- f->foro, c->conferencias, a->ambas
-);
-
-CREATE TABLE mdtt_rubric_detail( -- rubrica_detalle
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    id_rubrica INT,
-    id_seccion INT,
     
-    CONSTRAINT FK_RUBRICA_DETALLE_SECCION FOREIGN KEY(id_seccion) REFERENCES mdtt_rubric_seccion(id),
-    CONSTRAINT FK_RUBRICA_DETALLE_RUBRICA FOREIGN KEY(id_rubrica) REFERENCES mdtt_rubric(id)
+    CONSTRAINT FK_RUBRICA_SECCION_RUBRICA FOREIGN KEY(id_rubrica) REFERENCES mdtt_rubric(id)
 );
 
 CREATE TABLE mdtt_professor_profile( -- perfil_catedratico
@@ -207,14 +201,6 @@ CREATE TABLE mdtt_proffessor_period(
     CONSTRAINT KF_PROFESSOR_PROF_PROFESSOR_PROFILE FOREIGN KEY(professor_id) REFERENCES mdtt_professor_profile(id)
 );
 
-CREATE TABLE mdtt_pro_prof_class_taught( -- perfil_clases_impartidas
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	id_perfil INT,
-    id_proyecto INT,
-    estado VARCHAR(30),
-    CONSTRAINT FK_PF_CLASES_IMPARTIDAS_PERFIL FOREIGN KEY(id_perfil) REFERENCES mdtt_professor_profile(id),
-    CONSTRAINT FK_PF_CLASES_IMPARTIDAS_PROYECTO FOREIGN KEY(id_proyecto) REFERENCES user_project(id)
-);
 
 CREATE TABLE mdtt_forum( -- foro
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -260,7 +246,7 @@ CREATE TABLE mdtt_grade( -- calificacion
 	id INT AUTO_INCREMENT PRIMARY KEY,
     id_conferencia INT,
     id_foro INT,
-    id_seccion INT,
+    id_rubrica_seccion INT,
     id_penalizacion INT,
     tipo VARCHAR(30),
     nota DECIMAL(5,2),
@@ -268,7 +254,8 @@ CREATE TABLE mdtt_grade( -- calificacion
     
     CONSTRAINT FK_CALIFICACION_CONFERENCIA FOREIGN KEY(id_conferencia) REFERENCES mdtt_conference(id),
     CONSTRAINT FK_CALIFICACION_FORO FOREIGN KEY(id_foro) REFERENCES mdtt_forum(id),
-    CONSTRAINT FK_CALIFICACION_PENALIZACION FOREIGN KEY(id_penalizacion) REFERENCES mdtt_penalty(id)
+    CONSTRAINT FK_CALIFICACION_PENALIZACION FOREIGN KEY(id_penalizacion) REFERENCES mdtt_penalty(id),
+    CONSTRAINT FK_CALIFICACION_RUBRICA_SECCION FOREIGN KEY(id_rubrica_seccion) REFERENCES mdtt_rubric_seccion(id)
 );
 
 CREATE TABLE mdtt_tag( -- tag
@@ -289,14 +276,13 @@ CREATE TABLE mdtt_conference_tag( -- conferencia_tag
 
 DROP TABLE mdtt_pro_prof_class_taught;
 DROP TABLE mdtt_professor_profile;
-DROP TABLE mdtt_rubric_detail;
-DROP TABLE mdtt_rubric_seccion;
 DROP TABLE mdtt_grade;
 DROP TABLE mdtt_conference_tag;
 DROP TABLE mdtt_tag;
 DROP TABLE mdtt_forum;
 DROP TABLE mdtt_conference;
 DROP TABLE mdtt_penalty;
+DROP TABLE mdtt_rubric_seccion;
 DROP TABLE mdtt_rubric;
 DROP TABLE mdtt_forum_semester;
 
@@ -326,6 +312,8 @@ values('Foro 4', '2024-03-31 23:59:59', '2024-02-15', 'activo', 21);
 
 select * from mdtt_forum_semester;
 delete from mdtt_forum_semester where id > 1;
+
+UPDATE mdtt_forum_semester SET estado = 'inactivo' where id = 4;
 
 select * from mdtt_forum;
 delete from mdtt_forum where id > 0;
@@ -371,29 +359,28 @@ values('penalizacion prueba 3', 'esta no se deberia ver xq esta inactiva', 50.0,
 INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado)
 values('penalizacion prueba 4', 'esta no se deberia ver xq esta eliminada', 55.0, 'eliminado');
 
-INSERT INTO mdtt_rubric_seccion(seccion, puntos, estado, tipo)
-values('Seccion 1 de foro', 70.0, 'activo', 'foro');
-INSERT INTO mdtt_rubric_seccion(seccion, puntos, estado, tipo)
-values('Seccion 1 de conferencia', 70.0, 'activo', 'conferencia');
-INSERT INTO mdtt_rubric_seccion(seccion, puntos, estado, tipo)
-values('Seccion 2 de ambos', 30.0, 'activo', 'ambas');
+INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, periodo)
+VALUES(CURDATE(), 'activo', 'foro', 21);
+INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, periodo)
+VALUES('2023-08-17', 'activo', 'foro', 20);
+INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, periodo)
+VALUES(CURDATE(), 'activo', 'conferencia', 21);
 
-INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo)
-VALUES(CURDATE(), 'activo', 'foro');
-INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo)
-VALUES('2023-08-17', 'activo', 'foro');
-INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo)
-VALUES(CURDATE(), 'activo', 'conferencia');
+SELECT * FROM mdtt_rubric;
 
-INSERT INTO mdtt_rubric_detail(id_rubrica, id_seccion)
-VALUES(1,1);
-INSERT INTO mdtt_rubric_detail(id_rubrica, id_seccion)
-VALUES(1,3);
+INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+values(2,'Seccion 1 de foro', 60.0, 'activo');
+INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+values(2,'Seccion 2 de foro', 40.0, 'activo');
+INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+values(1, 'Seccion 1 de foro', 70.0, 'activo');
+INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+values(1, 'Seccion 2 de foro', 30.0, 'activo');
+INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+values(3, 'Seccion 1 de conferencia', 70.0, 'activo');
+INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+values(3, 'Seccion 2 de conferencia', 30.0, 'activo');
 
-INSERT INTO mdtt_rubric_detail(id_rubrica, id_seccion)
-VALUES(3,2);
-INSERT INTO mdtt_rubric_detail(id_rubrica, id_seccion)
-VALUES(3,3);
 
 UPDATE mdtt_rubric
 SET estado = 'inactivo'
