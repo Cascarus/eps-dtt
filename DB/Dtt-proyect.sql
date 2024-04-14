@@ -163,10 +163,10 @@ CREATE TABLE mdtt_rubric( -- rubrica
     fecha_creacion DATE,
     estado VARCHAR(30), --  a-> activo, i->inactivo, e->eliminado
     tipo VARCHAR(30), -- f->foro, c->conferencias
-	periodo INT -- id periodo
+	id_periodo INT -- id periodo
 );
 
-CREATE TABLE mdtt_rubric_seccion( -- rubrica_detalle
+CREATE TABLE mdtt_rubric_section( -- rubrica_detalle
 	id INT AUTO_INCREMENT PRIMARY KEY,
     id_rubrica INT,
     seccion VARCHAR(100),
@@ -186,21 +186,11 @@ CREATE TABLE mdtt_professor_profile( -- perfil_catedratico
     semblanza VARCHAR(1000),
     formacion VARCHAR(1000),
     estado VARCHAR(30) default 'activo',
-    period_id INT,
+    id_periodo INT,
     
     CONSTRAINT FK_PEFIL_CATEDRATICO_AUTH_USER FOREIGN KEY(user_id) REFERENCES auth_user(id),
-    CONSTRAINT FK_PROF_PROFILE_PERIOD_YEAR FOREIGN KEY(period_id) REFERENCES period_year(id)
+    CONSTRAINT FK_PROF_PROFILE_PERIOD_YEAR FOREIGN KEY(id_periodo) REFERENCES period_year(id)
 );
-
-CREATE TABLE mdtt_proffessor_period(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    professor_id INT,
-    period_id INT,
-    
-    CONSTRAINT FK_PROFESOR_PROF_PROFESSOR_PERIOD FOREIGN KEY(period_id) REFERENCES period_year(id),
-    CONSTRAINT KF_PROFESSOR_PROF_PROFESSOR_PROFILE FOREIGN KEY(professor_id) REFERENCES mdtt_professor_profile(id)
-);
-
 
 CREATE TABLE mdtt_forum( -- foro
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -208,7 +198,6 @@ CREATE TABLE mdtt_forum( -- foro
     id_estudiante INT,
     id_dsi INT,
     id_foro_semestre INT,
-    nombre_foro VARCHAR(100),
     reporte VARCHAR(512),
     nota DECIMAL(5,2) DEFAULT 0,
     estado VARCHAR(30),
@@ -246,16 +235,31 @@ CREATE TABLE mdtt_grade( -- calificacion
 	id INT AUTO_INCREMENT PRIMARY KEY,
     id_conferencia INT,
     id_foro INT,
-    id_rubrica_seccion INT,
-    id_penalizacion INT,
     tipo VARCHAR(30),
     nota DECIMAL(5,2),
-    nota_completa BOOLEAN,
     
     CONSTRAINT FK_CALIFICACION_CONFERENCIA FOREIGN KEY(id_conferencia) REFERENCES mdtt_conference(id),
-    CONSTRAINT FK_CALIFICACION_FORO FOREIGN KEY(id_foro) REFERENCES mdtt_forum(id),
-    CONSTRAINT FK_CALIFICACION_PENALIZACION FOREIGN KEY(id_penalizacion) REFERENCES mdtt_penalty(id),
-    CONSTRAINT FK_CALIFICACION_RUBRICA_SECCION FOREIGN KEY(id_rubrica_seccion) REFERENCES mdtt_rubric_seccion(id)
+    CONSTRAINT FK_CALIFICACION_FORO FOREIGN KEY(id_foro) REFERENCES mdtt_forum(id)
+);
+
+CREATE TABLE mdtt_grade_detail(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    id_grade INT,
+    id_rubrica_seccion INT,
+    nota_seccion DECIMAL(5,2),
+    
+    CONSTRAINT FK_GRADE_DET_CALIFICACION FOREIGN KEY(id_grade) REFERENCES mdtt_grade(id),
+    CONSTRAINT FK_GRADE_DET_RUBRICA_SECCION FOREIGN KEY(id_rubrica_seccion) REFERENCES mdtt_rubric_section(id)
+);
+
+CREATE TABLE mdtt_penalty_detail(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    id_grade_detail INT,
+    id_penalty INT,
+    penalty DECIMAL(5,2),
+    
+    CONSTRAINT FK_PENALTY_DETAIL_GRADE_DET FOREIGN KEY(id_grade_detail) REFERENCES mdtt_grade_detail(id),
+    CONSTRAINT FK_PENLATY_DETAIL_PENALTY FOREIGN KEY(id_penalty) REFERENCES mdtt_penalty(id)
 );
 
 CREATE TABLE mdtt_tag( -- tag
@@ -274,30 +278,18 @@ CREATE TABLE mdtt_conference_tag( -- conferencia_tag
 );
 
 
-DROP TABLE mdtt_pro_prof_class_taught;
 DROP TABLE mdtt_professor_profile;
+DROP TABLE mdtt_penalty_detail;
+DROP TABLE mdtt_grade_detail;
 DROP TABLE mdtt_grade;
 DROP TABLE mdtt_conference_tag;
 DROP TABLE mdtt_tag;
 DROP TABLE mdtt_forum;
 DROP TABLE mdtt_conference;
 DROP TABLE mdtt_penalty;
-DROP TABLE mdtt_rubric_seccion;
+DROP TABLE mdtt_rubric_section;
 DROP TABLE mdtt_rubric;
 DROP TABLE mdtt_forum_semester;
-
-DROP TABLE perfil_clases_impartidas;
-DROP TABLE perfil_catedratico;
-DROP TABLE rubrica_detalle;
-DROP TABLE seccion_rubrica;
-DROP TABLE calificacion;
-DROP TABLE conferencia_tag;
-DROP TABLE tag;
-DROP TABLE conferencia;
-DROP TABLE foro;
-DROP TABLE penalizacion;
-DROP TABLE rubrica;
-
 -- ---------------------------------------------------------------------------------------------------------------------
 --                    INSERTS
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -359,26 +351,28 @@ values('penalizacion prueba 3', 'esta no se deberia ver xq esta inactiva', 50.0,
 INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado)
 values('penalizacion prueba 4', 'esta no se deberia ver xq esta eliminada', 55.0, 'eliminado');
 
-INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, periodo)
+select * FROM mdtt_penalty;
+
+INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, id_periodo)
 VALUES(CURDATE(), 'activo', 'foro', 21);
-INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, periodo)
+INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, id_periodo)
 VALUES('2023-08-17', 'activo', 'foro', 20);
-INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, periodo)
+INSERT INTO mdtt_rubric(fecha_creacion, estado, tipo, id_periodo)
 VALUES(CURDATE(), 'activo', 'conferencia', 21);
 
 SELECT * FROM mdtt_rubric;
 
-INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(2,'Seccion 1 de foro', 60.0, 'activo');
-INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(2,'Seccion 2 de foro', 40.0, 'activo');
-INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(1, 'Seccion 1 de foro', 70.0, 'activo');
-INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(1, 'Seccion 2 de foro', 30.0, 'activo');
-INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(3, 'Seccion 1 de conferencia', 70.0, 'activo');
-INSERT INTO mdtt_rubric_seccion(id_rubrica, seccion, puntos, estado)
+INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(3, 'Seccion 2 de conferencia', 30.0, 'activo');
 
 
@@ -446,17 +440,17 @@ select CURDATE();
 select * from auth_user where first_name like '%JOSÉ VALERIO%' and last_name like '%CHOC MIJANGOS%';
 -- 13858 6257
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(228, 'Herman Igor', 'Veliz Linares', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 19);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(6257, 'Álvaro Giovanni', 'Longo', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 19);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(247, 'Otto', 'Escobar Leiva', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Proin id lorem sit amet lorem malesuada fermentum. Fusce sed nisi in quam tincidunt condimentum.Quisque ullamcorper, justo eu tempor convallis, lorem justo luctus purus, non commodo odio ligula vel libero. Nulla auctor felis id ex volutpat, ac fringilla nunc tempor. Aliquam eget sapien ac lectus aliquam ullamcorper.
 
 Sed consequat, libero id consequat dapibus, ex urna dapibus velit, id ultricies metus tortor vel velit. Aenean et ante non turpis sodales vehicula. Vivamus nec mi ut erat laoreet accumsan. Vestibulum tincidunt dui velit, non tempor enim pellentesque ut.
@@ -465,23 +459,23 @@ Nam venenatis urna vel eros rutrum, sed tempus dui ultrices. Proin fermentum var
 Maestro en Ciencias en Ingeniería Mecánica - University of Washington,
 Ingeniero Electronico - USAC', 'activo', 19);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(1521, 'Jose Anibal', 'Silva', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 19);
 
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(228, 'Herman Igor', 'Veliz Linares', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(6257, 'Álvaro Giovanni', 'Longo', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(247, 'Otto', 'Escobar Leiva', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Proin id lorem sit amet lorem malesuada fermentum. Fusce sed nisi in quam tincidunt condimentum.Quisque ullamcorper, justo eu tempor convallis, lorem justo luctus purus, non commodo odio ligula vel libero. Nulla auctor felis id ex volutpat, ac fringilla nunc tempor. Aliquam eget sapien ac lectus aliquam ullamcorper.
 
 Sed consequat, libero id consequat dapibus, ex urna dapibus velit, id ultricies metus tortor vel velit. Aenean et ante non turpis sodales vehicula. Vivamus nec mi ut erat laoreet accumsan. Vestibulum tincidunt dui velit, non tempor enim pellentesque ut.
@@ -490,28 +484,28 @@ Nam venenatis urna vel eros rutrum, sed tempus dui ultrices. Proin fermentum var
 Maestro en Ciencias en Ingeniería Mecánica - University of Washington,
 Ingeniero Electronico - USAC', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(1521, 'Jose Anibal', 'Silva', 'Defecto.png', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(230, 'Luis Fernando', 'Espino Barrios', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Esta es una semblanza de prueba la cual debería ocupar un espacio máximo de unas 1000 líneas, para eso me puse a escribir cualquier babosada que se me vino a la cabeza con tal de ocupar todo el espacio
 que se pueda ya que no sé si siquiera van
 jalar los enters con signo y solo así pero bueno vamos a ver qué ocurre', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(252, 'Otto Amilcar', 'Rodriguez', 'Defecto.png', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
 Ut nec dui ac ligula lacinia imperdiet. Nam nec nunc eu justo efficitur mattis. Nullam a tellus sit amet libero laoreet venenatis.
 Fusce aliquam velit vel quam tristique cursus. Suspendisse potenti. Sed eu nunc velit.', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(246, 'Manuel', 'Castillo Reyna', 'que-hay-que-hacer-para-ser-catedratico-1.jpg', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod
 bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
 Ut nec dui ac ligula lacinia imperdiet. Nam nec nunc eu justo efficitur mattis. Nullam a tellus sit amet libero laoreet venenatis.
 Fusce aliquam velit vel quam tristique cursus. Suspendisse potenti. Sed eu nunc velit.', 'formacion1, formacion 2, formacion 3', 'activo', 20);
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 VALUES(245, 'Mario Jose', 'Bautista', 'Defecto.png', 'correo1@prueba.com', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae risus nec nunc fermentum aliquam. Maecenas vitae elit eu urna pharetra iaculis. Quisque auctor, ligula vel efficitur tincidunt, sapien eros pharetra justo, a vulputate felis dui at mi. Sed auctor sagittis quam, at ultricies justo. Nunc feugiat, leo et euismod bibendum, turpis mauris varius velit, vel congue eros lectus vel elit.
 Ut nec dui ac ligula lacinia imperdiet. Nam nec nunc eu justo efficitur mattis. Nullam a tellus sit amet libero laoreet venenatis.
 Fusce aliquam velit vel quam tristique cursus. Suspendisse potenti. Sed eu nunc velit.', 'formacion1, formacion 2, formacion 3', 'activo', 20);
@@ -642,7 +636,16 @@ SELECT fs.id, fs.nombre_foro, fs.fecha_apertura, fs.fecha_corte, f.estado, f.not
 FROM mdtt_forum_semester fs
 LEFT JOIN mdtt_forum f ON fs.id = f.id_foro_semestre AND f.id_estudiante = 3330
 WHERE fs.id_periodo = 21;
+
 -- ---------------------------------------------------------------------------------------------------------------------
+--                 BUSQUEDA - muestra unicamente los periodos en los cuales hay rubricas
+-- ---------------------------------------------------------------------------------------------------------------------
+SELECT DISTINCT py.id, py.yearp, p.name
+FROM period_year py
+INNER JOIN period p on p.id = py.period
+RIGHT JOIN mdtt_rubric rub on rub.id_periodo = py.id
+ORDER BY py.id DESC;
+
 select * from mdtt_forum_semester;
 SELECT * FROM foro WHERE id_estudiante = 3330 AND id_proyecto = 9;
 
@@ -690,7 +693,8 @@ SELECT py.id, py.yearp, p.name
 FROM period_year py
 INNER JOIN user_project uspj ON uspj.period = py.id
 INNER JOIN period p on p.id = py.period
-WHERE uspj.ASSIGNED_USER = 3330;
+WHERE uspj.ASSIGNED_USER = 3330
+ORDER BY py.id DESC;
 
 -- query para buscar proyeto por periodos
 SELECT *
@@ -801,7 +805,7 @@ BEGIN
         
         IF verify_older_teacher_data(cur_usr_id) THEN
 			-- Insercion del ultimo registro que se tenga del catedratico en la tabla mdtt_professor_profile
-			INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+			INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 			SELECT user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, (SELECT id FROM period_year ORDER BY id DESC LIMIT 1)
 			FROM mdtt_professor_profile
 			WHERE user_id = cur_usr_id
@@ -809,7 +813,7 @@ BEGIN
         ELSE
 			-- Insercion de los datos basicos que tenga el catedratico en su usuario
 			SET cur_period_year = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
-			INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, period_id)
+			INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, id_periodo)
             VALUES(cur_usr_id, cur_name, cur_last_name, 'Defecto.png', cur_email , 'Pendiente' , 'Pendiente', cur_period_year);
         END IF;
     END LOOP loop_List;
@@ -869,10 +873,11 @@ WHERE aug.id = 3 AND py.id = 21;
 SELECT id FROM period_year ORDER BY id DESC LIMIT 1;
 
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, period_id)
+INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
 			SELECT user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, (SELECT id FROM period_year ORDER BY id DESC LIMIT 1)
 			FROM mdtt_professor_profile
 			WHERE user_id = 6257
 			ORDER BY id DESC LIMIT 1;
             
 select * from mdtt_professor_profile;
+
