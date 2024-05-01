@@ -154,6 +154,7 @@ CREATE TABLE mdtt_penalty( -- penalizacion
 	id int auto_increment PRIMARY KEY,
     nombre VARCHAR(100),
     descripcion VARCHAR(500),
+    tipo VARCHAR(30), -- f->foro, c->conferencias
 	penalizacion DECIMAL(5,2),
     estado VARCHAR(30) -- a-> activo, i->inactivo, e->eliminado
 );
@@ -342,14 +343,18 @@ values(9,3330, 'reporte prueba 13','PDF reporte de prueba 13', 'pendiente');
 insert into mdtt_conference(id_proyecto, id_estudiante, nombre_video, reporte, video, estado, descripcion)
 values(9,3330, 'video de preuba','PDF reporte de prueba', 'URL video', 'pendiente', 'este es el primer video de prueba por un estudiante');
 
-INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado)
-values('penalizacion prueba 1', 'penalizacion que se utiliza para pruebas', 30.0, 'activo');
-INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado)
-values('penalizacion prueba 2', 'penalizacion que se utiliza para pruebas', 10.0, 'activo');
-INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado)
-values('penalizacion prueba 3', 'esta no se deberia ver xq esta inactiva', 50.0, 'inactivo');
-INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado)
-values('penalizacion prueba 4', 'esta no se deberia ver xq esta eliminada', 55.0, 'eliminado');
+INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado, tipo)
+values('penalizacion prueba 1', 'penalizacion que se utiliza para pruebas', 30.0, 'activo', 'foro');
+INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado, tipo)
+values('penalizacion prueba 2', 'penalizacion que se utiliza para pruebas', 10.0, 'activo', 'conferencia');
+INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado, tipo)
+values('penalizacion prueba 3', 'esta no se deberia ver xq esta inactiva', 50.0, 'inactivo', 'conferencia');
+INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado, tipo)
+values('penalizacion prueba 4', 'esta no se deberia ver xq esta eliminada', 55.0, 'eliminado', 'foro');
+
+UPDATE mdtt_penalty
+SET tipo = 'conferencia'
+WHERE tipo = 'Conferencia';
 
 select * FROM mdtt_penalty;
 
