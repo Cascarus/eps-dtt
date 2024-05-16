@@ -161,7 +161,7 @@ CREATE TABLE mdtt_penalty( -- penalizacion
 
 CREATE TABLE mdtt_rubric( -- rubrica
 	id INT AUTO_INCREMENT PRIMARY KEY,
-    fecha_creacion DATE,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     estado VARCHAR(30), --  a-> activo, i->inactivo, e->eliminado
     tipo VARCHAR(30), -- f->foro, c->conferencias
 	id_periodo INT -- id periodo
