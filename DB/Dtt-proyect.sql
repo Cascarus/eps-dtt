@@ -5,142 +5,6 @@ USE cpfecys_scheduler;
 drop database cpfecys;
 drop database cpfecys_scheduler;
 
-select * from foro_semestre;
-/*CREATE TABLE foro_semestre(
-	id int auto_increment PRIMARY KEY,
-    nombre_foro VARCHAR(500),
-    fecha_corte DATETIME, -- fecha en la que se deja de recibir respuestas
-    fecha_apertura DATETIME, -- fecha en la que inicia a recibir respuestas
-    estado VARCHAR(30), -- activo, finalizado, eliminado
-    id_periodo int
-);
-
-CREATE TABLE penalizacion(
-	id int auto_increment PRIMARY KEY,
-    nombre VARCHAR(100),
-    descripcion VARCHAR(500),
-	penalizacion DECIMAL(5,2),
-    estado VARCHAR(30) -- a-> activo, i->inactivo, e->eliminado
-);
-
-CREATE TABLE rubrica(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    fecha_creacion DATE,
-    estado VARCHAR(30), --  a-> activo, i->inactivo, e->eliminado
-    tipo VARCHAR(30) -- f->foro, c->conferencias
-);
-
-CREATE TABLE seccion_rubrica(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    seccion VARCHAR(100),
-    puntos DECIMAL(5,2),
-    estado VARCHAR(30), --  a-> activo, i->inactivo, e->eliminado
-    tipo VARCHAR(30) -- f->foro, c->conferencias, a->ambas
-);
-
-CREATE TABLE rubrica_detalle(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    id_rubrica INT,
-    id_seccion INT,
-    
-    CONSTRAINT FK_RUBRICA_DETALLE_SECCION FOREIGN KEY(id_seccion) REFERENCES seccion_rubrica(id),
-    CONSTRAINT FK_RUBRICA_DETALLE_RUBRICA FOREIGN KEY(id_rubrica) REFERENCES rubrica(id)
-);
-
-CREATE TABLE perfil_catedratico(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    nombre VARCHAR(128),
-    apellido VARCHAR(128),
-    foto VARCHAR(512),
-    correo VARCHAR(512),
-    semblanza VARCHAR(1000),
-    formacion VARCHAR(1000),
-    estado VARCHAR(30),
-    
-    CONSTRAINT FK_PEFIL_CATEDRATICO_AUTH_USER FOREIGN KEY(user_id) REFERENCES auth_user(id)
-);
-
-CREATE TABLE perfil_clases_impartidas(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-	id_perfil INT,
-    id_proyecto INT,
-    estado VARCHAR(30),
-    CONSTRAINT FK_PF_CLASES_IMPARTIDAS_PERFIL FOREIGN KEY(id_perfil) REFERENCES perfil_catedratico(id),
-    CONSTRAINT FK_PF_CLASES_IMPARTIDAS_PROYECTO FOREIGN KEY(id_proyecto) REFERENCES user_project(id)
-);
-
-CREATE TABLE foro(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    id_proyecto INT,
-    id_estudiante INT,
-    id_dsi INT,
-    id_foro_semestre INT,
-    nombre_foro VARCHAR(100),
-    reporte VARCHAR(512),
-    nota DECIMAL(5,2) DEFAULT 0,
-    estado VARCHAR(30),
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_calificacion datetime,
-    observaciones VARCHAR(500),
-    
-    CONSTRAINT FK_FORO_PROYECTO FOREIGN KEY(id_proyecto) REFERENCES project(id),
-    CONSTRAINT FK_FORO_ESTUDIANTE FOREIGN KEY(id_estudiante) REFERENCES auth_user(id),
-    CONSTRAINT FK_FORO_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id),
-    CONSTRAINT FK_FORO_SEMESTRE FOREIGN KEY(id_foro_semestre) REFERENCES foro_semestre(id)
-);
-
-CREATE TABLE conferencia(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    id_proyecto INT,
-    id_estudiante INT,
-    id_dsi INT,
-    nombre_video VARCHAR(512),
-    reporte VARCHAR(512),
-    video VARCHAR(512),
-    nota DECIMAL(5,2) DEFAULT 0,
-    estado VARCHAR(30),
-    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    fecha_calificacion datetime,
-    observaciones VARCHAR(500),
-    descripcion VARCHAR(1000),
-    
-    CONSTRAINT FK_CONFERENCIA_PROYECTO FOREIGN KEY(id_proyecto) REFERENCES project(id),
-    CONSTRAINT FK_CONFERENCIA_ESTUDIANTE FOREIGN KEY(id_estudiante) REFERENCES auth_user(id),
-    CONSTRAINT FK_CONFERENCIA_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
-);
-
-CREATE TABLE calificacion(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    id_conferencia INT,
-    id_foro INT,
-    id_seccion INT,
-    id_penalizacion INT,
-    tipo VARCHAR(30),
-    nota DECIMAL(5,2),
-    nota_completa BOOLEAN,
-    
-    CONSTRAINT FK_CALIFICACION_CONFERENCIA FOREIGN KEY(id_conferencia) REFERENCES conferencia(id),
-    CONSTRAINT FK_CALIFICACION_FORO FOREIGN KEY(id_foro) REFERENCES foro(id),
-    CONSTRAINT FK_CALIFICACION_PENALIZACION FOREIGN KEY(id_penalizacion) REFERENCES penalizacion(id)
-);
-
-CREATE TABLE tag(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    tag VARCHAR(100),
-    estado VARCHAR(30)
-);
-
-CREATE TABLE conferencia_tag(
-	id INT AUTO_INCREMENT PRIMARY KEY,
-    id_tag INT,
-    id_conferencia INT,
-    
-    CONSTRAINT FK_CONFERENCIA_TAG_TAG FOREIGN KEY(id_tag) REFERENCES tag(id),
-    CONSTRAINT FK_CONFERENCIA_TAG_CONFERENCIA FOREIGN KEY(id_conferencia) REFERENCES conferencia(id)
-);*/
-
-
 CREATE TABLE mdtt_forum_semester( -- foro_semestre
 	id int auto_increment PRIMARY KEY,
     nombre_foro VARCHAR(500),
@@ -217,6 +81,7 @@ CREATE TABLE mdtt_conference( -- conferencia
     id_proyecto INT,
     id_estudiante INT,
     id_dsi INT,
+    id_periodo int, -- id del periodo 
     nombre_video VARCHAR(512),
     reporte VARCHAR(512),
     video VARCHAR(512),
@@ -340,8 +205,8 @@ values(9,3330, 'reporte prueba 12','PDF reporte de prueba 12', 'pendiente');
 insert into mdtt_forum(id_proyecto, id_estudiante, nombre_foro, reporte, estado)
 values(9,3330, 'reporte prueba 13','PDF reporte de prueba 13', 'pendiente');
 
-insert into mdtt_conference(id_proyecto, id_estudiante, nombre_video, reporte, video, estado, descripcion)
-values(9,3330, 'video de preuba','PDF reporte de prueba', 'URL video', 'pendiente', 'este es el primer video de prueba por un estudiante');
+insert into mdtt_conference(id_proyecto, id_estudiante, id_periodo, nombre_video, reporte, video, estado, descripcion)
+values(9,3330, 22, 'video de prueba','conference.Tarea-Temperatura-Grupo-8.pdf', 'URL video', 'pendiente', 'este es el primer video de prueba por un estudiante');
 
 INSERT INTO mdtt_penalty(nombre, descripcion, penalizacion, estado, tipo)
 values('penalizacion prueba 1', 'penalizacion que se utiliza para pruebas', 30.0, 'activo', 'foro');
@@ -367,6 +232,8 @@ VALUES(CURDATE(), 'activo', 'conferencia', 21);
 
 SELECT * FROM mdtt_rubric;
 
+DELETE FROM mdtt_rubric WHERE id = 10;
+
 INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(2,'Seccion 1 de foro', 60.0, 'activo');
 INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
@@ -380,6 +247,11 @@ values(3, 'Seccion 1 de conferencia', 70.0, 'activo');
 INSERT INTO mdtt_rubric_section(id_rubrica, seccion, puntos, estado)
 values(3, 'Seccion 2 de conferencia', 30.0, 'activo');
 
+SELECT LAST_INSERT_ID();
+
+SELECT * FROM mdtt_rubric_section;
+CALL create_current_rubric_forum();
+CALL create_current_rubric_conference();
 
 UPDATE mdtt_rubric
 SET estado = 'inactivo'
@@ -542,7 +414,7 @@ INSERT INTO mdtt_conference (nombre_video, video, estado, descripcion)
 VALUES ('Video 8', 'https://www.youtube.com/embed/O3MWZCDgM7s', 'activo', 'Descripción del Video 8.');
 
 insert into mdtt_conference(id_proyecto, id_estudiante, nombre_video, reporte, video, estado, descripcion)
-values(9,3330, 'video de preuba','PDF reporte de prueba', 'URL video', 'pendiente', 'este es el primer video de prueba por un estudiante');
+values(9,3330, 'video de prueba','PDF reporte de prueba', 'URL video', 'pendiente', 'este es el primer video de prueba por un estudiante');
 commit;
 
 INSERT INTO mdtt_tag(tag, estado)
@@ -628,7 +500,8 @@ WHERE t.estado = 'activo';
 
 select * from foro_semestre;
 select * from foro where id_estudiante = 3371;
-select * from conferencia;
+select * from mdtt_conference;
+
 select * from penalizacion;
 select * from seccion_rubrica;
 select * from rubrica;
@@ -726,6 +599,11 @@ SELECT * FROM academic WHERE CARNET = '201325533';
 SELECT * FROM auth_user WHERE id = 947;
 SELECT password FROM auth_user WHERE id = 3330;
 
+SELECT *
+FROM mdtt_rubric
+WHERE tipo = 'foro' and id_periodo = 21 AND id != 11 and estado = 'inactivo'
+ORDER BY fecha_creacion desc;
+
 
 
 UPDATE academic
@@ -796,7 +674,7 @@ BEGIN
 		INNER JOIN auth_group aug ON aug.id = autm.group_id
 		INNER JOIN user_project usrpj ON usr.id = usrpj.assigned_user 
 		INNER JOIN period_year py ON usrpj.period = py.id
-		WHERE aug.id = 3 AND py.id = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
+		WHERE aug.id = 3 AND py.id = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
         
 	DECLARE CONTINUE HANDLER FOR NOT FOUND SET cursor_List_isdone = TRUE;
 
@@ -825,7 +703,7 @@ BEGIN
 END; $$
 DELIMITER ;
 
-
+CALL create_current_teacher_directory;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 --                 FUNCIONES
@@ -860,6 +738,7 @@ END; //
 DELIMITER ;
 
 SELECT verify_older_teacher_data(6257);
+SELECT id FROM period_year ORDER BY id DESC;
 
 SELECT user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, (SELECT id FROM period_year ORDER BY id DESC LIMIT 1)
 FROM mdtt_professor_profile
@@ -878,11 +757,38 @@ WHERE aug.id = 3 AND py.id = 21;
 SELECT id FROM period_year ORDER BY id DESC LIMIT 1;
 
 
-INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, id_periodo)
-			SELECT user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, (SELECT id FROM period_year ORDER BY id DESC LIMIT 1)
+SELECT user_id, nombre, apellido, foto, correo, semblanza, formacion, estado, (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1)
 			FROM mdtt_professor_profile
 			WHERE user_id = 6257
-			ORDER BY id DESC LIMIT 1;
+ORDER BY id DESC LIMIT 1;
             
 select * from mdtt_professor_profile;
 
+SELECT distinct usr.id, usr.first_name, usr.last_name, usr.email, py.id
+		FROM  auth_user usr
+		INNER JOIN auth_membership autm ON usr.id = autm.user_id
+		INNER JOIN auth_group aug ON aug.id = autm.group_id
+		INNER JOIN user_project usrpj ON usr.id = usrpj.assigned_user 
+		INNER JOIN period_year py ON usrpj.period = py.id
+		WHERE aug.id = 3 AND py.id = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
+        
+        
+
+        
+SELECT rs.seccion, rs.puntos, rs.estado
+FROM mdtt_rubric_section rs
+INNER JOIN (
+SELECT id FROM mdtt_rubric WHERE tipo = 'foro' AND estado = 'activo' AND id_periodo = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1)
+) rub ON rs.id_rubrica = rub.id;
+
+SELECT rs.seccion, rs.puntos, rs.estado
+FROM mdtt_rubric_section rs
+INNER JOIN mdtt_rubric rub ON rs.id_rubrica = rub.id
+WHERE  rub.tipo = 'foro' AND rub.estado = 'activo' AND rub.id_periodo = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
+
+SELECT rs.seccion, rs.puntos, rs.estado
+FROM mdtt_rubric_section rs
+INNER JOIN mdtt_rubric rub ON rs.id_rubrica = rub.id
+WHERE rub.tipo = 'conferencia' AND rub.estado = 'activo' AND rub.id_periodo = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
+
+SELECT id FROM mdtt_rubric WHERE tipo = 'foro' AND estado = 'activo' AND id_periodo = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
