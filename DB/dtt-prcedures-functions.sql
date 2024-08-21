@@ -137,6 +137,78 @@ BEGIN
 END$$
 DELIMITER ;
 
+/* ---------------------------------------------------------------------------------------------------------------------
+                 FOROS - Valida las fechas de corte del foro y genera notas
+                         automaticas para los que no entreagaron
+-- ---------------------------------------------------------------------------------------------------------------------*/
+DROP PROCEDURE IF EXISTS validate_date_forums;
+DELIMITER $$
+CREATE PROCEDURE validate_date_forums()
+BEGIN
+    DECLARE current_period_id, cur_forum_id INT;
+    DECLARE cur_forum_fecha_corte DATETIME;
+    DECLARE cur_students_id , cur_students_id_pj INT;
+    DECLARE done1, done2 INT DEFAULT FALSE;
+	
+    -- primer cursor para obtener foros activos
+    DECLARE cursor_active_forums CURSOR FOR 
+        SELECT id, fecha_corte FROM mdtt_forum_semester WHERE estado = 'activo' AND id_periodo = current_period_id;
+	
+    -- segundo cursor para obtener a los estudiantes que no entregaron el foro
+	DECLARE cursor_students CURSOR FOR
+		SELECT aus.id, pj.id
+		FROM auth_membership aum 
+		INNER JOIN auth_user aus ON aum.user_id = aus.id
+		INNER JOIN auth_group aug ON aum.group_id = aug.id
+		INNER JOIN user_project usrp ON usrp.assigned_user = aus.id
+		INNER JOIN project pj ON usrp.project = pj.id
+		LEFT JOIN mdtt_forum mf ON aus.id = mf.id_estudiante AND mf.id_foro_semestre = cur_forum_id
+		WHERE aug.role = 'Student' 
+		  AND usrp.period = current_period_id 
+		  AND pj.area_level = 1 
+		  AND usrp.pro_bono = 'F' 
+		  AND mf.id_estudiante IS NULL;
+	
+    DECLARE CONTINUE HANDLER FOR NOT FOUND 
+    BEGIN
+        SET done1 = TRUE;
+        SET done2 = TRUE;
+    END;
+	
+    SET current_period_id = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
+	
+    OPEN cursor_active_forums;
+    active_forums_loop: LOOP
+        FETCH  cursor_active_forums INTO cur_forum_id, cur_forum_fecha_corte;
+        IF done1 THEN
+            LEAVE active_forums_loop;
+        END IF;
+        
+        -- se valida que la fecha de corte ya haya pasado
+        IF cur_forum_fecha_corte IS NOT NULL AND cur_forum_fecha_corte < NOW() THEN
+			UPDATE mdtt_forum_semester SET estado = 'inactivo' WHERE id = cur_forum_id;
+			OPEN cursor_students;
+			
+			students_loop: LOOP
+			FETCH cursor_students INTO cur_students_id, cur_students_id_pj;
+			IF done2 THEN
+				LEAVE students_loop;
+			END IF;
+			
+            INSERT INTO mdtt_forum(id_foro_semestre, id_estudiante, id_proyecto, estado, nota, fecha_calificacion, observaciones)
+            VALUES(cur_forum_id, cur_students_id, cur_students_id_pj, 'sin entrega', 0, NOW(), 'No entrego'); 
+			
+			END LOOP students_loop;
+			CLOSE cursor_students;
+			SET done2 = FALSE;
+			END IF;
+        
+    END LOOP active_forums_loop;
+    CLOSE cursor_active_forums;
+
+END$$
+DELIMITER ;
+
 -- ---------------------------------------------------------------------------------------------------------------------
 --                 FUNCIONES
 -- ---------------------------------------------------------------------------------------------------------------------

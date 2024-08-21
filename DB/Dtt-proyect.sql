@@ -85,8 +85,10 @@ CREATE TABLE mdtt_conference( -- conferencia
     nombre_video VARCHAR(512),
     reporte VARCHAR(512),
     video VARCHAR(512),
+    portada VARCHAR(512),
     nota DECIMAL(5,2) DEFAULT 0,
-    estado VARCHAR(30),
+    estado_calificacion VARCHAR(30),
+    estado_video VARCHAR(30),
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     fecha_calificacion datetime,
     observaciones VARCHAR(500),
@@ -96,6 +98,10 @@ CREATE TABLE mdtt_conference( -- conferencia
     CONSTRAINT FK_CONFERENCIA_ESTUDIANTE FOREIGN KEY(id_estudiante) REFERENCES auth_user(id),
     CONSTRAINT FK_CONFERENCIA_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
 );
+
+ALTER TABLE mdtt_conference CHANGE COLUMN estado estado_calificacion VARCHAR(30);
+ALTER TABLE mdtt_conference ADD COLUMN portada VARCHAR(512);
+desc mdtt_conference;
 
 CREATE TABLE mdtt_grade( -- calificacion
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -302,6 +308,11 @@ UPDATE auth_user
 SET password = (SELECT password FROM auth_user WHERE id = 3330)
 WHERE id = 5214;
 
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE id = 6286;
+
+
 select CURDATE();
 -- 947 --- 201325533
 -- 1529 -- 198830600
@@ -313,6 +324,8 @@ select CURDATE();
 -- 6788 -- 20050320
 -- 3371 --- 201602723
 -- 5214 --- 201905743
+-- 6286 --- 202002793
+
 
 select * from auth_user where first_name like '%JOSÉ VALERIO%' and last_name like '%CHOC MIJANGOS%';
 -- 13858 6257
@@ -751,7 +764,7 @@ INNER JOIN auth_membership autm ON usr.id = autm.user_id
 INNER JOIN auth_group aug ON aug.id = autm.group_id
 INNER JOIN user_project usrpj ON usr.id = usrpj.assigned_user 
 INNER JOIN period_year py ON usrpj.period = py.id
-WHERE aug.id = 3 AND py.id = 21;
+WHERE aug.id = 3 AND py.id = 22;
 
 
 SELECT id FROM period_year ORDER BY id DESC LIMIT 1;
@@ -792,3 +805,93 @@ INNER JOIN mdtt_rubric rub ON rs.id_rubrica = rub.id
 WHERE rub.tipo = 'conferencia' AND rub.estado = 'activo' AND rub.id_periodo = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
 
 SELECT id FROM mdtt_rubric WHERE tipo = 'foro' AND estado = 'activo' AND id_periodo = (SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1);
+
+
+
+-- -----------------------------------------------------------------------------------------------
+--                Query para sacar a todos los auxiliares que no han entregado un foro
+--       solo se deben de modificar el period
+-- -----------------------------------------------------------------------------------------------
+SELECT aus.id, aus.username, aus.first_name, aus.last_name,  pj.id ,pj.name, aug.role, usrp.period
+FROM auth_membership aum 
+INNER JOIN auth_user aus ON aum.user_id = aus.id
+INNER JOIN auth_group aug ON aum.group_id = aug.id
+INNER JOIN user_project usrp ON usrp.assigned_user = aus.id
+INNER JOIN project pj ON usrp.project = pj.id
+LEFT JOIN mdtt_forum mf ON aus.id = mf.id_estudiante AND mf.id_foro_semestre = 6
+WHERE aug.role = 'Student' 
+  AND usrp.period = 22 
+  AND pj.area_level = 1 
+  AND usrp.pro_bono = 'F' 
+  AND mf.id_estudiante IS NULL;
+  
+  SELECT id, fecha_corte FROM mdtt_forum_semester WHERE estado = 'activo' AND id_periodo = 22;
+
+-- SELECT (id - 1) FROM period_year ORDER BY id DESC LIMIT 1
+
+DROP PROCEDURE IF EXISTS validate_date_forums;
+DELIMITER $$
+CREATE PROCEDURE validate_date_forums()
+BEGIN
+    DECLARE current_period_id, cur_forum_id INT;
+    DECLARE cur_forum_fecha_corte DATETIME;
+    DECLARE cur_students_id , cur_students_id_pj INT;
+    DECLARE done1, done2 INT DEFAULT FALSE;
+
+    DECLARE cursor_active_forums CURSOR FOR 
+        SELECT id, fecha_corte FROM mdtt_forum_semester WHERE estado = 'activo' AND id_periodo = current_period_id;
+	
+	DECLARE cursor_students CURSOR FOR
+		SELECT aus.id, pj.id
+		FROM auth_membership aum 
+		INNER JOIN auth_user aus ON aum.user_id = aus.id
+		INNER JOIN auth_group aug ON aum.group_id = aug.id
+		INNER JOIN user_project usrp ON usrp.assigned_user = aus.id
+		INNER JOIN project pj ON usrp.project = pj.id
+		LEFT JOIN mdtt_forum mf ON aus.id = mf.id_estudiante AND mf.id_foro_semestre = cur_forum_id
+		WHERE aug.role = 'Student' 
+		  AND usrp.period = current_period_id 
+		  AND pj.area_level = 1 
+		  AND usrp.pro_bono = 'F' 
+		  AND mf.id_estudiante IS NULL;
+	
+    DECLARE CONTINUE HANDLER FOR NOT FOUND 
+    BEGIN
+        SET done1 = TRUE;
+        SET done2 = TRUE;
+    END;
+	
+    SET current_period_id = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
+	
+    OPEN cursor_active_forums;
+    active_forums_loop: LOOP
+        FETCH  cursor_active_forums INTO cur_forum_id, cur_forum_fecha_corte;
+        IF done1 THEN
+            LEAVE active_forums_loop;
+        END IF;
+        
+        IF cur_forum_fecha_corte IS NOT NULL AND cur_forum_fecha_corte < NOW() THEN
+			UPDATE mdtt_forum_semester SET estado = 'inactivo' WHERE id = cur_forum_id;
+			OPEN cursor_students;
+			
+			students_loop: LOOP
+			FETCH cursor_students INTO cur_students_id, cur_students_id_pj;
+			IF done2 THEN
+				LEAVE students_loop;
+			END IF;
+			
+            INSERT INTO mdtt_forum(id_foro_semestre, id_estudiante, id_proyecto, estado, nota, fecha_calificacion, observaciones)
+            VALUES(cur_forum_id, cur_students_id, cur_students_id_pj, 'sin entrega', 0, NOW(), 'No entrego'); 
+			
+			END LOOP students_loop;
+			CLOSE cursor_students;
+			SET done2 = FALSE;
+			END IF;
+        
+    END LOOP active_forums_loop;
+    CLOSE cursor_active_forums;
+
+END$$
+DELIMITER ;
+
+CALL validate_date_forums();
