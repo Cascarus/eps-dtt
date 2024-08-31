@@ -209,6 +209,61 @@ BEGIN
 END$$
 DELIMITER ;
 
+/* ---------------------------------------------------------------------------------------------------------------------
+                 FOROS - Valida las fechas de corte de las prorrogas de los foros
+-- ---------------------------------------------------------------------------------------------------------------------*/
+DROP PROCEDURE IF EXISTS validate_extention_date_forums;
+DELIMITER $$
+CREATE PROCEDURE validate_extention_date_forums()
+BEGIN
+    DECLARE current_period_id, cur_forum_id INT;
+    DECLARE cur_fecha_corte DATETIME;
+    DECLARE done1 INT DEFAULT FALSE;
+	
+    -- cursor para obtener foros con prorroga
+    DECLARE cursor_active_extentions CURSOR FOR 
+        -- SELECT mf.id, mf.estado, mfs.id_periodo, mfe.extention_date
+		SELECT mf.id, mfe.extention_date
+        FROM mdtt_forum mf
+		INNER JOIN mdtt_forum_semester mfs ON mf.id_foro_semestre = mfs.id
+		INNER JOIN (
+			SELECT id_forum as id, MAX(extention_date) AS extention_date
+			FROM mdtt_forum_extension
+			GROUP BY id_forum
+		) mfe ON mfe.id = mf.id
+		WHERE mf.estado = 'prorroga'
+			AND mfs.id_periodo = current_period_id;
+	
+    DECLARE CONTINUE HANDLER FOR NOT FOUND 
+    BEGIN
+        SET done1 = TRUE;
+    END;
+	
+    SET current_period_id = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
+	
+    OPEN cursor_active_extentions;
+    active_extentions: LOOP
+        FETCH  cursor_active_extentions INTO cur_forum_id, cur_fecha_corte;
+        IF done1 THEN
+            LEAVE active_extentions;
+        END IF;
+        
+        -- se valida que la fecha de corte ya haya pasado
+        IF cur_fecha_corte IS NOT NULL AND cur_fecha_corte < NOW() THEN
+			UPDATE mdtt_forum 
+            SET 
+				estado = 'sin entrega',
+                fecha_calificacion = NOW(),
+                observaciones = 'No entrego'
+			WHERE id = cur_forum_id;
+		END IF;
+        
+    END LOOP active_extentions;
+    CLOSE cursor_active_extentions;
+
+END$$
+DELIMITER ;
+
 -- ---------------------------------------------------------------------------------------------------------------------
 --                 FUNCIONES
 -- ---------------------------------------------------------------------------------------------------------------------
