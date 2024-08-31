@@ -149,7 +149,19 @@ CREATE TABLE mdtt_conference_tag( -- conferencia_tag
     CONSTRAINT FK_CONFERENCIA_TAG_CONFERENCIA FOREIGN KEY(id_conferencia) REFERENCES mdtt_conference(id)
 );
 
+CREATE TABLE mdtt_forum_extension(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    id_forum int,
+    id_dsi INT,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    extention_date datetime,
+    late_delivery_penalty smallint, -- 1 -> se penaliza; 0 --> no se penaliza
+    
+    CONSTRAINT FK_FORUM_EXTENSION_FORUM FOREIGN KEY(id_forum) REFERENCES mdtt_forum(id),
+    CONSTRAINT FK_FORUM_EXTENSION_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
+);
 
+DROP TABLE mdtt_forum_extension;
 DROP TABLE mdtt_professor_profile;
 DROP TABLE mdtt_penalty_detail;
 DROP TABLE mdtt_grade_detail;
