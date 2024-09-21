@@ -5,6 +5,13 @@ USE cpfecys_scheduler;
 drop database cpfecys;
 drop database cpfecys_scheduler;
 
+CREATE TABLE mdtt_parameters(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    mdtt_parameter_name VARCHAR(500),
+    mdtt_parameter_value_string VARCHAR(500),
+    mdtt_parameter_value_number DECIMAL(5,2)
+);
+
 CREATE TABLE mdtt_forum_semester( -- foro_semestre
 	id int auto_increment PRIMARY KEY,
     nombre_foro VARCHAR(500),
@@ -178,6 +185,14 @@ DROP TABLE mdtt_forum_semester;
 -- ---------------------------------------------------------------------------------------------------------------------
 --                    INSERTS
 -- ---------------------------------------------------------------------------------------------------------------------
+insert into mdtt_parameters(mdtt_parameter_name, mdtt_parameter_value_number)
+values('penalizacion por entrega tarde en %', 50.00);
+
+insert into mdtt_parameters(mdtt_parameter_name, mdtt_parameter_value_number)
+values('id del item para proceso marin', 50.00);
+
+select * from mdtt_parameters;
+
 insert into mdtt_forum_semester(nombre_foro, fecha_corte, fecha_apertura,estado, id_periodo)
 values('Foro 1', '2024-02-12 23:59:59', '2024-02-11', 'activo', 21);
 insert into mdtt_forum_semester(nombre_foro, fecha_corte, fecha_apertura,estado, id_periodo)
@@ -325,6 +340,9 @@ UPDATE auth_user
 SET password = (SELECT password FROM auth_user WHERE id = 3330)
 WHERE id = 6286;
 
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE id = 6489;
 
 select CURDATE();
 -- 947 --- 201325533
@@ -338,6 +356,7 @@ select CURDATE();
 -- 3371 --- 201602723
 -- 5214 --- 201905743
 -- 6286 --- 202002793
+-- 6489 --- 202004725
 
 
 select * from auth_user where first_name like '%JOSÉ VALERIO%' and last_name like '%CHOC MIJANGOS%';
@@ -489,7 +508,7 @@ INNER JOIN auth_group aug ON aug.id = autm.group_id
 INNER JOIN user_project usrpj ON usr.id = usrpj.assigned_user 
 INNER JOIN project prj ON usrpj.project = prj.id
 INNER JOIN period_year py ON usrpj.period = py.id
-WHERE aug.id = 3 AND py.id = 21;
+WHERE aug.id = 2 AND py.id = 22;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 --                 BUSQUEDA - busqueda de cursos de los catedraticos para el directorio
