@@ -208,6 +208,77 @@ BEGIN
 END$$
 DELIMITER ;
 
+/* ---------------------------------------------------------------------------------------------------------------------
+                 CONFERENCIAS - Valida las fechas de corte del foro y genera notas
+                         automaticas para los que no entreagaron
+-- ---------------------------------------------------------------------------------------------------------------------*/
+DROP PROCEDURE IF EXISTS validate_date_conferences;
+DELIMITER $$
+CREATE PROCEDURE validate_date_conferences()
+BEGIN
+    DECLARE current_period_id, cur_conference_id INT;
+    DECLARE cur_conference_fecha_corte DATETIME;
+    DECLARE cur_students_id , cur_students_id_pj INT;
+    DECLARE done INT DEFAULT FALSE;
+    
+    -- primer cursor para obtener foros activos
+    DECLARE cursor_active_conferences CURSOR FOR 
+        SELECT id, fecha_corte FROM mdtt_conference_semester WHERE estado = 'activo' AND id_periodo = current_period_id;
+    
+    -- segundo cursor para obtener a los estudiantes que no entregaron el foro
+    DECLARE cursor_students CURSOR FOR
+        SELECT aus.id, pj.id
+        FROM auth_membership aum 
+        INNER JOIN auth_user aus ON aum.user_id = aus.id
+        INNER JOIN auth_group aug ON aum.group_id = aug.id
+        INNER JOIN user_project usrp ON usrp.assigned_user = aus.id
+        INNER JOIN project pj ON usrp.project = pj.id
+        LEFT JOIN mdtt_conference mf ON aus.id = mf.id_estudiante AND mf.id_conference_semester = cur_conference_id and mf.id_proyecto = pj.id
+        WHERE aug.role = 'Student' 
+          AND usrp.period = current_period_id 
+          AND pj.area_level = 1 
+          AND usrp.pro_bono = 'F' 
+          AND mf.id_estudiante IS NULL;
+    
+    -- Un solo handler para ambos cursores
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    SET current_period_id = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
+    
+    OPEN cursor_active_conferences;
+    active_conferences_loop: LOOP
+        FETCH cursor_active_conferences INTO cur_conference_id, cur_conference_fecha_corte;
+        IF done THEN
+            LEAVE active_conferences_loop;
+        END IF;
+        
+        -- se valida que la fecha de corte ya haya pasado
+        IF cur_conference_fecha_corte IS NOT NULL AND cur_conference_fecha_corte < NOW() THEN
+            UPDATE mdtt_conference_semester SET estado = 'inactivo' WHERE id = cur_conference_id;
+            
+            SET done = FALSE;
+            OPEN cursor_students;
+            
+            students_loop: LOOP
+                FETCH cursor_students INTO cur_students_id, cur_students_id_pj;
+                IF done THEN
+                    LEAVE students_loop;
+                END IF;
+                
+                INSERT INTO mdtt_conference(id_conference_semester, id_estudiante, id_proyecto, estado_calificacion, nota, fecha_calificacion, observaciones, id_periodo)
+                VALUES(cur_conference_id, cur_students_id, cur_students_id_pj, 'sin entrega', 0, NOW(), 'No entrego', current_period_id);  
+            
+            END LOOP students_loop;
+            CLOSE cursor_students;
+        END IF;
+        
+        SET done = FALSE;
+    END LOOP active_conferences_loop;
+    CLOSE cursor_active_conferences;
+
+END$$
+DELIMITER ;
+
 
 /* ---------------------------------------------------------------------------------------------------------------------
                  FOROS - Valida las fechas de corte de las prorrogas de los foros

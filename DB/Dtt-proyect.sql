@@ -21,6 +21,14 @@ CREATE TABLE mdtt_forum_semester( -- foro_semestre
     id_periodo int -- id del periodo 
 );
 
+CREATE TABLE mdtt_conference_semester( -- conference_semeste
+	id int auto_increment PRIMARY KEY,
+    fecha_corte DATETIME, -- fecha en la que se deja de recibir respuestas
+    fecha_apertura DATETIME, -- fecha en la que inicia a recibir respuestas
+    estado VARCHAR(30), -- activo, finalizado, eliminado
+    id_periodo int -- id del periodo 
+);
+
 CREATE TABLE mdtt_penalty( -- penalizacion
 	id int auto_increment PRIMARY KEY,
     nombre VARCHAR(100),
@@ -88,7 +96,8 @@ CREATE TABLE mdtt_conference( -- conferencia
     id_proyecto INT,
     id_estudiante INT,
     id_dsi INT,
-    id_periodo int, -- id del periodo 
+    id_periodo int, -- id del periodo ,
+	id_conference_semester int,
     nombre_video VARCHAR(512),
     reporte VARCHAR(512),
     video VARCHAR(512),
@@ -103,12 +112,14 @@ CREATE TABLE mdtt_conference( -- conferencia
     
     CONSTRAINT FK_CONFERENCIA_PROYECTO FOREIGN KEY(id_proyecto) REFERENCES project(id),
     CONSTRAINT FK_CONFERENCIA_ESTUDIANTE FOREIGN KEY(id_estudiante) REFERENCES auth_user(id),
-    CONSTRAINT FK_CONFERENCIA_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
+    CONSTRAINT FK_CONFERENCIA_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id),
+    CONSTRAINT FK_CONFERENCE_SEMESTER FOREIGN KEY(id_conference_semester) REFERENCES mdtt_conference_semester(id)
 );
 
-ALTER TABLE mdtt_conference CHANGE COLUMN estado estado_calificacion VARCHAR(30);
-ALTER TABLE mdtt_conference ADD COLUMN portada VARCHAR(512);
-desc mdtt_conference;
+-- ALTER TABLE mdtt_conference CHANGE COLUMN estado estado_calificacion VARCHAR(30);
+-- ALTER TABLE mdtt_conference ADD COLUMN portada VARCHAR(512);
+-- ALTER TABLE mdtt_conference ADD COLUMN id_conference_semester int;
+-- ALTER TABLE mdtt_conference ADD CONSTRAINT FK_CONFERENCE_SEMESTER FOREIGN KEY(id_conference_semester) REFERENCES mdtt_conference_semester(id);
 
 CREATE TABLE mdtt_grade( -- calificacion
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -181,6 +192,7 @@ DROP TABLE mdtt_penalty;
 DROP TABLE mdtt_rubric_section;
 DROP TABLE mdtt_rubric;
 DROP TABLE mdtt_forum_semester;
+DROP TABLE mdtt_conference_semester;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 --                    INSERTS
@@ -533,7 +545,6 @@ INNER JOIN user_project usrpj ON usr.id = usrpj.assigned_user
 INNER JOIN project prj ON usrpj.project = prj.id
 INNER JOIN period_year py ON usrpj.period = py.id
 WHERE aug.id = 3 AND py.id = 19 AND usr.id = 245;
-
 
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -928,3 +939,4 @@ DELIMITER ;
 
 CALL validate_date_forums();
 CALL validate_extention_date_forums();
+CALL validate_date_conferences();
