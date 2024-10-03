@@ -9,7 +9,9 @@ CREATE TABLE mdtt_parameters(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     mdtt_parameter_name VARCHAR(500),
     mdtt_parameter_value_string VARCHAR(500),
-    mdtt_parameter_value_number DECIMAL(5,2)
+    mdtt_parameter_value_number DECIMAL(5,2),
+    updated_by INT,
+    updated_date datetime
 );
 
 CREATE TABLE mdtt_forum_semester( -- foro_semestre
@@ -106,6 +108,7 @@ CREATE TABLE mdtt_conference( -- conferencia
     estado_calificacion VARCHAR(30),
     estado_video VARCHAR(30),
     fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    fecha_realizacion datetime,
     fecha_calificacion datetime,
     observaciones VARCHAR(500),
     descripcion VARCHAR(1000),
@@ -117,7 +120,7 @@ CREATE TABLE mdtt_conference( -- conferencia
 );
 
 -- ALTER TABLE mdtt_conference CHANGE COLUMN estado estado_calificacion VARCHAR(30);
--- ALTER TABLE mdtt_conference ADD COLUMN portada VARCHAR(512);
+ALTER TABLE mdtt_conference ADD COLUMN fecha_realizacion datetime;
 -- ALTER TABLE mdtt_conference ADD COLUMN id_conference_semester int;
 -- ALTER TABLE mdtt_conference ADD CONSTRAINT FK_CONFERENCE_SEMESTER FOREIGN KEY(id_conference_semester) REFERENCES mdtt_conference_semester(id);
 
@@ -179,6 +182,18 @@ CREATE TABLE mdtt_forum_extension(
     CONSTRAINT FK_FORUM_EXTENSION_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
 );
 
+CREATE TABLE mdtt_conference_extension(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    id_conference int,
+    id_dsi INT,
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    extention_date datetime,
+    late_delivery_penalty smallint, -- 1 -> se penaliza; 0 --> no se penaliza
+    
+    CONSTRAINT FK_CONFERENCE_EXTENSION_CONFERENCE FOREIGN KEY(id_conference) REFERENCES mdtt_conference(id),
+    CONSTRAINT FK_CONFERENCE_EXTENSION_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
+);
+
 DROP TABLE mdtt_forum_extension;
 DROP TABLE mdtt_professor_profile;
 DROP TABLE mdtt_penalty_detail;
@@ -193,6 +208,7 @@ DROP TABLE mdtt_rubric_section;
 DROP TABLE mdtt_rubric;
 DROP TABLE mdtt_forum_semester;
 DROP TABLE mdtt_conference_semester;
+DROP TABLE mdtt_parameters;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 --                    INSERTS
@@ -355,6 +371,18 @@ WHERE id = 6286;
 UPDATE auth_user
 SET password = (SELECT password FROM auth_user WHERE id = 3330)
 WHERE id = 6489;
+
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE id = 6489;
+
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE id = 4101;
+
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE id = 4115;
 
 select CURDATE();
 -- 947 --- 201325533
@@ -937,6 +965,12 @@ BEGIN
 END$$
 DELIMITER ;
 
+
+CALL create_current_teacher_directory();
+CALL create_current_rubric_forum();
+CALL create_current_rubric_conference();
+
 CALL validate_date_forums();
 CALL validate_extention_date_forums();
 CALL validate_date_conferences();
+CALL validate_extention_date_conferences();

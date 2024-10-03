@@ -1,4 +1,36 @@
 -- ---------------------------------------------------------------------------------------------------------------------
+--                 FUNCIONES
+-- ---------------------------------------------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 PERFIL CATEDRATICO - verifica si el usuario cuenta con data vieja 
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS verify_older_teacher_data;
+DELIMITER //
+CREATE FUNCTION verify_older_teacher_data(
+    dir_teacher_id INT
+)
+RETURNS BOOL
+BEGIN
+    DECLARE res BOOL;
+    DECLARE condicion INT;
+
+    SET condicion = (
+        SELECT COUNT(id)
+        FROM mdtt_professor_profile
+        WHERE user_id = dir_teacher_id
+    );
+
+    IF condicion > 0 THEN
+        SET res = TRUE; -- el usuario si tiene registro en la tabla 
+    ELSE
+        SET res = FALSE; -- el usuario no tiene ningun registro en la tabla
+    END IF;
+
+    RETURN res;
+END; //
+DELIMITER ;
+
+-- ---------------------------------------------------------------------------------------------------------------------
 --                 PROCEDIMIENTOS
 -- ---------------------------------------------------------------------------------------------------------------------
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -389,37 +421,3 @@ BEGIN
 
 END$$
 DELIMITER ;
-
--- ---------------------------------------------------------------------------------------------------------------------
---                 FUNCIONES
--- ---------------------------------------------------------------------------------------------------------------------
--- ---------------------------------------------------------------------------------------------------------------------
---                 PERFIL CATEDRATICO - verifica si el usuario cuenta con data vieja 
--- ---------------------------------------------------------------------------------------------------------------------
-DROP FUNCTION IF EXISTS verify_older_teacher_data;
-DELIMITER //
-CREATE FUNCTION verify_older_teacher_data(
-    dir_teacher_id INT
-)
-RETURNS BOOL
-BEGIN
-    DECLARE res BOOL;
-    DECLARE condicion INT;
-
-    SET condicion = (
-        SELECT COUNT(id)
-        FROM mdtt_professor_profile
-        WHERE user_id = dir_teacher_id
-    );
-
-    IF condicion > 0 THEN
-        SET res = TRUE; -- el usuario si tiene registro en la tabla 
-    ELSE
-        SET res = FALSE; -- el usuario no tiene ningun registro en la tabla
-    END IF;
-
-    RETURN res;
-END; //
-DELIMITER ;
-
-SELECT verify_older_teacher_data(6257);
