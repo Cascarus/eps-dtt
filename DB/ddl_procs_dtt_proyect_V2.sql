@@ -10,6 +10,8 @@ CREATE FUNCTION verify_older_teacher_data(
     dir_teacher_id INT
 )
 RETURNS BOOL
+DETERMINISTIC
+READS SQL DATA
 BEGIN
     DECLARE res BOOL;
     DECLARE condicion INT;
@@ -76,7 +78,7 @@ BEGIN
 			-- Insercion de los datos basicos que tenga el catedratico en su usuario
 			SET cur_period_year = (SELECT id FROM period_year ORDER BY id DESC LIMIT 1);
 			INSERT INTO mdtt_professor_profile(user_id, nombre, apellido, foto, correo, semblanza, formacion, id_periodo)
-            VALUES(cur_usr_id, cur_name, cur_last_name, 'Defecto.png', cur_email , '' , '', cur_period_year);
+            VALUES(cur_usr_id, cur_name, cur_last_name, 'mdtt_professor_profile.foto.Defecto.png', cur_email , '' , '', cur_period_year);
         END IF;
     END LOOP loop_List;
 END; $$
@@ -419,5 +421,91 @@ BEGIN
     END LOOP active_extentions;
     CLOSE cursor_active_extentions;
 
+END$$
+DELIMITER ;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 CONFERENCIAS - creacion del encabezado de las conferencias
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP PROCEDURE IF EXISTS create_current_conference_header;
+DELIMITER $$
+CREATE PROCEDURE create_current_conference_header()
+BEGIN
+	
+    DECLARE cur_period_year, cur_semester, cur_limit_days INT;
+    DECLARE cur_nueva_fecha_corte DATETIME;
+    
+    SELECT id, period
+    INTO cur_period_year, cur_semester
+    FROM period_year
+    order by id DESC
+    LIMIT 1;
+    
+    SELECT ir.limit_days
+    INTO cur_limit_days
+	FROM item_restriction ir
+	INNER JOIN mdtt_parameters mp ON ir.id = mp.mdtt_parameter_value_number
+	WHERE mp.id = 2; -- id del registro en la tabla mdtt_parameters
+    
+    
+    IF cur_semester = 1 THEN
+        SET cur_nueva_fecha_corte = DATE_ADD('2024-01-02 00:00:00', interval (cur_limit_days - 1) day);
+		
+        INSERT INTO mdtt_conference_semester(fecha_corte, fecha_apertura, estado, id_periodo)
+        VALUES (cur_nueva_fecha_corte,'2024-01-02 00:00:00','activo',cur_period_year);
+        
+	ELSEIF cur_semester = 2 THEN
+		SET cur_nueva_fecha_corte = DATE_ADD('2024-06-02 00:00:00', interval (cur_limit_days - 1) day);
+		
+        INSERT INTO mdtt_conference_semester(fecha_corte, fecha_apertura, estado, id_periodo)
+        VALUES (cur_nueva_fecha_corte,'2024-06-02 00:00:00','activo',cur_period_year);
+    END IF;
+
+END; $$
+DELIMITER ;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 TRIGGERS
+-- ---------------------------------------------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 Conferencias - Modificacion automatica de la duracion de la conferencia
+-- 								  en base a item restriction
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP TRIGGER IF EXISTS mdtt_after_item_restriction_update
+DELIMITER $$
+CREATE TRIGGER mdtt_after_item_restriction_update
+AFTER UPDATE ON item_restriction
+FOR EACH ROW
+BEGIN
+    DECLARE v_period INT;
+    DECLARE id_header INT;
+    DECLARE v_fecha_apertura DATETIME;
+    DECLARE v_nueva_fecha_corte DATETIME;
+    
+    -- Obtener el id del periodo más reciente
+    SELECT id
+    INTO v_period
+    FROM period_year
+    ORDER BY id DESC
+    LIMIT 1;
+    
+    -- Verificar si el campo limit_days fue actualizado
+    IF NEW.limit_days IS NOT NULL AND NEW.limit_days > 0 THEN
+        -- Obtener la fecha_apertura de la tabla mdtt_conference_semester que corresponde al id_periodo
+        SELECT id, fecha_apertura
+        INTO id_header, v_fecha_apertura
+        FROM mdtt_conference_semester
+        WHERE id_periodo = v_period AND estado = 'activo'
+        LIMIT 1;
+        
+        -- Calcular la nueva fecha de corte sumando limit_days a fecha_apertura
+        SET v_nueva_fecha_corte = DATE_ADD(v_fecha_apertura, INTERVAL (NEW.limit_days - 1) DAY);
+        
+        -- Actualizar la fecha_corte en la tabla mdtt_conference_semester
+        UPDATE mdtt_conference_semester
+        SET fecha_corte = v_nueva_fecha_corte
+        WHERE id = id_header;
+    END IF;
+    
 END$$
 DELIMITER ;
