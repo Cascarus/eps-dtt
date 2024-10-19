@@ -182,3 +182,12 @@ CREATE TABLE mdtt_conference_extension(
     CONSTRAINT FK_CONFERENCE_EXTENSION_CONFERENCE FOREIGN KEY(id_conference) REFERENCES mdtt_conference(id),
     CONSTRAINT FK_CONFERENCE_EXTENSION_DSI FOREIGN KEY(id_dsi) REFERENCES auth_user(id)
 );
+
+CREATE TABLE mdtt_grading_user(
+	id INT AUTO_INCREMENT PRIMARY KEY,
+    id_dsi INT,
+    id_conference INT,
+    id_forum INT,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	estado VARCHAR(30) 
+);
