@@ -384,6 +384,10 @@ UPDATE auth_user
 SET password = (SELECT password FROM auth_user WHERE id = 3330)
 WHERE id = 4115;
 
+UPDATE auth_user
+SET password = (SELECT password FROM auth_user WHERE id = 3330)
+WHERE username = '201700945';
+
 select CURDATE();
 -- 947 --- 201325533
 -- 1529 -- 198830600

@@ -1,8 +1,8 @@
 CREATE TABLE mdtt_parameters(
 	id INT AUTO_INCREMENT PRIMARY KEY,
     mdtt_parameter_name VARCHAR(500),
-    mdtt_parameter_value_string VARCHAR(500),
     mdtt_parameter_value_number DECIMAL(5,2),
+    tipo INT, -- 1: entrega tarde 2: item 3: foros 4:conferenecias 5: catedraticos
     updated_by INT,
     updated_date datetime
 );

@@ -216,7 +216,7 @@ BEGIN
         END IF;
         
         -- se valida que la fecha de corte ya haya pasado
-        IF cur_forum_fecha_corte IS NOT NULL AND cur_forum_fecha_corte < NOW() THEN
+        IF cur_forum_fecha_corte IS NOT NULL AND cur_forum_fecha_corte <= NOW() THEN
             UPDATE mdtt_forum_semester SET estado = 'inactivo' WHERE id = cur_forum_id;
             
             SET done = FALSE;
@@ -287,7 +287,7 @@ BEGIN
         END IF;
         
         -- se valida que la fecha de corte ya haya pasado
-        IF cur_conference_fecha_corte IS NOT NULL AND cur_conference_fecha_corte < NOW() THEN
+        IF cur_conference_fecha_corte IS NOT NULL AND cur_conference_fecha_corte <= NOW() THEN
             UPDATE mdtt_conference_semester SET estado = 'inactivo' WHERE id = cur_conference_id;
             
             SET done = FALSE;
@@ -354,7 +354,7 @@ BEGIN
         END IF;
         
         -- se valida que la fecha de corte ya haya pasado
-        IF cur_fecha_corte IS NOT NULL AND cur_fecha_corte < NOW() THEN
+        IF cur_fecha_corte IS NOT NULL AND cur_fecha_corte <= NOW() THEN
 			UPDATE mdtt_forum 
             SET 
 				estado = 'sin entrega',
@@ -409,7 +409,7 @@ BEGIN
         END IF;
         
         -- se valida que la fecha de corte ya haya pasado
-        IF cur_fecha_corte IS NOT NULL AND cur_fecha_corte < NOW() THEN
+        IF cur_fecha_corte IS NOT NULL AND cur_fecha_corte <= NOW() THEN
 			UPDATE mdtt_conference 
             SET 
 				estado_calificacion = 'sin entrega',
@@ -471,7 +471,7 @@ DELIMITER ;
 --                 Conferencias - Modificacion automatica de la duracion de la conferencia
 -- 								  en base a item restriction
 -- ---------------------------------------------------------------------------------------------------------------------
-DROP TRIGGER IF EXISTS mdtt_after_item_restriction_update
+DROP TRIGGER IF EXISTS mdtt_after_item_restriction_update;
 DELIMITER $$
 CREATE TRIGGER mdtt_after_item_restriction_update
 AFTER UPDATE ON item_restriction
@@ -507,5 +507,64 @@ BEGIN
         WHERE id = id_header;
     END IF;
     
+END$$
+DELIMITER ;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 EVENTS
+-- ---------------------------------------------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 Evento que se encarga de validar las fechas de corte de foros y conferencias
+-- 								  en base a item restriction
+-- ---------------------------------------------------------------------------------------------------------------------
+-- correr este comando para iniciar siempre el scheduler
+SET GLOBAL event_scheduler=ON;
+
+DROP EVENT IF EXISTS mdtt_check_dates_forum_conference;
+DELIMITER $$
+CREATE EVENT mdtt_check_dates_forum_conference
+ON SCHEDULE EVERY 1 HOUR
+STARTS CURRENT_DATE - INTERVAL 1 DAY -- Empieza a la medianoche de ayer
+ON COMPLETION PRESERVE
+DO
+BEGIN
+    CALL validate_date_forums();
+	CALL validate_extention_date_forums();
+	CALL validate_date_conferences();
+	CALL validate_extention_date_conferences();
+END$$
+DELIMITER ;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+--                 Evento que se encarga de crear las fichas de los catedraticos
+--                          y el encabezado de las conferencias para el semestre
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Evento para ejecutar el procedimiento de creación de encabezado de conferencia para el semestre 1
+
+DROP EVENT IF EXISTS mdtt_create_conference_header_semester_1;
+DELIMITER $$
+CREATE EVENT mdtt_create_conference_header_semester_1
+ON SCHEDULE EVERY 1 YEAR
+STARTS '2024-01-02 00:00:00' -- Ejecutar cada 2 de enero
+ON COMPLETION PRESERVE -- Mantén el evento para que se ejecute cada año
+DO
+BEGIN
+    CALL create_current_teacher_directory();
+	CALL create_current_conference_header();
+END$$
+DELIMITER ;
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Evento para ejecutar el procedimiento de creación de encabezado de conferencia para el semestre 2
+
+DROP EVENT IF EXISTS mdtt_create_conference_header_semester_2;
+DELIMITER $$
+CREATE EVENT mdtt_create_conference_header_semester_2
+ON SCHEDULE EVERY 1 YEAR
+STARTS '2024-06-02 00:00:00' -- Ejecutar cada 2 de junio
+ON COMPLETION PRESERVE -- Mantén el evento para que se ejecute cada año
+DO
+BEGIN
+    CALL create_current_teacher_directory();
+	CALL create_current_conference_header();
 END$$
 DELIMITER ;
